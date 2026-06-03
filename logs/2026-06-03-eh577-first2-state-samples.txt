@@ -1,0 +1,1 @@
+Failed to read camera specified in the 'device_path' config option, aborting

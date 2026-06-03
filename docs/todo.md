@@ -10,11 +10,14 @@
 - [x] Check for existing local Linux OEM blobs / userspace components
 - [x] Prove or disprove EH575 bulk-protocol compatibility on live EH577 hardware
 - [ ] Check for OEM Windows driver packages that mention EH577
-- [ ] Replay the full EH575 post-init sequence on EH577
-- [ ] Determine whether `64 14 ec` returns a `5356`-byte payload on EH577
-- [ ] Poll interrupt endpoints `0x83` / `0x84` during idle and init
+- [x] Replay the full EH575 post-init sequence on EH577
+- [x] Determine whether `64 14 ec` returns a `5356`-byte payload on EH577
+- [x] Poll interrupt endpoints `0x83` / `0x84` during idle and init
 - [x] Build an initial EH577 libfprint driver skeleton by adapting `egis0575`
-- [ ] Reconcile the `01 01 01` response on `EGIS 60 01 fc` with the EH575 pre-init branch logic
+- [ ] Characterize EH577 state variation on `EGIS 60 00/01 fc` (`aa` vs `ab`, `01` vs `05`)
+- [ ] Save and analyze the raw `5356`-byte payload from `64 14 ec`
+- [ ] Poll interrupts while physically touching/removing a finger
+- [ ] Reconcile the earlier `01 01 01` response with the EH575 pre-init branch logic
 
 ## Likely deeper reverse-engineering work
 

@@ -376,6 +376,20 @@ Observed successful exchanges:
 5. `EGIS 63 26 06 06 60 06 05 2f 06`
    -> `SIGE 26 06 01 06 60 06 05 2f 06`
 
+#### Important nuance discovered after comparing with the EH575 driver logic
+
+The EH575 patch does **not** simply continue after packet 1.
+
+- In `egis0575.c`, when the response to `EGIS 60 01 fc` has byte 5 equal to `0x01`, the driver switches into the longer `PRE_INIT` sequence.
+- Our first raw probe kept sending later post-init packets anyway, and EH577 still accepted them.
+
+This means one of two things is true:
+
+1. EH577 is permissive and accepts both paths, or
+2. our first probe proved wire compatibility but not yet the *canonical* init path.
+
+So future probing should prefer an **auto-init** mode that follows the EH575 branch rule.
+
 This is the strongest finding so far.
 
 #### What this proves
@@ -392,10 +406,115 @@ So EH577 is no longer just *suspected* to be similar to EH575; it has now been s
 - Some `sudo` invocations worked during probing, but later attempts became inconsistent and started requiring interactive authentication again.
 - Because of that, a full replay of all 18 EH575 post-init packets and interrupt polling is still pending.
 
+### Additional artifacts created after the first live probe
+
+#### Improved standalone probe
+
+`tools/eh577_usbfs_probe.c` was expanded to include:
+
+- `reset` mode via `USBDEVFS_RESET`
+- proper interrupt URB polling for endpoints `0x83` / `0x84`
+- explicit `eh575-preinit`, `eh575-postinit`, and `eh575-repeat` modes
+- `eh575-auto` mode that follows the EH575 branch rule and switches into pre-init when packet `60 01 fc` returns the `01 01 01` state
+
+This should reduce ambiguity in future captures and make it easier to identify the first real divergence.
+
+#### WIP libfprint port base
+
+A local driver work area now exists under `wip-libfprint/`:
+
+- `wip-libfprint/drivers/egis0575.c`
+- `wip-libfprint/drivers/egis0575.h`
+  - extracted from the EH575 patch for direct local reference
+- `wip-libfprint/drivers/egis0577.c`
+- `wip-libfprint/drivers/egis0577.h`
+  - first EH577 draft derived from the EH575 driver skeleton
+
+Current status of the EH577 draft:
+
+- device ID changed to `1c7a:0577`
+- component / full-name strings renamed to EH577
+- sequence tables still intentionally mirror EH575 until live captures show otherwise
+- interrupt endpoints are still not integrated into the libfprint draft yet
+
+## 2026-06-03 — full EH575 post-init replay on real EH577
+
+Using `build/eh577_usbfs_probe` with a direct usbfs reset before each run:
+
+### Full `eh575-auto` / post-init sequence result
+
+A complete 18-packet EH575 post-init replay succeeded on EH577 with no protocol errors.
+
+Important observed responses:
+
+- `60 00 fc` -> `SIGE 00 aa 01` on one run, `SIGE 00 ab 01` on later runs
+- `60 01 fc` -> `SIGE 01 05 01` on repeated reset-based runs
+  - this is different from the earlier one-off observation `SIGE 01 01 01`
+- `60 40 fc` -> `SIGE 40 80 01`
+- `62 67 03` -> 10-byte response `53 49 47 45 67 03 01 00 00 00`
+- `64 14 ec` -> **5356-byte response received successfully**
+
+This is a major milestone:
+
+- EH577 does not just accept a few early EH575 packets
+- it accepts the **entire EH575 post-init sequence** that was replayed
+- it returns the same response lengths expected by the EH575 driver, including the large `5356`-byte payload
+
+### Large payload observation
+
+The `64 14 ec` payload returned on these runs was all zeros in the visible leading/trailing bytes logged by the probe.
+
+Interpretation is still open:
+
+- the device may need extra state or finger interaction before meaningful image data appears
+- the current sequence may only fetch a blank / dark frame when idle
+- the EH575 driver's pre-init / repeat path may still matter for getting usable capture data
+
+### Interrupt endpoint observation so far
+
+Two interrupt-poll runs were performed with the standalone probe:
+
+- one after reset while idle
+- one after a successful post-init replay
+
+Both runs produced **no interrupt payloads** on endpoints `0x83` or `0x84` within the short polling window used by the probe.
+
+This suggests one of:
+
+- interrupts are only emitted on finger events
+- interrupts require a different arming sequence
+- the OEM stack may use them opportunistically rather than mandatorily for basic bulk transport
+
+### State variability discovered
+
+Earlier, a one-off manual run observed:
+
+- `60 01 fc` -> `SIGE 01 01 01`
+
+After explicit usbfs resets, repeated runs instead observed:
+
+- `60 01 fc` -> `SIGE 01 05 01`
+
+And `60 00 fc` toggled between:
+
+- `SIGE 00 aa 01`
+- `SIGE 00 ab 01`
+
+So EH577 clearly has **internal state-dependent response variation** even while remaining EH575-compatible at the framing/length level.
+
+This is now one of the most important reverse-engineering clues.
+
+### Access / tooling friction note
+
+- `sudo -n` worked for the successful reset and probe runs above.
+- a later attempt to automate repeated reset+probe loops failed because sudo credentials were no longer available non-interactively.
+
+So more repetition and `usbmon` capture should proceed with an explicit fresh sudo authentication step.
+
 ### Practical next actions after this batch
 
-1. Replay the remainder of the EH575 post-init sequence on EH577.
-2. Check whether packet `64 14 ec` yields a `5356`-byte image-like payload on EH577.
-3. Poll interrupt endpoints `0x83` and `0x84` before/after init.
-4. Capture `usbmon` traces for these experiments.
-5. Start a new EH577 driver skeleton by adapting the EH575 transport logic.
+1. Repeat the first two post-init packets several times with stable sudo auth to characterize `aa`/`ab` and `01`/`05` state changes.
+2. Modify the probe to dump the full `5356`-byte payload to a file for entropy/image analysis.
+3. Poll interrupts while a finger is physically placed/removed from the sensor.
+4. Capture `usbmon` traces for reset, post-init, and finger interaction.
+5. Update the EH577 libfprint draft once the state-machine branching is better understood.

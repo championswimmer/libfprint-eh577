@@ -168,6 +168,47 @@ static void usage(const char *argv0) {
           argv0, argv0, argv0, argv0, argv0, argv0);
 }
 
+static void sanitize_name(const char *in, char *out, size_t out_sz) {
+  size_t j = 0;
+  for (size_t i = 0; in[i] && j + 1 < out_sz; i++) {
+    char c = in[i];
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+      out[j++] = c;
+    else
+      out[j++] = '_';
+  }
+  out[j] = '\0';
+}
+
+static void maybe_dump_response(const char *label, int index, const char *pkt_name,
+                                const uint8_t *buf, int len) {
+  const char *dir = getenv("EH577_DUMP_DIR");
+  if (!dir || !*dir)
+    return;
+
+  char safe[128];
+  char path[512];
+  sanitize_name(pkt_name, safe, sizeof(safe));
+  snprintf(path, sizeof(path), "%s/%s-%02d-%s.bin", dir, label, index, safe);
+
+  FILE *fp = fopen(path, "wb");
+  if (!fp) {
+    fprintf(stderr, "dump open failed for %s: %s\n", path, strerror(errno));
+    return;
+  }
+  fwrite(buf, 1, len, fp);
+  fclose(fp);
+  printf("  dumped to %s\n", path);
+}
+
+static void print_payload_stats(const uint8_t *buf, int len) {
+  int nonzero = 0;
+  for (int i = 0; i < len; i++)
+    if (buf[i] != 0)
+      nonzero++;
+  printf("  payload stats: len=%d nonzero=%d zero=%d\n", len, nonzero, len - nonzero);
+}
+
 static int do_poll_int(int fd, int loops) {
   uint8_t buf[64];
   for (int i = 0; i < loops; i++) {
@@ -192,7 +233,8 @@ static int do_poll_int(int fd, int loops) {
   return 0;
 }
 
-static int run_sequence(int fd, const struct packet *seq, int total, int count) {
+static int run_sequence(int fd, const struct packet *seq, int total, int count,
+                        const char *label) {
   if (count < 1) count = 1;
   if (count > total) count = total;
 
@@ -226,10 +268,12 @@ static int run_sequence(int fd, const struct packet *seq, int total, int count) 
       hexdump(resp, 64);
       printf("  ... (truncated, last 16): ");
       hexdump(resp + r - 16, 16);
+      print_payload_stats(resp, r);
     } else {
       hexdump(resp, r);
     }
 
+    maybe_dump_response(label, i, p->name, resp, r);
     free(resp);
   }
 
@@ -271,16 +315,20 @@ static int do_auto_init(int fd, int count) {
       hexdump(resp, 64);
       printf("  ... (truncated, last 16): ");
       hexdump(resp + r - 16, 16);
+      print_payload_stats(resp, r);
     } else {
       hexdump(resp, r);
     }
+
+    maybe_dump_response("eh575-auto", i, p->name, resp, r);
 
     if (i == 1 && r >= 7 && resp[5] == 0x01) {
       printf("  NOTE: packet 1 returned state byte 0x01; switching to EH575 pre-init sequence as the reference patch does.\n");
       free(resp);
       return run_sequence(fd, eh575_pre_init,
                           (int)(sizeof(eh575_pre_init) / sizeof(eh575_pre_init[0])),
-                          (int)(sizeof(eh575_pre_init) / sizeof(eh575_pre_init[0])));
+                          (int)(sizeof(eh575_pre_init) / sizeof(eh575_pre_init[0])),
+                          "eh575-preinit");
     }
 
     free(resp);
@@ -328,13 +376,13 @@ int main(int argc, char **argv) {
     rc = do_poll_int(fd, loops);
   } else if (strcmp(mode, "eh575-preinit") == 0) {
     int count = argc >= 4 ? atoi(argv[3]) : (int)(sizeof(eh575_pre_init) / sizeof(eh575_pre_init[0]));
-    rc = run_sequence(fd, eh575_pre_init, (int)(sizeof(eh575_pre_init) / sizeof(eh575_pre_init[0])), count);
+    rc = run_sequence(fd, eh575_pre_init, (int)(sizeof(eh575_pre_init) / sizeof(eh575_pre_init[0])), count, "eh575-preinit");
   } else if (strcmp(mode, "eh575-postinit") == 0) {
     int count = argc >= 4 ? atoi(argv[3]) : (int)(sizeof(eh575_post_init) / sizeof(eh575_post_init[0]));
-    rc = run_sequence(fd, eh575_post_init, (int)(sizeof(eh575_post_init) / sizeof(eh575_post_init[0])), count);
+    rc = run_sequence(fd, eh575_post_init, (int)(sizeof(eh575_post_init) / sizeof(eh575_post_init[0])), count, "eh575-postinit");
   } else if (strcmp(mode, "eh575-repeat") == 0) {
     int count = argc >= 4 ? atoi(argv[3]) : (int)(sizeof(eh575_repeat) / sizeof(eh575_repeat[0]));
-    rc = run_sequence(fd, eh575_repeat, (int)(sizeof(eh575_repeat) / sizeof(eh575_repeat[0])), count);
+    rc = run_sequence(fd, eh575_repeat, (int)(sizeof(eh575_repeat) / sizeof(eh575_repeat[0])), count, "eh575-repeat");
   } else if (strcmp(mode, "eh575-auto") == 0) {
     int count = argc >= 4 ? atoi(argv[3]) : (int)(sizeof(eh575_post_init) / sizeof(eh575_post_init[0]));
     rc = do_auto_init(fd, count);
