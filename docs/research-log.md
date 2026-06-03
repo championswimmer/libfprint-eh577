@@ -511,10 +511,155 @@ This is now one of the most important reverse-engineering clues.
 
 So more repetition and `usbmon` capture should proceed with an explicit fresh sudo authentication step.
 
+## 2026-06-03 — explicit EH575 pre-init and repeat path replays on EH577
+
+After the successful post-init replay, the standalone probe was used to run the other EH575 bulk paths explicitly:
+
+- `eh575-preinit`
+- `eh575-repeat`
+
+Artifacts created:
+
+- `logs/2026-06-03-eh577-preinit-run.txt`
+- `logs/2026-06-03-eh577-repeat-run.txt`
+- `logs/2026-06-03-eh577-sequence-comparison.txt`
+- `dumps/2026-06-03-preinit/`
+- `dumps/2026-06-03-repeat/`
+
+### Repeat path result
+
+The full EH575 repeat path succeeded on EH577.
+
+Important points:
+
+- all 9 packets completed successfully
+- `64 14 ec` again returned `5356` bytes
+- the payload was again all zeros in the idle capture
+- the smaller replies matched the same general EH575-compatible shape already seen in post-init
+
+Notable replies:
+
+- `61 2d 20` -> `53 49 47 45 2d 20 01`
+- `60 00 20` -> `53 49 47 45 00 aa 01`
+- `60 01 20` -> `53 49 47 45 01 05 01`
+- `60 2d 02` -> `53 49 47 45 2d c7 01`
+- `62 67 03` -> `53 49 47 45 67 03 01 00 ff 00`
+- `64 14 ec` -> `5356` bytes, all zero in this run
+
+### Pre-init path result
+
+The full EH575 pre-init path also succeeded on EH577.
+
+Important points:
+
+- all 29 packets completed successfully
+- EH577 accepted pre-init-specific commands without transport/protocol failure
+- the pre-init path's `73 14 ec` command **did not** return a large payload
+- instead, `73 14 ec` returned exactly 7 zero bytes
+
+Notable replies:
+
+- `60 00 00` -> `53 49 47 45 00 aa 01`
+- `60 01 00` -> `53 49 47 45 01 05 01`
+- `60 80 00` -> `53 49 47 45 80 02 01`
+- `73 14 ec` -> `00 00 00 00 00 00 00`
+- `60 40 ec` -> `53 49 47 45 40 00 01`
+- `60 00 66` -> `53 49 47 45 00 ab 01`
+- `60 01 66` -> `53 49 47 45 01 00 01`
+- `60 40 66` -> `53 49 47 45 40 00 01`
+
+### Interpretation of the new path coverage
+
+This is an important strengthening of the EH575-family model.
+
+EH577 now appears to accept not only the EH575 post-init path, but also:
+
+- the EH575 pre-init path
+- the EH575 repeat path
+
+That means the main reverse-engineering question is no longer whether EH577 belongs to the EH575 protocol family; it almost certainly does.
+
+The more precise open questions are now:
+
+1. which path is the canonical capture path for EH577,
+2. when the large payload becomes meaningful instead of zero-filled,
+3. and how the variable state bytes should influence driver branching.
+
+### Tooling note
+
+A direct `sudo -n env EH577_DUMP_DIR=...` invocation behaved inconsistently once and triggered an unrelated-looking warning before sudo rejected the command.
+
+Using the more explicit form below worked reliably for the pre-init replay:
+
+```bash
+sudo -n bash -lc 'export EH577_DUMP_DIR="$PWD/dumps/2026-06-03-preinit"; \
+  ./build/eh577_usbfs_probe /dev/bus/usb/003/004 eh575-preinit'
+```
+
+So future scripted runs that need environment variables should prefer `sudo -n bash -lc '...'`.
+
+## 2026-06-03 — repeated early-state sampling
+
+To characterize the earliest varying status bytes, the first two EH575 post-init packets were sampled repeatedly in two modes:
+
+1. 10 runs with a fresh usbfs reset before each run
+2. 6 runs without resets between runs
+
+Artifacts created:
+
+- `logs/2026-06-03-eh577-first2-state-samples.txt`
+- `logs/2026-06-03-eh577-first2-noreset-samples.txt`
+- `logs/2026-06-03-eh577-first2-state-analysis.txt`
+
+### Observed replies in the repeated sampling series
+
+Across both repeated series, the replies were fully stable:
+
+- `60 00 fc` -> `53 49 47 45 00 ab 01`
+- `60 01 fc` -> `53 49 47 45 01 00 01`
+
+This is different from earlier successful captures, which had shown:
+
+- `60 00 fc` -> `... aa 01`
+- `60 01 fc` -> `... 05 01`
+- and one early one-off `60 01 fc` -> `... 01 01`
+
+### Interpretation
+
+EH577 clearly has multiple internal reply states for the earliest status-like commands.
+
+At this point at least three packet-1 variants have been observed across the session history:
+
+- `01 00 01`
+- `01 05 01`
+- `01 01 01`
+
+And packet-0 has at least two observed variants:
+
+- `00 aa 01`
+- `00 ab 01`
+
+This means the driver should not assume a single fixed early-state reply. Instead it should:
+
+- treat those bytes as stateful
+- branch conservatively
+- and only rely on stronger invariants such as transport framing, packet lengths, and larger behavior patterns
+
+### Early-state variation table
+
+| Command | Observed replies so far | Notes |
+|---|---|---|
+| `60 00 fc` | `... 00 aa 01`, `... 00 ab 01` | varies across session history |
+| `60 01 fc` | `... 01 00 01`, `... 01 05 01`, `... 01 01 01` | most important current branch/state indicator |
+| `60 00 66` | `... 00 aa 01`, `... 00 ab 01` | also stateful |
+| `60 01 66` | `... 01 05 01`, `... 01 00 01` | seen in post-init vs pre-init captures |
+| `60 2d 02` | `... 2d 47 01`, `... 2d c7 01` | later status variation |
+| `62 67 03` | `... 67 03 01 00 00 00`, `... 67 03 01 00 ff 00` | later status variation |
+
 ### Practical next actions after this batch
 
-1. Repeat the first two post-init packets several times with stable sudo auth to characterize `aa`/`ab` and `01`/`05` state changes.
-2. Modify the probe to dump the full `5356`-byte payload to a file for entropy/image analysis.
-3. Poll interrupts while a finger is physically placed/removed from the sensor.
-4. Capture `usbmon` traces for reset, post-init, and finger interaction.
-5. Update the EH577 libfprint draft once the state-machine branching is better understood.
+1. Poll interrupts while a finger is physically placed/removed from the sensor.
+2. Capture non-idle `64 14 ec` payloads on the post-init and repeat paths.
+3. Capture `usbmon` traces for reset, post-init/repeat, and finger interaction.
+4. Update the EH577 libfprint draft once the state-machine branching is better understood.
+5. Investigate whether any known sequence reliably transitions between the `00/05/01` and `ab/00/01` early-state families.

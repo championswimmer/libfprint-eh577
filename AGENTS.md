@@ -107,8 +107,12 @@ Note:
   - standalone usbfs-based probe tool
   - no libusb dev headers required
   - directly uses `USBDEVFS_*` ioctls
+- `tools/eh577_guided_capture.sh`
+  - helper script that prints timed `TOUCH` / `REMOVE` cues
+  - can optionally launch a capture command in the background
+  - useful for finger-interaction tests without needing live LLM timing prompts
 
-Supported modes in the tool:
+Supported modes in the probe tool:
 
 - `reset`
 - `poll-int [loops]`
@@ -117,9 +121,10 @@ Supported modes in the tool:
 - `eh575-repeat [count]`
 - `eh575-auto [count]`
 
-Useful feature:
+Useful features:
 
-- if `EH577_DUMP_DIR` is set, the tool writes raw response bytes per packet into that directory
+- if `EH577_DUMP_DIR` is set, the probe writes raw response bytes per packet into that directory
+- `eh577_guided_capture.sh` can coordinate touch/remove timing around commands like `poll-int` or `eh575-repeat`
 
 ### build/
 
@@ -145,6 +150,26 @@ Key reference files:
 - `refs/libfprint/libfprint/drivers/egis0570.h`
 - `refs/libfprint/libfprint/drivers/egismoc/egismoc.c`
 - `refs/libfprint/libfprint/drivers/egismoc/egismoc.h`
+
+### Web research is allowed and useful
+
+Future agents should feel free to use the available web-search tools when local evidence is insufficient.
+
+Good uses:
+
+- finding `libfprint` build or API documentation
+- looking for public mentions of `1c7a:0577` / `EH577`
+- finding OEM Windows driver package names, INF files, or archive versions
+- checking `usbmon` / Wireshark capture instructions
+
+Current web-search leads already found:
+
+- Windows packages for `USB\\VID_1C7A&PID_0577` likely use an INF named `EgisTouchFP0577s.inf`
+- one third-party driver listing reported version `3.6.1.8`
+- `libfprint` getting-started docs confirm the normal device-enumeration and open path
+- Wireshark / usbmon docs confirm Linux capture setup with `modprobe usbmon` and capture on `usbmonX`
+
+Treat web findings as leads until they are cross-checked against local captures or source code.
 
 ### wip-libfprint/
 
@@ -365,6 +390,10 @@ The current development strategy is:
 
 5. **Convert the WIP skeleton into a real libfprint patch**
    - once sequence/state behavior is better understood
+
+6. **Use the numbered bringup plan as the live todo list**
+   - see `.agents/plans/02-eh577-driver-bringup.md`
+   - update checkboxes as work advances
 
 ### Good commands to rerun
 

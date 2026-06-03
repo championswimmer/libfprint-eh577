@@ -1,0 +1,16 @@
+[23:29:24] === EH577 interrupt finger-event capture ===
+[23:29:24] Plan: start-delay=3s touch-delay=2s hold=4s remove-gap=2s cycles=2
+[23:29:24] Command: sudo -n ./build/eh577_usbfs_probe /dev/bus/usb/003/004 poll-int 40
+[23:29:24] capture starts in 3s
+[23:29:25] capture starts in 2s
+[23:29:26] capture starts in 1s
+[23:29:27] starting capture command
+[23:29:27] keep finger OFF sensor
+[23:29:29] CYCLE 1/2: TOUCH sensor now
+[23:29:33] CYCLE 1/2: REMOVE finger now
+[23:29:35] prepare for next cycle
+[23:29:35] CYCLE 2/2: TOUCH sensor now
+[23:29:39] CYCLE 2/2: REMOVE finger now
+[23:29:41] cue sequence finished
+[23:29:41] waiting for capture command to finish
+[23:29:50] capture command finished successfully

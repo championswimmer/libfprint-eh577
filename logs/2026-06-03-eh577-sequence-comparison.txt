@@ -1,0 +1,97 @@
+# EH577 sequence comparison: post-init vs pre-init vs repeat
+
+Date: 2026-06-03
+Tool: `build/eh577_usbfs_probe`
+Device: `/dev/bus/usb/003/004`
+
+Artifacts referenced:
+
+- `logs/2026-06-03-eh577-preinit-run.txt`
+- `logs/2026-06-03-eh577-repeat-run.txt`
+- `logs/2026-06-03-eh577-postinit18-dump.txt`
+- `dumps/2026-06-03-preinit/`
+- `dumps/2026-06-03-repeat/`
+- `dumps/2026-06-03-postinit18/`
+
+## Summary
+
+EH577 successfully accepted all three EH575-family bulk paths tested so far:
+
+1. full `eh575-postinit`
+2. full `eh575-preinit`
+3. full `eh575-repeat`
+
+This strengthens the conclusion that EH577 is not merely loosely similar to EH575; it is operationally compatible with the known EH575 bulk command families at least in the currently tested idle state.
+
+## Key observations by path
+
+### Post-init
+
+- Accepted all 18 packets.
+- `64 14 ec` returned `5356` bytes.
+- Saved payload is all-zero in this idle capture.
+
+Notable replies:
+
+- `60 00 fc` -> `53 49 47 45 00 aa 01`
+- `60 01 fc` -> `53 49 47 45 01 05 01`
+- `60 40 fc` -> `53 49 47 45 40 80 01`
+- `60 2d 02` -> `53 49 47 45 2d c7 01`
+- `62 67 03` -> `53 49 47 45 67 03 01 00 ff 00`
+- `60 0f 03` -> `53 49 47 45 0f 20 01`
+- `60 00 02` -> `53 49 47 45 00 ab 01`
+
+### Pre-init
+
+- Accepted all 29 packets.
+- The pre-init-specific `73 14 ec` did **not** return a large payload.
+- Instead, `73 14 ec` returned exactly 7 zero bytes:
+  - `00 00 00 00 00 00 00`
+
+Notable replies:
+
+- `60 00 00` -> `53 49 47 45 00 aa 01`
+- `60 01 00` -> `53 49 47 45 01 05 01`
+- `60 80 00` -> `53 49 47 45 80 02 01`
+- `73 14 ec` -> `00 00 00 00 00 00 00`
+- `60 40 ec` -> `53 49 47 45 40 00 01`
+- `60 00 66` -> `53 49 47 45 00 ab 01`
+- `60 01 66` -> `53 49 47 45 01 00 01`
+- `60 40 66` -> `53 49 47 45 40 00 01`
+
+Interpretation:
+
+- EH577 accepts the EH575 pre-init packet family cleanly.
+- The `73 14 ec` behavior suggests that the pre-init path is not yet the path that yields image-like bulk payloads in the tested idle state.
+- The pre-init sequence also reveals additional state bytes such as `80 02 01`, `40 00 01`, and `01 00 01` that should not be assumed constant without more captures.
+
+### Repeat
+
+- Accepted all 9 packets.
+- `64 14 ec` again returned `5356` bytes.
+- Saved payload is all-zero in this idle capture.
+
+Notable replies:
+
+- `61 2d 20` -> `53 49 47 45 2d 20 01`
+- `60 00 20` -> `53 49 47 45 00 aa 01`
+- `60 01 20` -> `53 49 47 45 01 05 01`
+- `60 2d 02` -> `53 49 47 45 2d c7 01`
+- `62 67 03` -> `53 49 47 45 67 03 01 00 ff 00`
+- `60 00 02` -> `53 49 47 45 00 aa 01`
+- `64 14 ec` -> `5356` bytes, all zero
+
+## Cross-path conclusions
+
+1. EH577 accepts all currently tested EH575-family bulk paths.
+2. Large `5356`-byte payloads have been observed on the post-init and repeat paths, but not on the tested pre-init `73 14 ec` packet.
+3. All large payloads captured so far are zero-filled when idle.
+4. Small reply bytes vary by command family and likely internal state.
+5. Current evidence still supports an EH575-derived driver, but the EH577 state machine should remain flexible.
+
+## Immediate follow-up implied by this comparison
+
+1. Test the repeat path during actual finger interaction.
+2. Capture non-idle `64 14 ec` payloads on post-init and repeat.
+3. Check whether pre-init must be followed by some other transition before meaningful payloads appear.
+4. Treat the pre-init `73 14 ec` 7-byte zero reply as a potentially important mode/state indicator.
