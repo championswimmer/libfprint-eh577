@@ -1,0 +1,67 @@
+# EH577 post-init finger-hold reproducibility analysis
+
+Artifacts:
+
+- `logs/2026-06-03-eh577-guided-postinit-fingerhold-01.txt`
+- `logs/2026-06-03-eh577-guided-postinit-fingerhold-03.txt`
+- `logs/2026-06-03-eh577-postinit-fingerhold-01-ascii.txt`
+- `logs/2026-06-03-eh577-postinit-fingerhold-03-ascii.txt`
+- `dumps/2026-06-03-postinit-fingerhold-01/`
+- `dumps/2026-06-03-postinit-fingerhold-03/`
+
+## Summary
+
+A second correctly timed guided post-init finger-hold run was captured to test reproducibility.
+
+This second run again produced a meaningful non-zero `64 14 ec` payload, confirming that the earlier non-zero capture was not a one-off artifact.
+
+## Frame-level comparison
+
+### First successful finger-hold frame (`fingerhold-01`)
+
+- file: `eh575-postinit-17-64_14_ec.bin`
+- length: `5356`
+- nonzero: `1305`
+- unique byte values: `80`
+- SHA-256: `51e6dcd08a54f9d1aeed5269e362e4720c2c3835994c586bdac299df569c95c3`
+- bbox: `x=0..69`, `y=0..51`
+
+### Second successful finger-hold frame (`fingerhold-03`)
+
+- file: `eh575-postinit-17-64_14_ec.bin`
+- length: `5356`
+- nonzero: `1594`
+- unique byte values: `104`
+- SHA-256: `826fc28994c7371d70761ad6444b2ddcd9322bab0547a2dd74d5f4eeb09f4e28`
+- bbox: `x=0..78`, `y=0..51`
+
+### Similarities
+
+- both frames are non-zero only during post-init finger-hold capture
+- both are exactly `103 x 52` bytes
+- both span the full height
+- both are concentrated on the left side of the frame
+- both differ strongly from the all-zero idle / repeat-path frames
+
+### Differences
+
+- the two non-zero frames are not identical
+- they differ at `2322` byte positions
+- the second frame has more non-zero pixels and a slightly wider active region
+
+## Interpretation
+
+This strongly suggests the EH577 payload is capturing real, variable finger-dependent sensor data rather than a fixed template or deterministic noise block.
+
+The current evidence now supports these claims with high confidence:
+
+1. EH577 can produce meaningful image-like bulk data.
+2. The successful path is post-init with finger contact timed appropriately.
+3. The captured frame content varies between acquisitions, as expected for real scans.
+4. The repeat path alone still does not appear sufficient in the tested conditions.
+
+## Immediate implications for driver bringup
+
+- The first EH577 libfprint driver should focus on the post-init-led bulk capture path.
+- Interrupt support can remain optional/deferred unless later evidence shows it is required.
+- Driver logic should avoid overfitting to single-state small reply bytes, but may use them as weak indicators.

@@ -7,6 +7,8 @@ HOLD_SECONDS=8
 DELAY_AFTER_REMOVE=2
 CYCLES=1
 LABEL="EH577 guided capture"
+SUDO_UPFRONT_MODE="auto"
+SUDO_KEEPALIVE_PID=""
 
 usage() {
   cat <<'EOF'
@@ -18,6 +20,10 @@ This helper decouples finger-timing prompts from the agent loop.
 It can optionally launch a capture command in the background, then prints
 clear "touch / hold / remove" cues at scheduled times.
 
+If the capture command starts with `sudo`, the script will by default request
+sudo credentials *up front* before any delays begin, and keep them alive for
+the duration of the run so the capture is not interrupted mid-sequence.
+
 Options:
   --delay-before-start N   Seconds before starting the capture command (default: 5)
   --delay-before-touch N   Seconds to wait after command start before first touch (default: 2)
@@ -25,6 +31,8 @@ Options:
   --delay-after-remove N   Seconds to wait after remove before next cycle/end (default: 2)
   --cycles N               Number of touch/hold/remove cycles (default: 1)
   --label TEXT             Label to print in the session banner
+  --sudo-upfront           Force a sudo credential check before any delays/cues
+  --no-sudo-upfront        Never do an upfront sudo credential check
   -h, --help               Show this help
 
 Examples:
@@ -65,6 +73,31 @@ is_nonneg_int() {
   [[ ${1:-} =~ ^[0-9]+$ ]]
 }
 
+command_needs_sudo() {
+  (( ${#COMMAND[@]} > 0 )) || return 1
+  [[ ${COMMAND[0]} == sudo ]]
+}
+
+cleanup() {
+  if [[ -n "$SUDO_KEEPALIVE_PID" ]]; then
+    kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+    wait "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+  fi
+}
+
+acquire_sudo_upfront() {
+  log "requesting sudo credentials up front"
+  sudo -v
+
+  (
+    while true; do
+      sleep 15
+      sudo -n -v >/dev/null 2>&1 || exit 0
+    done
+  ) &
+  SUDO_KEEPALIVE_PID=$!
+}
+
 while (($#)); do
   case "$1" in
     --delay-before-start)
@@ -96,6 +129,14 @@ while (($#)); do
       LABEL=${2:-}
       shift 2
       ;;
+    --sudo-upfront)
+      SUDO_UPFRONT_MODE="always"
+      shift
+      ;;
+    --no-sudo-upfront)
+      SUDO_UPFRONT_MODE="never"
+      shift
+      ;;
     -h|--help)
       usage
       exit 0
@@ -121,6 +162,8 @@ COMMAND=("$@")
 CMD_PID=""
 CMD_RC=0
 
+trap cleanup EXIT
+
 log "=== ${LABEL} ==="
 log "Plan: start-delay=${DELAY_BEFORE_START}s touch-delay=${DELAY_BEFORE_TOUCH}s hold=${HOLD_SECONDS}s remove-gap=${DELAY_AFTER_REMOVE}s cycles=${CYCLES}"
 
@@ -128,6 +171,10 @@ if (( ${#COMMAND[@]} > 0 )); then
   log "Command: ${COMMAND[*]}"
 else
   log "Command: (none; cue-only mode)"
+fi
+
+if [[ $SUDO_UPFRONT_MODE == always ]] || { [[ $SUDO_UPFRONT_MODE == auto ]] && command_needs_sudo; }; then
+  acquire_sudo_upfront
 fi
 
 if (( DELAY_BEFORE_START > 0 )); then

@@ -120,7 +120,8 @@ Note:
 - `tools/eh577_guided_capture.sh`
   - helper script that prints timed `TOUCH` / `REMOVE` cues
   - can optionally launch a capture command in the background
-  - useful for finger-interaction tests without needing live LLM timing prompts
+  - if the command starts with `sudo`, it now acquires sudo credentials **up front** before delays begin and keeps them alive during the run
+  - useful for finger-interaction tests without needing live LLM timing prompts or mid-capture sudo failures
 - `tools/eh577_dump_to_pgm.py`
   - helper to convert a raw `5356`-byte payload dump into a `103x52` PGM image
   - useful for quick visual inspection of candidate image-like captures
@@ -138,6 +139,7 @@ Useful features:
 
 - if `EH577_DUMP_DIR` is set, the probe writes raw response bytes per packet into that directory
 - `eh577_guided_capture.sh` can coordinate touch/remove timing around commands like `poll-int` or `eh575-repeat`
+- when using `eh577_guided_capture.sh`, prefer putting the actual capture command after `--` and let the script handle sudo caching first
 
 ### build/
 
@@ -465,8 +467,10 @@ sudo env EH577_DUMP_DIR="$PWD/dumps/run-name" \
 
 ### Sudo behavior
 
-- `sudo -n` has sometimes worked, sometimes expired during longer automation
-- if commands start failing with interactive-auth errors, refresh sudo first
+- plain ad-hoc `sudo -n` commands have sometimes expired during longer automation
+- `tools/eh577_guided_capture.sh` now mitigates this by calling `sudo -v` **before** delays/cues begin and refreshing the cached credential in the background when the capture command starts with `sudo`
+- for scripted finger-interaction captures, prefer the guided helper over hand-timed raw commands
+- if non-guided commands start failing with interactive-auth errors, refresh sudo first
 
 ### Device ownership
 

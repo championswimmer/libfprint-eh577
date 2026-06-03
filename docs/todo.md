@@ -14,10 +14,12 @@
 - [x] Determine whether `64 14 ec` returns a `5356`-byte payload on EH577
 - [x] Poll interrupt endpoints `0x83` / `0x84` during idle and init
 - [x] Build an initial EH577 libfprint driver skeleton by adapting `egis0575`
-- [ ] Characterize EH577 state variation on `EGIS 60 00/01 fc` (`aa` vs `ab`, `01` vs `05`)
-- [ ] Save and analyze the raw `5356`-byte payload from `64 14 ec`
-- [ ] Poll interrupts while physically touching/removing a finger
-- [ ] Reconcile the earlier `01 01 01` response with the EH575 pre-init branch logic
+- [x] Characterize EH577 state variation on `EGIS 60 00/01 fc` (`aa` vs `ab`, `01` vs `05`)
+- [x] Save and analyze the raw `5356`-byte payload from `64 14 ec`
+- [x] Poll interrupts while physically touching/removing a finger
+- [ ] Reproduce the earlier `01 01 01` response and reconcile it with the EH575 pre-init branch logic
+- [ ] Repeat the successful non-zero post-init finger-hold capture to confirm reproducibility
+- [ ] Compare multiple non-zero payload frames for image stability
 
 ## Likely deeper reverse-engineering work
 
@@ -29,3 +31,4 @@
 - [ ] Get probe/open working against real hardware
 - [ ] Implement activation/deactivation and event handling
 - [ ] Implement first image / payload acquisition path
+- [ ] Decide whether the first EH577 driver patch should stay bulk-only and omit interrupt handling

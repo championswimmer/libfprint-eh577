@@ -69,24 +69,27 @@ EH577 now looks **very close to EH575**, not just descriptively but on the wire:
 - bulk endpoint numbering matches exactly
 - live probing showed EH577 accepts the full EH575 post-init replay and returns valid `SIGE` responses with the expected lengths
 - `64 14 ec` returned a full `5356`-byte payload on EH577
+- idle post-init and idle/repeat captures produced all-zero `5356`-byte payloads
+- a guided **post-init finger-hold** capture produced the first non-zero `5356`-byte payload (`1305` non-zero bytes), while a guided **repeat finger-hold** capture still produced an all-zero payload
 - observed state bytes vary across runs:
   - earlier one-off result: `60 01 fc` -> `SIGE 01 01 01`
   - repeated reset-based runs: `60 01 fc` -> `SIGE 01 05 01`
-  - `60 00 fc` also varied between `...00 aa 01` and `...00 ab 01`
+  - later repeated sampling stabilized at `60 01 fc` -> `SIGE 01 00 01`
+  - `60 00 fc` varied between `...00 aa 01` and `...00 ab 01`
 
 So the most plausible starting point is now:
 
 1. EH575-derived bulk command transport as the primary implementation base
 2. prefer an EH575-style state machine, but do not assume the packet-1 branch is fixed until EH577 state variation is mapped
-3. analyze the `64 14 ec` payload contents and determine when it stops being all-zero
-4. monitor `0x83` and `0x84` for optional notifications or power-management wake events
+3. treat the **post-init path** as the currently strongest candidate for meaningful capture on EH577
+4. monitor `0x83` and `0x84` for optional notifications or power-management wake events, but do not assume they are required for first driver bringup
 
 ## Implications for implementation
 
 - A first libfprint prototype should probably be cloned from the EH575 driver approach, not from `egis0570` or `egismoc`.
 - The first milestone is now narrower and clearer: **port EH575 transport logic to EH577 and find the first protocol divergence**.
 - The most valuable next artifacts are:
-  - repeated first-packet state samples after controlled resets
-  - a saved raw `64 14 ec` payload for entropy/image analysis
-  - idle / finger-event interrupt captures from `0x83` and `0x84`
-  - confirmation of whether the current `wip-libfprint/` skeleton needs state-machine changes beyond device ID/name updates
+  - repeated successful non-zero post-init finger-hold captures for reproducibility
+  - side-by-side comparisons of multiple non-zero payload frames
+  - `usbmon` traces for a successful non-zero post-init finger-hold run
+  - confirmation of whether the current `wip-libfprint/` skeleton should prefer post-init-led capture logic with relaxed state-byte checks

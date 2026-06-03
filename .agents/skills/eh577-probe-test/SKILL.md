@@ -36,12 +36,14 @@ Do not hardcode state bytes as fixed constants without repeated captures. Some `
 1. Reset the device before a fresh capture series.
 2. Use `eh575-auto` or `eh575-postinit 18` to establish the baseline.
 3. If collecting raw payloads, set `EH577_DUMP_DIR` to a new dated directory under `dumps/`.
-4. If checking finger events, run `poll-int` while touching and removing a finger.
+4. If checking finger events, prefer `tools/eh577_guided_capture.sh` so sudo is acquired up front and the touch/remove timing is scripted.
 5. Compare idle vs touch vs repeated-run behavior before changing driver logic.
 
 ## Commands
 
 Device access here normally requires root.
+
+For longer finger-interaction runs, prefer the guided helper because it now acquires sudo credentials up front before any delays and keeps them alive during the run if the capture command starts with `sudo`.
 
 Reset:
 
@@ -75,6 +77,31 @@ sudo env EH577_DUMP_DIR="$PWD/dumps/2026-06-03-sample-run" \
   ./build/eh577_usbfs_probe /dev/bus/usb/003/004 eh575-postinit 18
 ```
 
+Guided interrupt polling with scripted touch/remove timing:
+
+```bash
+./tools/eh577_guided_capture.sh \
+  --delay-before-start 3 \
+  --delay-before-touch 2 \
+  --hold 4 \
+  --delay-after-remove 2 \
+  --cycles 2 \
+  -- sudo -n ./build/eh577_usbfs_probe /dev/bus/usb/003/004 poll-int 40
+```
+
+Guided post-init finger-hold capture with dumps:
+
+```bash
+mkdir -p dumps/2026-06-03-sample-fingerhold
+./tools/eh577_guided_capture.sh \
+  --delay-before-start 3 \
+  --delay-before-touch 1 \
+  --hold 10 \
+  --delay-after-remove 2 \
+  --cycles 1 \
+  -- sudo -n bash -lc 'export EH577_DUMP_DIR="$PWD/dumps/2026-06-03-sample-fingerhold"; ./build/eh577_usbfs_probe /dev/bus/usb/003/004 eh575-postinit 18'
+```
+
 ## What to record
 
 For every meaningful run, capture:
@@ -90,7 +117,7 @@ Write a summary log under `logs/` and keep raw dumps under `dumps/`.
 
 ## Cautions
 
-- `sudo` may expire during longer runs
+- plain ad-hoc `sudo` may expire during longer runs; prefer `eh577_guided_capture.sh` for finger-interaction captures so sudo is acquired before the timing starts
 - dump files created as root may be owned by `root:root`
 - interrupt silence in short tests does not prove interrupts are irrelevant
 - an all-zero 5356-byte payload can still be a valid idle frame

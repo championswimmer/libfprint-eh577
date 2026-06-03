@@ -12,16 +12,17 @@ Reverse-engineering workspace for an open-source Linux fingerprint driver for th
   - USB topology path: `/sys/bus/usb/devices/3-3`
 - Stock Ubuntu `fprintd` currently reports **no supported device available**.
 - System `libfprint` contains Egis-related drivers for **0570** and Egis MOC devices, but nothing obvious for **0577**.
-- Live usbfs probing already confirmed that EH577 accepts early **EH575-style `EGIS` bulk commands** and returns valid `SIGE` responses.
+- Live usbfs probing confirmed that EH577 accepts the full **EH575-style bulk command family** and returns valid `SIGE` responses.
+- Idle large-payload captures are zero-filled, but a guided **post-init finger-hold** run produced the first non-zero `5356`-byte payload.
 - A first **WIP EH577 libfprint driver skeleton** now exists under `wip-libfprint/`.
 
 ## Immediate plan
 
 1. Preserve all local observations in-repo.
-2. Study the prior EH575 reverse-engineering effort.
+2. Confirm reproducibility of the new non-zero post-init finger-hold payload.
 3. Compare EH577 USB descriptors/protocol shape against upstream/libfprint Egis drivers.
 4. Capture live USB traffic from a working vendor stack if available.
-5. Build a minimal open driver skeleton and iterate toward probe/init/interrupt handling.
+5. Turn the WIP EH577 skeleton into a buildable libfprint patch and iterate from there.
 
 ## Notes
 
@@ -29,4 +30,6 @@ Reverse-engineering workspace for an open-source Linux fingerprint driver for th
 - Side-by-side protocol family notes: `docs/protocol-comparison.md`
 - Next actions: `docs/todo.md`
 - Direct probe tool: `tools/eh577_usbfs_probe.c`
+- Guided finger-timing helper: `tools/eh577_guided_capture.sh`
+- Payload-to-image helper: `tools/eh577_dump_to_pgm.py`
 - WIP libfprint port base: `wip-libfprint/`
