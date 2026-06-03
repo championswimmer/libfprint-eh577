@@ -112,19 +112,19 @@ The bringup plan is considered materially successful when all of the following e
 ### Phase 3 — finger interaction and interrupt behavior
 
 - [x] Poll interrupts while no finger is present
-- [ ] Poll interrupts while placing a finger on the sensor
-- [ ] Poll interrupts while holding a finger steady on the sensor
-- [ ] Poll interrupts while removing a finger
-- [ ] Record whether `0x83`, `0x84`, both, or neither emit data during finger interaction
-- [ ] If interrupts remain silent, record that clearly and continue using bulk-only testing as the primary path
+- [x] Poll interrupts while placing a finger on the sensor
+- [x] Poll interrupts while holding a finger steady on the sensor
+- [x] Poll interrupts while removing a finger
+- [x] Record whether `0x83`, `0x84`, both, or neither emit data during finger interaction
+- [x] If interrupts remain silent, record that clearly and continue using bulk-only testing as the primary path
 
 ### Phase 4 — payload analysis
 
-- [ ] Capture `64 14 ec` payloads during idle, touch, hold, and remove scenarios
-- [ ] Compare payload nonzero counts and entropy across those scenarios
-- [ ] Check whether any payload resembles image-strip structure rather than pure zeros/noise
-- [ ] If needed, add a small analysis helper under `tools/` to summarize payload bytes or render them for inspection
-- [ ] Record payload conclusions in a new log or doc entry
+- [x] Capture `64 14 ec` payloads during idle, touch, hold, and remove scenarios
+- [x] Compare payload nonzero counts and entropy across those scenarios
+- [x] Check whether any payload resembles image-strip structure rather than pure zeros/noise
+- [x] If needed, add a small analysis helper under `tools/` to summarize payload bytes or render them for inspection
+- [x] Record payload conclusions in a new log or doc entry
 
 ### Phase 5 — external research leads
 

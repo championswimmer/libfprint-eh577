@@ -29,8 +29,8 @@ The most important finding so far is:
 Important nuance:
 
 - some response bytes vary across runs / state
-- the 5356-byte payload captured so far is **all zeros** when idle
-- interrupt endpoints `0x83` / `0x84` have been **silent** in short idle/post-init polls
+- the 5356-byte payload is **all zeros when idle**, but becomes **non-zero during a successful post-init finger-hold capture**
+- interrupt endpoints `0x83` / `0x84` have remained **silent** in short idle, post-init, and guided finger-interaction polls
 
 So the current working hypothesis is:
 
@@ -84,18 +84,28 @@ Most important logs right now:
   - full post-init replay with raw per-packet dumps saved to disk
 - `logs/2026-06-03-eh577-postinit18-analysis.txt`
   - summarized analysis of the raw dump set
-- `logs/2026-06-03-eh577-idle-interrupt-poll.txt`
-  - idle interrupt polling
-- `logs/2026-06-03-eh577-postinit-interrupt-poll.txt`
-  - interrupt polling after post-init
+- `logs/2026-06-03-eh577-sequence-comparison.txt`
+  - side-by-side summary of post-init vs pre-init vs repeat behavior
+- `logs/2026-06-03-eh577-first2-state-analysis.txt`
+  - early-state reply variation analysis
+- `logs/2026-06-03-eh577-finger-analysis.txt`
+  - guided finger-interaction analysis including the first non-zero payload capture
+- `logs/2026-06-03-eh577-guided-interrupt-finger-2cycle.txt`
+  - guided interrupt poll during touch/remove cycles
+- `logs/2026-06-03-eh577-guided-postinit-fingerhold-01.txt`
+  - guided post-init finger-hold capture log
 
 ### dumps/
 
-Currently most important dump set:
+Currently most important dump sets:
 
 - `dumps/2026-06-03-postinit18/`
   - raw `.bin` responses for each packet of a full EH575 post-init replay on EH577
-  - packet 17 file is the saved 5356-byte payload
+  - packet 17 file is the saved idle 5356-byte zero payload
+- `dumps/2026-06-03-postinit-fingerhold-01/`
+  - raw `.bin` responses for a successful guided post-init finger-hold run
+  - packet 17 file is the first non-zero 5356-byte payload capture
+  - also contains a rendered `.pgm` made from that payload
 
 Note:
 
@@ -111,6 +121,9 @@ Note:
   - helper script that prints timed `TOUCH` / `REMOVE` cues
   - can optionally launch a capture command in the background
   - useful for finger-interaction tests without needing live LLM timing prompts
+- `tools/eh577_dump_to_pgm.py`
+  - helper to convert a raw `5356`-byte payload dump into a `103x52` PGM image
+  - useful for quick visual inspection of candidate image-like captures
 
 Supported modes in the probe tool:
 
@@ -279,10 +292,11 @@ Polled interrupt endpoints `0x83` and `0x84`:
 
 - idle after reset
 - after post-init replay
+- during guided finger touch / hold / remove cycles
 
 Result:
 
-- no payloads observed in short polling windows
+- no payloads observed in the tested polling windows
 
 ### 7. Raw payload dumping
 
@@ -290,8 +304,19 @@ Saved per-packet response dumps with `EH577_DUMP_DIR=...`.
 
 Result:
 
-- packet 17 (`64 14 ec`) dump is exactly `5356` bytes
-- all bytes are zero in the captured idle run
+- idle post-init packet 17 (`64 14 ec`) dump is exactly `5356` bytes and all zero
+- repeat-path finger-hold packet 8 (`64 14 ec`) dump is also exactly `5356` bytes and bit-identical to idle
+- post-init finger-hold packet 17 (`64 14 ec`) dump is exactly `5356` bytes with `1305` non-zero bytes
+
+### 8. Guided finger-interaction capture
+
+Used `tools/eh577_guided_capture.sh` to coordinate timing while the user touched/held/removed a finger.
+
+Result:
+
+- interrupt endpoints stayed silent
+- repeat-path finger hold still produced an all-zero large payload
+- post-init finger hold produced the first meaningful non-zero payload
 
 ---
 
@@ -309,10 +334,15 @@ These are the strongest validated results so far:
 3. **EH577 returns the expected large response size**
    - `64 14 ec` -> `5356` bytes
 
-4. **An EH577 driver skeleton now exists**
+4. **EH577 returns non-zero image-like data during post-init finger hold**
+   - idle captures are zero-filled
+   - repeat-path finger-hold captures stayed zero-filled
+   - post-init finger-hold capture produced `1305` non-zero bytes and a structured frame-like payload
+
+5. **An EH577 driver skeleton now exists**
    - `wip-libfprint/drivers/egis0577.c/.h`
 
-5. **Raw dumps are now being saved for analysis**
+6. **Raw dumps are now being saved for analysis**
    - useful for future tooling and regression checks
 
 ---
