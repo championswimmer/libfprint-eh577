@@ -1,0 +1,78 @@
+# EH577 bulk probe against EH575 packet sequence
+
+Tool: `build/eh577_usbfs_probe`
+Target: `/dev/bus/usb/003/004`
+Date: 2026-06-03
+
+## Preconditions
+
+- Device power control forced to `on`
+- Device runtime status observed as `active`
+- Probe used direct usbfs bulk transfers on:
+  - OUT `0x01`
+  - IN `0x82`
+
+## Successful EH575-compatible exchanges
+
+### Packet 0
+
+TX: `45 47 49 53 60 00 fc`
+
+RX: `53 49 47 45 00 aa 01`
+
+Interpretation:
+- `EGIS` / `SIGE` framing confirmed on EH577.
+- Response shape exactly matches EH575-style 7-byte command ack.
+
+### Packet 1
+
+TX: `45 47 49 53 60 01 fc`
+
+RX: `53 49 47 45 01 01 01`
+
+Interpretation:
+- This is especially interesting because the EH575 patch comments mention `01:01:01` as a state cue.
+- EH577 returning the same triplet is strong evidence of protocol kinship.
+
+### Packet 2
+
+TX: `45 47 49 53 60 40 fc`
+
+RX: `53 49 47 45 40 80 01`
+
+### Packet 3
+
+TX: `45 47 49 53 63 09 0b 83 24 00 44 0f 08 20 20 01 05 12`
+
+RX: `53 49 47 45 09 0b 01 83 24 00 44 0f 08 20 20 01 05 12`
+
+Interpretation:
+- Longer structured command also accepted.
+- Response preserves nearly all payload bytes, replacing the command byte region with what looks like an ack/status form.
+
+### Packet 4
+
+TX: `45 47 49 53 63 26 06 06 60 06 05 2f 06`
+
+RX: `53 49 47 45 26 06 01 06 60 06 05 2f 06`
+
+Interpretation:
+- Another EH575 packet accepted successfully.
+- Confirms EH577 is not merely recognizing the `EGIS` magic; it is understanding at least several EH575 command families.
+
+## Important conclusion
+
+EH577 definitely speaks an EH575-like bulk protocol on endpoints `0x01` / `0x82`.
+
+This is the strongest result so far and materially changes the implementation strategy:
+
+- start from the EH575 driver/prototype transport,
+- not from `egis0570` or `egismoc` transport,
+- then determine where EH577 diverges later in the init/capture sequence.
+
+## Follow-up needed
+
+- Replay the rest of the EH575 post-init sequence up to packet 17.
+- Determine whether packet 17 (`64 14 ec`) returns a `5356`-byte image-like payload on EH577 too.
+- Poll interrupt endpoints `0x83` / `0x84` during and after bulk init to learn whether they matter for capture state.
+- Capture usbmon traces once sudo access is available consistently.
