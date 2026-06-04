@@ -1,0 +1,47 @@
+# EH577 img-capture timeout boundary summary
+
+Date: 2026-06-04
+Driver: patched `egis0577` in `refs/libfprint`
+Command:
+
+```bash
+sudo -n env G_MESSAGES_DEBUG=all \
+  LD_LIBRARY_PATH="$PWD/refs/libfprint/build/libfprint" \
+  "$PWD/refs/libfprint/build/examples/img-capture"
+```
+
+Detailed log:
+- `logs/2026-06-04-img-capture-after-set-config-sudo.txt`
+
+## Result
+
+The timeout still occurs before the driver ever reaches `SM_RESP`.
+
+Instrumented runtime flow now shows:
+
+1. device opens successfully
+2. `g_usb_device_set_configuration(..., 1, ...)` succeeds
+3. interface 0 is claimed successfully
+4. activation enters `SM_INIT` then `SM_START` then `SM_REQ`
+5. the very first bulk OUT is submitted as post-init packet 0:
+   - `60 00 fc`
+   - len `7`
+   - expected response len `7`
+6. no completion callback fires for that transfer
+7. after `EGIS0577_TIMEOUT` the SSM fails in state 2 (`SM_REQ`) with `transfer timed out`
+
+## Important conclusion
+
+This means the current runtime blocker is *earlier* than response parsing, zero-frame handling, or image assembly.
+The libfprint/GUsb path is stalling on the first bulk OUT request itself.
+
+## Additional attempted change
+
+A temporary `g_usb_device_reset()` call was inserted before set-configuration/claiming.
+That caused the runtime test to hang during open and was reverted.
+
+So, as of this checkpoint:
+
+- `set_configuration(1)` alone did **not** move the timeout boundary
+- `reset()` in `dev_init()` was **not** a safe fix in this path
+- the next investigation should focus on why the first libusb/GUsb bulk OUT never completes even though the standalone usbfs probe can write the same packet immediately

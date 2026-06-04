@@ -66,31 +66,31 @@ This plan is successful when all of the following are true:
 
 ### Phase 0 — lock the current failure baseline
 
-- [ ] Save a concise log describing the current `img-capture` timeout boundary
-- [ ] Save a concise log describing the current patched `fprintd-enroll` timeout boundary
-- [ ] Mark in notes that verify is blocked downstream of enroll because no prints are enrolled yet
+- [x] Save a concise log describing the current `img-capture` timeout boundary
+- [x] Save a concise log describing the current patched `fprintd-enroll` timeout boundary
+- [x] Mark in notes that verify is blocked downstream of enroll because no prints are enrolled yet
 
 ### Phase 1 — instrument the driver
 
-- [ ] Add `fp_dbg()` logging around EH577 activation and state transitions
-- [ ] Log packet-array selection changes (`POST_INIT`, `PRE_INIT`, `REPEAT`)
-- [ ] Log when zero frames are seen and what the driver does next
-- [ ] Log when finger status is reported true/false
-- [ ] Log when strips/frames are appended and when an image is emitted
+- [x] Add `fp_dbg()` logging around EH577 activation and state transitions
+- [x] Log packet-array selection changes (`POST_INIT`, `PRE_INIT`, `REPEAT`)
+- [x] Log when zero frames are seen and what the driver does next
+- [x] Log when finger status is reported true/false
+- [x] Log when strips/frames are appended and when an image is emitted
 
 ### Phase 2 — compare runtime flow vs standalone probe evidence
 
-- [ ] Compare driver packet ordering with `tools/eh577_usbfs_probe.c`
-- [ ] Compare runtime assumptions against the successful post-init finger-hold captures
-- [ ] Decide whether the current runtime path should force post-init-led polling before any pre-init branch
+- [x] Compare driver packet ordering with `tools/eh577_usbfs_probe.c`
+- [x] Compare runtime assumptions against the successful post-init finger-hold captures
+- [x] Decide whether the current runtime path should force post-init-led polling before any pre-init branch
 - [ ] Decide whether the finger-detection heuristic is too strict for EH577 frames
 
 ### Phase 3 — targeted runtime fixes
 
-- [ ] Patch the smallest likely blocker in `egis0577.c`
-- [ ] Rebuild `refs/libfprint` sequentially (`meson compile` then `meson test`)
-- [ ] Re-run `img-capture` with the patched tree
-- [ ] Record whether the timeout moved, disappeared, or changed shape
+- [x] Patch the smallest likely blocker in `egis0577.c`
+- [x] Rebuild `refs/libfprint` sequentially (`meson compile` then `meson test`)
+- [x] Re-run `img-capture` with the patched tree
+- [x] Record whether the timeout moved, disappeared, or changed shape
 - [ ] If still blocked, iterate once more with the next smallest evidence-backed fix
 
 ### Phase 4 — patched fprintd runtime re-test

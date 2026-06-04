@@ -1,0 +1,24 @@
+# EH577 patched fprintd-enroll timeout boundary summary
+
+Date: 2026-06-04
+Sources:
+- `logs/2026-06-04-patched-fprintd-enroll.txt`
+- `logs/2026-06-04-patched-fprintd-daemon-enroll.txt`
+
+## Result
+
+The patched enroll path currently fails at the same early runtime stage as `img-capture`.
+
+Observed flow:
+
+1. fprintd claims the EH577 device successfully
+2. enrollment starts and the image device activates
+3. the EH577 SSM enters states 0, 1, and 2
+4. libfprint moves into `FPI_IMAGE_DEVICE_STATE_AWAIT_FINGER_ON`
+5. after ~10 seconds the SSM fails in state 2 with `transfer timed out`
+6. fprintd reports `enroll-unknown-error`
+
+## Important conclusion
+
+`verify` is still blocked downstream of enrollment because no successful enroll has completed yet.
+The current blocker is not match logic or storage logic; it is the same early capture-path timeout seen in `img-capture`.

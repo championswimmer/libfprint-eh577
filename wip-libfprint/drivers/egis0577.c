@@ -42,6 +42,7 @@ struct _FpDeviceEgis0577
 
   gboolean      running;
   gboolean      stop;
+  gboolean      finger_reported;
 
   GSList       *strips;
   gsize         strips_len;
@@ -77,6 +78,46 @@ static struct fpi_frame_asmbl_ctx assembling_ctx = {
   .get_pixel = egis_get_pixel,
 };
 
+static const char *
+packet_array_name (const Packet *pkt_array)
+{
+  if (pkt_array == EGIS0577_POST_INIT_PACKETS)
+    return "post-init";
+  if (pkt_array == EGIS0577_REPEAT_PACKETS)
+    return "repeat";
+  if (pkt_array == EGIS0577_PRE_INIT_PACKETS)
+    return "pre-init";
+
+  return "unknown";
+}
+
+static void
+report_finger_status (FpDeviceEgis0577 *self,
+                      FpImageDevice    *img_self,
+                      gboolean          present,
+                      const char       *reason)
+{
+  if (self->finger_reported != present)
+    fp_dbg ("Reporting finger %s (%s)", present ? "present" : "absent", reason);
+  else
+    fp_dbg ("Finger remains %s (%s)", present ? "present" : "absent", reason);
+
+  self->finger_reported = present;
+  fpi_image_device_report_finger_status (img_self, present);
+}
+
+static gsize
+count_nonzero_bytes (FpiUsbTransfer *transfer)
+{
+  gsize nonzero = 0;
+
+  for (size_t i = 0; i < transfer->actual_length; i++)
+    if (transfer->buffer[i] != 0)
+      nonzero++;
+
+  return nonzero;
+}
+
 /*
  * ==================== Data processing ====================
  */
@@ -86,11 +127,7 @@ static struct fpi_frame_asmbl_ctx assembling_ctx = {
 static gboolean
 valid_data (FpiUsbTransfer *transfer)
 {
-  int sum = 0;
-
-  for (size_t i = 0; i < MIN (100, transfer->actual_length); i++)
-    sum |= transfer->buffer[i];
-  return sum;
+  return count_nonzero_bytes (transfer) > 0;
 }
 
 static gboolean
@@ -117,16 +154,31 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
 {
   FpImageDevice *img_self = FP_IMAGE_DEVICE (dev);
   FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
+  gsize nonzero = count_nonzero_bytes (transfer);
+  gboolean has_valid_data = valid_data (transfer);
+  gboolean detected_finger = FALSE;
+
+  fp_dbg ("Frame received from %s[%d]: len=%zu nonzero=%zu strips=%zu stop=%d",
+          packet_array_name (self->pkt_array),
+          self->current_index,
+          transfer->actual_length,
+          nonzero,
+          self->strips_len,
+          self->stop);
 
   /*
    * EH577 idle captures are often all-zero, including the first 5356-byte
    * post-init frame when no finger is present. Treat that as "no finger yet"
    * rather than as a fatal transport/data error.
    */
-  if (!valid_data (transfer))
+  if (!has_valid_data)
     {
+      fp_dbg ("Zero frame seen; %s",
+              self->strips_len > 0 ? "processing previously collected strips" : "continuing polling loop");
+
       if (self->stop)
         {
+          fp_dbg ("Stop requested while handling zero frame");
           fpi_ssm_jump_to_state (transfer->ssm, SM_DONE);
           g_slist_free_full (self->strips, g_free);
           self->strips_len = 0;
@@ -137,13 +189,14 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
       if (self->strips_len > 0)
         goto START_PROCESSING;
 
-      fpi_image_device_report_finger_status (img_self, FALSE);
+      report_finger_status (self, img_self, FALSE, "all-zero frame");
       fpi_ssm_jump_to_state (transfer->ssm, SM_REQ);
       return;
     }
 
   if (self->stop)
     {
+      fp_dbg ("Stop requested while handling non-zero frame");
       fpi_ssm_jump_to_state (transfer->ssm, SM_DONE);
       g_slist_free_full (self->strips, g_free);
       self->strips_len = 0;
@@ -151,10 +204,18 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
       return;
     }
 
-  if (!finger_present (transfer))
+  detected_finger = finger_present (transfer);
+  fp_dbg ("Finger heuristic for current frame: %s", detected_finger ? "present" : "absent");
+
+  if (!detected_finger)
     {
       if (self->strips_len > 0)
-        goto START_PROCESSING;
+        {
+          fp_dbg ("Finger no longer detected after %zu strips, processing image", self->strips_len);
+          goto START_PROCESSING;
+        }
+
+      report_finger_status (self, img_self, FALSE, "non-zero frame below finger heuristic threshold");
     }
   else
     {
@@ -164,13 +225,22 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
       memcpy (stripe->data, (transfer->buffer) + (EGIS0577_IMGWIDTH * EGIS0577_RFMDIS), EGIS0577_IMGWIDTH * EGIS0577_RFMGHEIGHT);
       self->strips = g_slist_prepend (self->strips, stripe);
       self->strips_len += 1;
+
+      report_finger_status (self, img_self, TRUE, "frame variance exceeded threshold");
+      fp_dbg ("Appended strip %zu/%d", self->strips_len, EGIS0577_CONSECUTIVE_CAPTURES);
     }
 
   if (self->strips_len < EGIS0577_CONSECUTIVE_CAPTURES)
-    fpi_ssm_jump_to_state (transfer->ssm, SM_REQ);
+    {
+      fp_dbg ("Continuing polling loop with %zu strips buffered", self->strips_len);
+      fpi_ssm_jump_to_state (transfer->ssm, SM_REQ);
+    }
   else
 START_PROCESSING:
-    fpi_ssm_next_state (transfer->ssm);
+    {
+      fp_dbg ("Enough data collected, moving to image processing with %zu strips", self->strips_len);
+      fpi_ssm_next_state (transfer->ssm);
+    }
 }
 
 static void
@@ -181,9 +251,10 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
 
   FpiImageDeviceState state;
 
-  fpi_image_device_report_finger_status (img_self, TRUE);
+  report_finger_status (self, img_self, TRUE, "processing buffered strips");
 
   g_object_get (dev, "fpi-image-device-state", &state, NULL);
+  fp_dbg ("Processing %zu strips while image-device state=%d", self->strips_len, state);
   if (state == FPI_IMAGE_DEVICE_STATE_CAPTURE)
     {
       if (!self->stop)
@@ -198,6 +269,7 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
 
           FpImage *resizedImage = fpi_image_resize (img, EGIS0577_RESIZE, EGIS0577_RESIZE);
 
+          fp_dbg ("Submitting assembled image from %zu strips", self->strips_len);
           fpi_image_device_image_captured (img_self, resizedImage);
         }
 
@@ -205,8 +277,13 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
       self->strips = NULL;
       self->strips_len = 0;
 
-      fpi_image_device_report_finger_status (img_self, FALSE);
+      report_finger_status (self, img_self, FALSE, "image submitted");
       fpi_ssm_next_state (ssm);
+    }
+  else
+    {
+      fp_dbg ("Image-device state is not CAPTURE yet, returning to polling loop");
+      fpi_ssm_jump_to_state (ssm, SM_REQ);
     }
 }
 
@@ -221,13 +298,9 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
 
   if (error)
     {
-      const char *array_name = "pre-init";
-      if (self->pkt_array == EGIS0577_POST_INIT_PACKETS)
-        array_name = "post-init";
-      else if (self->pkt_array == EGIS0577_REPEAT_PACKETS)
-        array_name = "repeat";
-
-      fp_dbg ("Error occurred at index %d of %s array", self->current_index, array_name);
+      fp_dbg ("Error occurred at index %d of %s array",
+              self->current_index,
+              packet_array_name (self->pkt_array));
       fpi_ssm_mark_failed (transfer->ssm, error);
 
       g_slist_free_full (self->strips, g_free);
@@ -236,10 +309,24 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
       return;
     }
 
+  fp_dbg ("RX complete for %s[%d]: actual=%zu first-bytes=%02x %02x %02x %02x %02x %02x %02x",
+          packet_array_name (self->pkt_array),
+          self->current_index,
+          transfer->actual_length,
+          transfer->actual_length > 0 ? transfer->buffer[0] : 0,
+          transfer->actual_length > 1 ? transfer->buffer[1] : 0,
+          transfer->actual_length > 2 ? transfer->buffer[2] : 0,
+          transfer->actual_length > 3 ? transfer->buffer[3] : 0,
+          transfer->actual_length > 4 ? transfer->buffer[4] : 0,
+          transfer->actual_length > 5 ? transfer->buffer[5] : 0,
+          transfer->actual_length > 6 ? transfer->buffer[6] : 0);
+
   if (self->current_index == self->pkt_array_len - 1)
     {
       if (self->pkt_array == EGIS0577_REPEAT_PACKETS || self->pkt_array == EGIS0577_POST_INIT_PACKETS)
         {
+          fp_dbg ("Completed %s sequence, switching to repeat/data handling",
+                  packet_array_name (self->pkt_array));
           self->pkt_array = EGIS0577_REPEAT_PACKETS;
           self->pkt_array_len = EGIS0577_REPEAT_PACKETS_LENGTH;
           self->current_index = 0;
@@ -249,6 +336,7 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
         }
       else
         {
+          fp_dbg ("Completed pre-init sequence, switching back to post-init");
           self->pkt_array = EGIS0577_POST_INIT_PACKETS;
           self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
           self->current_index = 0;
@@ -263,14 +351,13 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
     {
       /*
        * EH575 switches to pre-init on SIGE 01 01 01.
-       * Keep that path available for EH577, but only on the full exact
-       * pattern. Real EH577 hardware has also returned 01 05 01 and 01 00 01,
-       * and meaningful captures were observed on the post-init-led path.
+       * For EH577, the strongest capture evidence remains on the post-init
+       * path, while the PRE_INIT-specific 73 14 ec command has so far returned
+       * only a short status reply instead of the meaningful 5356-byte frame
+       * seen on post-init 64 14 ec.
        */
-      fp_dbg ("Exact 01 01 01 state observed, switching to pre-init packets");
-      self->pkt_array = EGIS0577_PRE_INIT_PACKETS;
-      self->pkt_array_len = EGIS0577_PRE_INIT_PACKETS_LENGTH;
-      self->current_index = 0;
+      fp_dbg ("Exact 01 01 01 state observed, but EH577 stays on post-init path");
+      self->current_index += 1;
     }
   else
     {
@@ -284,10 +371,17 @@ static void
 recv_resp (FpiSsm *ssm, FpDevice *dev, int response_length)
 {
   FpiUsbTransfer *transfer = fpi_usb_transfer_new (dev);
+  FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
+
+  fp_dbg ("Submitting bulk IN for %s[%d], expecting %d bytes",
+          packet_array_name (self->pkt_array),
+          self->current_index,
+          response_length);
 
   fpi_usb_transfer_fill_bulk (transfer, EGIS0577_EPIN, response_length);
 
   transfer->ssm = ssm;
+  transfer->short_is_error = TRUE;
 
   fpi_usb_transfer_submit (transfer, EGIS0577_TIMEOUT, NULL, resp_cb, NULL);
 }
@@ -296,6 +390,17 @@ static void
 send_req (FpiSsm *ssm, FpDevice *dev, const Packet *pkt)
 {
   FpiUsbTransfer *transfer = fpi_usb_transfer_new (dev);
+  FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
+
+  fp_dbg ("Submitting bulk OUT for %s[%d/%d]: %02x %02x %02x len=%d expect=%d",
+          packet_array_name (self->pkt_array),
+          self->current_index,
+          self->pkt_array_len,
+          pkt->sequence[4],
+          pkt->sequence[5],
+          pkt->sequence[6],
+          pkt->length,
+          pkt->response_length);
 
   fpi_usb_transfer_fill_bulk_full (transfer, EGIS0577_EPOUT, pkt->sequence, pkt->length, NULL);
 
@@ -322,9 +427,11 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
       self->pkt_array = EGIS0577_POST_INIT_PACKETS;
       self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
       self->current_index = 0;
+      self->finger_reported = FALSE;
 
       self->strips_len = 0;
       self->strips = NULL;
+      fp_dbg ("Initial packet array: %s", packet_array_name (self->pkt_array));
       fpi_ssm_next_state (ssm);
       break;
 
@@ -342,10 +449,18 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
       break;
 
     case SM_REQ:
+      fp_dbg ("SSM_REQ using %s[%d/%d]",
+              packet_array_name (self->pkt_array),
+              self->current_index,
+              self->pkt_array_len);
       send_req (ssm, dev, &self->pkt_array[self->current_index]);
       break;
 
     case SM_RESP:
+      fp_dbg ("SSM_RESP waiting on %s[%d/%d]",
+              packet_array_name (self->pkt_array),
+              self->current_index,
+              self->pkt_array_len);
       recv_resp (ssm, dev, self->pkt_array[self->current_index].response_length);
       break;
 
@@ -371,7 +486,14 @@ loop_complete (FpiSsm *ssm, FpDevice *dev, GError *error)
   self->running = FALSE;
 
   if (error)
-    fpi_image_device_session_error (img_dev, error);
+    {
+      fp_dbg ("Capture loop completed with error: %s", error->message);
+      fpi_image_device_session_error (img_dev, error);
+    }
+  else
+    {
+      fp_dbg ("Capture loop completed cleanly");
+    }
 }
 
 /*
@@ -383,7 +505,16 @@ dev_init (FpImageDevice *dev)
 {
   GError *error = NULL;
 
-  g_usb_device_claim_interface (fpi_device_get_usb_device (FP_DEVICE (dev)), 0, 0, &error);
+  fp_dbg ("Opening EH577 device");
+  fp_dbg ("Claiming interface %d", EGIS0577_INTERFACE);
+  if (!g_usb_device_claim_interface (fpi_device_get_usb_device (FP_DEVICE (dev)),
+                                     EGIS0577_INTERFACE,
+                                     0,
+                                     &error))
+    {
+      fpi_image_device_open_complete (dev, error);
+      return;
+    }
 
   fpi_image_device_open_complete (dev, error);
 }
@@ -393,7 +524,11 @@ dev_deinit (FpImageDevice *dev)
 {
   GError *error = NULL;
 
-  g_usb_device_release_interface (fpi_device_get_usb_device (FP_DEVICE (dev)), 0, 0, &error);
+  fp_dbg ("Releasing interface %d", EGIS0577_INTERFACE);
+  g_usb_device_release_interface (fpi_device_get_usb_device (FP_DEVICE (dev)),
+                                  EGIS0577_INTERFACE,
+                                  0,
+                                  &error);
 
   fpi_image_device_close_complete (dev, error);
 }
@@ -403,6 +538,7 @@ dev_stop (FpImageDevice *dev)
 {
   FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
 
+  fp_dbg ("Deactivate requested, running=%d", self->running);
   if (self->running)
     self->stop = TRUE;
   else
@@ -415,6 +551,7 @@ dev_start (FpImageDevice *dev)
   FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
   FpiSsm *ssm = fpi_ssm_new (FP_DEVICE (dev), ssm_run_state, SM_STATES_NUM);
 
+  fp_dbg ("Activate requested");
   self->stop = FALSE;
 
   fpi_ssm_start (ssm, loop_complete);

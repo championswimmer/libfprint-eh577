@@ -1,0 +1,42 @@
+# EH577 post-reboot enumeration check
+
+Date: 2026-06-04
+Context: resumed after system reboot following the earlier EH577 USB reset wedge.
+
+## Result
+
+A normal reboot did not recover the fingerprint sensor.
+
+Observed after boot:
+
+- `sudo -n true` succeeded
+- `lsusb` showed no `1c7a:0577` / `EgisTec EH577`
+- `/sys/bus/usb/devices` showed devices on `3-1`, `3-2`, `3-4`, `3-5`, but no `3-3`
+- `journalctl -k -b` still shows the EH577 port failing during boot enumeration
+
+Key kernel lines:
+
+- `usb 3-3: new high-speed USB device number 4 using xhci_hcd`
+- repeated `device descriptor read/64, error -110`
+- repeated `device not accepting address ..., error -62`
+- `usb usb3-port3: unable to enumerate USB device`
+
+## Conclusion
+
+The EH577 remains unavailable after a warm reboot. The previous reset experiment appears to have left the device in a state that survives reboot or requires a deeper power cycle than a software restart.
+
+## Next step
+
+Further libfprint or libusb runtime testing is blocked until the hardware enumerates again.
+Likely recovery actions are:
+
+1. full shutdown / cold boot rather than warm reboot
+2. if possible, remove wall power briefly before power-on
+3. if firmware setup offers internal fingerprint / USB power toggles, use those only if needed
+
+Once the device reappears in `lsusb`, resume with:
+
+```bash
+sudo -n ./build/eh577_libusb_smoketest --debug 4
+sudo -n ./build/eh577_libusb_smoketest --set-config --read --debug 4
+```
