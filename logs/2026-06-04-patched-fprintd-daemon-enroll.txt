@@ -1,0 +1,80 @@
+(fprintd:203967): fprintd-DEBUG: 01:24:33.039: About to load configuration file '/etc/fprintd.conf'
+(fprintd:203967): fprintd-DEBUG: 01:24:33.039: Launching FprintObject
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.039: Initializing FpContext (libfprint version 1.94.10)
+(fprintd:203967): fprintd-DEBUG: 01:24:33.043: Preparing devices for resume
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 1D6B:0003
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 046D:085E
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 1D6B:0002
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 1D6B:0003
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 1D6B:0002
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 1D6B:0003
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 13D3:3604
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 1D6B:A4A7
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 046D:C548
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 046D:C52B
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 1D6B:0002
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 1D6B:0003
+(fprintd:203967): libfprint-context-DEBUG: 01:24:33.043: No driver found for USB device 1D6B:0002
+(fprintd:203967): libfprint-device-DEBUG: 01:24:33.043: Device reported probe completion
+(fprintd:203967): libfprint-device-DEBUG: 01:24:33.043: Completing action FPI_DEVICE_ACTION_PROBE in idle!
+(fprintd:203967): libfprint-device-DEBUG: 01:24:33.043: Updated temperature model after 0.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+(fprintd:203967): fprintd-DEBUG: 01:24:33.044: Device LighTuning Technology Inc. EgisTec EH577 scan type changed to 'swipe'
+(fprintd:203967): fprintd-DEBUG: 01:24:33.044: Device LighTuning Technology Inc. EgisTec EH577 enroll stages changed to 6
+(fprintd:203967): fprintd-DEBUG: 01:24:33.044: Finger present 0
+(fprintd:203967): fprintd-DEBUG: 01:24:33.044: Finger needed 0
+(fprintd:203967): fprintd-DEBUG: 01:24:33.044: Got delay inhibitor for sleep.
+(fprintd:203967): fprintd-DEBUG: 01:24:33.044: entering main loop
+(fprintd:203967): fprintd-DEBUG: 01:24:33.044: D-Bus service launched with name: net.reactivated.Fprint
+(fprintd:203967): fprintd-DEBUG: 01:24:36.039: Requesting authorization from :1.708 to call method 'Claim' for device 'LighTuning Technology Inc. EgisTec EH577'
+(fprintd:203967): fprintd-DEBUG: 01:24:36.039: Getting authorization to perform Polkit action net.reactivated.fprint.device.verify
+(fprintd:203967): fprintd-DEBUG: 01:24:36.041: Authorization granted to :1.708 to call method 'Claim' for device 'LighTuning Technology Inc. EgisTec EH577'!
+(fprintd:203967): fprintd-DEBUG: 01:24:36.041: user 'championswimmer' claiming the device: 0
+(fprintd:203967): libfprint-image_device-DEBUG: 01:24:36.041: Image device open completed
+(fprintd:203967): libfprint-device-DEBUG: 01:24:36.041: Device reported open completion
+(fprintd:203967): libfprint-device-DEBUG: 01:24:36.041: Completing action FPI_DEVICE_ACTION_OPEN in idle!
+(fprintd:203967): libfprint-device-DEBUG: 01:24:36.041: Updated temperature model after 3.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+(fprintd:203967): fprintd-DEBUG: 01:24:36.041: claimed device 0
+(fprintd:203967): fprintd-DEBUG: 01:24:36.041: Requesting authorization from :1.708 to call method 'EnrollStart' for device 'LighTuning Technology Inc. EgisTec EH577'
+(fprintd:203967): fprintd-DEBUG: 01:24:36.041: Getting authorization to perform Polkit action net.reactivated.fprint.device.enroll
+(fprintd:203967): fprintd-DEBUG: 01:24:42.479: Authorization granted to :1.708 to call method 'EnrollStart' for device 'LighTuning Technology Inc. EgisTec EH577'!
+(fprintd:203967): fprintd-DEBUG: 01:24:42.479: file_storage_print_data_load(): loaded '/var/lib/fprint/championswimmer/egis0577/0/7' Unknown error -2
+(fprintd:203967): fprintd-DEBUG: 01:24:42.479: start enrollment device 0 finger 7
+(fprintd:203967): libfprint-device-DEBUG: 01:24:42.479: Updated temperature model after 6.44 seconds, ratio 0.27 -> 0.26, active 1 -> 1, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+(fprintd:203967): libfprint-image_device-DEBUG: 01:24:42.479: Activating image device
+(fprintd:203967): libfprint-image_device-DEBUG: 01:24:42.479: Image device internal state change from FPI_IMAGE_DEVICE_STATE_INACTIVE to FPI_IMAGE_DEVICE_STATE_ACTIVATING
+(fprintd:203967): libfprint-SSM-DEBUG: 01:24:42.479: [egis0577] SM_STATES_NUM entering state 0
+(fprintd:203967): libfprint-egis0577-DEBUG: 01:24:42.479: Starting capture
+(fprintd:203967): libfprint-SSM-DEBUG: 01:24:42.479: [egis0577] SM_STATES_NUM entering state 1
+(fprintd:203967): libfprint-SSM-DEBUG: 01:24:42.479: [egis0577] SM_STATES_NUM entering state 2
+(fprintd:203967): libfprint-image_device-DEBUG: 01:24:42.479: Image device activation completed
+(fprintd:203967): libfprint-image_device-DEBUG: 01:24:42.479: Image device internal state change from FPI_IMAGE_DEVICE_STATE_ACTIVATING to FPI_IMAGE_DEVICE_STATE_IDLE
+(fprintd:203967): libfprint-image_device-DEBUG: 01:24:42.479: Image device internal state change from FPI_IMAGE_DEVICE_STATE_IDLE to FPI_IMAGE_DEVICE_STATE_AWAIT_FINGER_ON
+(fprintd:203967): libfprint-device-DEBUG: 01:24:42.479: Device reported finger status change: FP_FINGER_STATUS_NEEDED
+(fprintd:203967): fprintd-DEBUG: 01:24:42.479: Finger present 0
+(fprintd:203967): fprintd-DEBUG: 01:24:42.479: Finger needed 1
+(fprintd:203967): libfprint-device-DEBUG: 01:24:43.724: Updated temperature model after 1.24 seconds, ratio 0.26 -> 0.27, active 1 -> 1, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_WARM
+(fprintd:203967): libfprint-SSM-DEBUG: 01:24:52.480: [egis0577] SSM SM_STATES_NUM failed in state 2 with error: transfer timed out
+(fprintd:203967): libfprint-SSM-DEBUG: 01:24:52.480: [egis0577] SM_STATES_NUM completed with error: transfer timed out
+(fprintd:203967): libfprint-image_device-DEBUG: 01:24:52.480: Deactivating image device
+(fprintd:203967): libfprint-image_device-DEBUG: 01:24:52.480: Image device internal state change from FPI_IMAGE_DEVICE_STATE_AWAIT_FINGER_ON to FPI_IMAGE_DEVICE_STATE_DEACTIVATING
+(fprintd:203967): libfprint-image_device-DEBUG: 01:24:52.480: Image device deactivation completed
+(fprintd:203967): libfprint-image_device-DEBUG: 01:24:52.480: Image device internal state change from FPI_IMAGE_DEVICE_STATE_DEACTIVATING to FPI_IMAGE_DEVICE_STATE_INACTIVE
+(fprintd:203967): libfprint-device-DEBUG: 01:24:52.480: Device reported generic error (transfer timed out) during action; action was: FPI_DEVICE_ACTION_IDENTIFY
+(fprintd:203967): libfprint-device-DEBUG: 01:24:52.480: Device reported identify completion
+(fprintd:203967): libfprint-device-DEBUG: 01:24:52.480: Device reported finger status change: FP_FINGER_STATUS_NONE
+(fprintd:203967): fprintd-DEBUG: 01:24:52.480: Finger present 0
+(fprintd:203967): fprintd-DEBUG: 01:24:52.480: Finger needed 0
+(fprintd:203967): libfprint-device-DEBUG: 01:24:52.480: Completing action FPI_DEVICE_ACTION_IDENTIFY in idle!
+(fprintd:203967): libfprint-device-DEBUG: 01:24:52.480: Updated temperature model after 8.76 seconds, ratio 0.27 -> 0.30, active 0 -> 0, FP_TEMPERATURE_WARM -> FP_TEMPERATURE_WARM
+
+(fprintd:203967): fprintd-WARNING **: 01:24:52.480: Device reported an error during identify for enroll: transfer timed out
+(fprintd:203967): fprintd-DEBUG: 01:24:52.481: Requesting authorization from :1.708 to call method 'EnrollStop' for device 'LighTuning Technology Inc. EgisTec EH577'
+(fprintd:203967): fprintd-DEBUG: 01:24:52.481: Authorization granted to :1.708 to call method 'EnrollStop' for device 'LighTuning Technology Inc. EgisTec EH577'!
+(fprintd:203967): fprintd-DEBUG: 01:24:52.481: Requesting authorization from :1.708 to call method 'Release' for device 'LighTuning Technology Inc. EgisTec EH577'
+(fprintd:203967): fprintd-DEBUG: 01:24:52.481: Authorization granted to :1.708 to call method 'Release' for device 'LighTuning Technology Inc. EgisTec EH577'!
+(fprintd:203967): libfprint-image_device-DEBUG: 01:24:52.481: Image device close completed
+(fprintd:203967): libfprint-device-DEBUG: 01:24:52.481: Device reported close completion
+(fprintd:203967): libfprint-device-DEBUG: 01:24:52.481: Completing action FPI_DEVICE_ACTION_CLOSE in idle!
+(fprintd:203967): libfprint-device-DEBUG: 01:24:52.482: Updated temperature model after 0.00 seconds, ratio 0.30 -> 0.30, active 0 -> 0, FP_TEMPERATURE_WARM -> FP_TEMPERATURE_WARM
+(fprintd:203967): fprintd-DEBUG: 01:24:52.482: released device 0
+(fprintd:203967): fprintd-DEBUG: 01:24:52.561: main loop completed

@@ -45,8 +45,12 @@
  * the early EH575 post-init packets on the wire.
  *
  * Important nuance:
- * - on real EH577 hardware, `EGIS 60 01 fc` returned `SIGE 01 01 01`
- * - the EH575 driver treats that as a cue to switch into the PRE_INIT sequence
+ * - on real EH577 hardware, `EGIS 60 01 fc` has returned `SIGE 01 01 01`,
+ *   `SIGE 01 05 01`, and `SIGE 01 00 01`
+ * - only the exact `SIGE 01 01 01` pattern should trigger the EH575-style
+ *   switch into the PRE_INIT sequence
+ * - the strongest successful capture evidence so far came from the post-init-led
+ *   path during finger hold
  */
 
 typedef struct Packet
@@ -93,7 +97,7 @@ static const Packet EGIS0577_PRE_INIT_PACKETS[] = {
 #define EGIS0577_POST_INIT_PACKETS_LENGTH 18
 static const Packet EGIS0577_POST_INIT_PACKETS[] = {
   {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x60, 0x00, 0xfc}, .response_length = 7},
-  {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x60, 0x01, 0xfc}, .response_length = 7},   /* Change to EGIS0577_PRE_INIT_PACKETS if response == 01:01:01 */
+  {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x60, 0x01, 0xfc}, .response_length = 7},   /* Change to EGIS0577_PRE_INIT_PACKETS only if response is exact SIGE 01 01 01 */
   {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x60, 0x40, 0xfc}, .response_length = 7},
   {.length = 18, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x63, 0x09, 0x0b, 0x83, 0x24, 0x00, 0x44, 0x0f, 0x08, 0x20, 0x20, 0x01, 0x05, 0x12}, .response_length = 18},
   {.length = 13, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x63, 0x26, 0x06, 0x06, 0x60, 0x06, 0x05, 0x2f, 0x06}, .response_length = 13},

@@ -115,20 +115,36 @@ finger_present (FpiUsbTransfer *transfer)
 static void
 save_img (FpiUsbTransfer *transfer, FpDevice *dev)
 {
+  FpImageDevice *img_self = FP_IMAGE_DEVICE (dev);
   FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
 
+  /*
+   * EH577 idle captures are often all-zero, including the first 5356-byte
+   * post-init frame when no finger is present. Treat that as "no finger yet"
+   * rather than as a fatal transport/data error.
+   */
   if (!valid_data (transfer))
     {
-      GError *error = fpi_device_error_new_msg (FP_DEVICE_ERROR_DATA_INVALID, "All zero data received!");
-      fpi_ssm_mark_failed (transfer->ssm, error);
-      g_error_free (error);
-      goto CLEANUP;
+      if (self->stop)
+        {
+          fpi_ssm_jump_to_state (transfer->ssm, SM_DONE);
+          g_slist_free_full (self->strips, g_free);
+          self->strips_len = 0;
+          self->strips = NULL;
+          return;
+        }
+
+      if (self->strips_len > 0)
+        goto START_PROCESSING;
+
+      fpi_image_device_report_finger_status (img_self, FALSE);
+      fpi_ssm_jump_to_state (transfer->ssm, SM_REQ);
+      return;
     }
 
   if (self->stop)
     {
       fpi_ssm_jump_to_state (transfer->ssm, SM_DONE);
-CLEANUP:
       g_slist_free_full (self->strips, g_free);
       self->strips_len = 0;
       self->strips = NULL;
@@ -238,9 +254,20 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
           self->current_index = 0;
         }
     }
-  else if (self->pkt_array == EGIS0577_POST_INIT_PACKETS && self->current_index == 1 && transfer->buffer[5] == 0x01)
+  else if (self->pkt_array == EGIS0577_POST_INIT_PACKETS &&
+           self->current_index == 1 &&
+           transfer->actual_length >= 7 &&
+           transfer->buffer[4] == 0x01 &&
+           transfer->buffer[5] == 0x01 &&
+           transfer->buffer[6] == 0x01)
     {
-      fp_dbg ("Pre initialization required, switching to pre-init packets");
+      /*
+       * EH575 switches to pre-init on SIGE 01 01 01.
+       * Keep that path available for EH577, but only on the full exact
+       * pattern. Real EH577 hardware has also returned 01 05 01 and 01 00 01,
+       * and meaningful captures were observed on the post-init-led path.
+       */
+      fp_dbg ("Exact 01 01 01 state observed, switching to pre-init packets");
       self->pkt_array = EGIS0577_PRE_INIT_PACKETS;
       self->pkt_array_len = EGIS0577_PRE_INIT_PACKETS_LENGTH;
       self->current_index = 0;

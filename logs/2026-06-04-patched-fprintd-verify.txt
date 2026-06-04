@@ -1,0 +1,2 @@
+Using device /net/reactivated/Fprint/Device/0
+ListEnrolledFingers failed: GDBus.Error:net.reactivated.Fprint.Error.NoEnrolledPrints: Failed to discover prints

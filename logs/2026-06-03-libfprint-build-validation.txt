@@ -1,0 +1,101 @@
+# libfprint EH577 build validation
+
+Date: 2026-06-03
+Reference tree: `refs/libfprint`
+Upstream base: `d79f157282085738ea8ffbe8c2ae96fb8b3ad831`
+
+## Summary
+
+The local EH577 driver integration was validated against the latest upstream `libfprint` tree.
+
+Result:
+
+- Meson configuration succeeded
+- the modified tree compiled successfully
+- the reduced configured test run passed
+- one metadata mismatch had to be fixed during integration
+
+## Configuration used
+
+A reduced build was used to avoid unrelated system-integration dependencies while validating the EH577 driver bringup:
+
+```bash
+meson setup refs/libfprint/build refs/libfprint \
+  -Ddrivers=egis0577,virtual_image \
+  -Dudev_rules=disabled \
+  -Dudev_hwdb=disabled \
+  -Dintrospection=false \
+  -Ddoc=false \
+  -Dinstalled-tests=false
+```
+
+## Build result
+
+```bash
+meson compile -C refs/libfprint/build
+```
+
+Succeeded.
+
+Important practical note:
+
+- build and test steps must be run sequentially
+- running them in parallel can race on the just-linked shared library and produce bogus `file format not recognized` linker failures
+
+## Test result
+
+```bash
+meson test -C refs/libfprint/build --print-errorlogs
+```
+
+Succeeded in the configured environment.
+
+Observed summary:
+
+- `Ok: 6`
+- `Fail: 0`
+- `Skipped: 28`
+
+The skipped tests are expected because only a reduced driver set was configured and many device-specific tests are not applicable in this setup.
+
+## Metadata issue fixed during integration
+
+After first wiring in `egis0577`, the generated `udev-hwdb` helper warned:
+
+- `1c7a:0577 implemented by driver egis0577`
+
+Cause:
+
+- `0577` was still present in the autosuspend-only allowlist / generated hwdb source
+- once a real driver exists, that duplication becomes inconsistent
+
+Fix applied:
+
+- removed `1c7a:0577` from:
+  - `refs/libfprint/libfprint/fprint-list-udev-hwdb.c`
+  - `refs/libfprint/data/autosuspend.hwdb`
+
+## Code-level EH577 bringup changes currently in tree
+
+The local EH577 integration currently includes:
+
+- new driver source/header wired into Meson:
+  - `refs/libfprint/libfprint/drivers/egis0577.c`
+  - `refs/libfprint/libfprint/drivers/egis0577.h`
+- build-system registration in:
+  - `refs/libfprint/libfprint/meson.build`
+  - `refs/libfprint/meson.build`
+- behavioral adjustments beyond the raw EH575 port base:
+  - idle all-zero 5356-byte frames are not treated as fatal
+  - the PRE_INIT branch is only taken on exact `SIGE 01 01 01`
+
+## Current interpretation
+
+This is the first successful integration milestone, not the final driver validation milestone.
+
+What has been proven by this build step:
+
+1. the EH577 driver skeleton can be integrated into the latest upstream tree,
+2. the code is buildable in a real `libfprint` environment,
+3. the metadata/build-system fallout is manageable,
+4. the next step can shift from pure build integration toward runtime enumeration and behavior testing.

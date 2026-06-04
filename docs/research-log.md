@@ -749,10 +749,162 @@ At this point the best working model is:
 3. The **repeat path alone** is not enough in the currently tested scenario.
 4. Interrupt endpoints `0x83` / `0x84` appear optional, inactive, or OEM-armed rather than required for the observed bulk capture path.
 
+## 2026-06-03 — post-init finger-hold reproducibility confirmed
+
+A second correctly timed guided post-init finger-hold capture was performed.
+
+Artifacts created:
+
+- `logs/2026-06-03-eh577-guided-postinit-fingerhold-03.txt`
+- `logs/2026-06-03-eh577-postinit-fingerhold-03-ascii.txt`
+- `logs/2026-06-03-eh577-postinit-fingerhold-reproducibility.txt`
+- `dumps/2026-06-03-postinit-fingerhold-03/`
+
+Important note:
+
+- an intermediate run `fingerhold-02` was mistimed because the capture command finished before the touch cue
+- that run is useful as a timing lesson, but it is **not** the reproducibility result to rely on
+
+### Second successful non-zero frame
+
+The corrected `fingerhold-03` run again produced a non-zero `64 14 ec` payload:
+
+- length `5356`
+- nonzero bytes `1594`
+- unique values `104`
+- SHA-256 `826fc28994c7371d70761ad6444b2ddcd9322bab0547a2dd74d5f4eeb09f4e28`
+
+This confirms that the earlier non-zero `fingerhold-01` frame was not a one-off accident.
+
+### Comparison against the first successful frame
+
+`fingerhold-01`:
+
+- nonzero `1305`
+- unique values `80`
+- SHA-256 `51e6dcd08a54f9d1aeed5269e362e4720c2c3835994c586bdac299df569c95c3`
+- bbox `x=0..69`, `y=0..51`
+
+`fingerhold-03`:
+
+- nonzero `1594`
+- unique values `104`
+- SHA-256 `826fc28994c7371d70761ad6444b2ddcd9322bab0547a2dd74d5f4eeb09f4e28`
+- bbox `x=0..69`, `y=0..51`
+
+The two frames differ at `2322` byte positions.
+
+### Interpretation
+
+This is strong evidence that EH577 is returning real, variable finger-dependent image-like data rather than a fixed template block or random deterministic noise.
+
+At this point the evidence strongly supports all of the following:
+
+1. EH577 is an EH575-family bulk image device.
+2. The **post-init path** is the current reliable path for meaningful capture.
+3. The **repeat path alone** still does not produce meaningful payloads in the tested conditions.
+4. Frame content varies between acquisitions, as expected for real scans.
+
+## 2026-06-03 — first successful upstream libfprint integration build
+
+After confirming the latest upstream `libfprint` clone was current, the local EH577 driver draft was wired into the real source tree under `refs/libfprint/`.
+
+### Code integration changes
+
+Added / updated:
+
+- `refs/libfprint/libfprint/drivers/egis0577.c`
+- `refs/libfprint/libfprint/drivers/egis0577.h`
+- `refs/libfprint/libfprint/meson.build`
+- `refs/libfprint/meson.build`
+
+Important EH577-specific logic changes made before build validation:
+
+1. idle all-zero `5356`-byte frames are no longer treated as fatal errors
+2. the PRE_INIT branch is only taken on the exact `SIGE 01 01 01` pattern
+3. comments were updated to document real EH577 state variation and the observed post-init-led capture behavior
+
+### Build environment issues encountered
+
+The machine initially lacked several build dependencies/tools:
+
+- `meson`
+- `ninja`
+- `gusb` development files
+- `gudev` / udev-related development support for full default builds
+
+For EH577 bringup, a reduced local build configuration was used to avoid unrelated integration requirements:
+
+```bash
+meson setup refs/libfprint/build refs/libfprint \
+  -Ddrivers=egis0577,virtual_image \
+  -Dudev_rules=disabled \
+  -Dudev_hwdb=disabled \
+  -Dintrospection=false \
+  -Ddoc=false \
+  -Dinstalled-tests=false
+```
+
+### Metadata mismatch fixed during integration
+
+The first post-integration test run exposed a consistency issue:
+
+- `1c7a:0577` was still present in the autosuspend-only allowlist/hwdb generator input
+- once `egis0577` became a real driver, this caused the `udev-hwdb` helper to warn that `0577` was now implemented by a driver
+
+Fix applied:
+
+- removed `1c7a:0577` from:
+  - `refs/libfprint/libfprint/fprint-list-udev-hwdb.c`
+  - `refs/libfprint/data/autosuspend.hwdb`
+
+### Build/test validation result
+
+Artifact created:
+
+- `logs/2026-06-03-libfprint-build-validation.txt`
+
+Results:
+
+- `meson setup` succeeded
+- `meson compile -C refs/libfprint/build` succeeded
+- `meson test -C refs/libfprint/build --print-errorlogs` succeeded in the reduced configured environment
+
+Observed test summary:
+
+- `Ok: 6`
+- `Fail: 0`
+- `Skipped: 28`
+
+The skipped tests are expected in this reduced driver configuration.
+
+### Important build-process note
+
+A false failure was seen when `compile` and `test` were accidentally started in parallel while the shared library was still being relinked.
+
+That produced misleading linker errors like:
+
+- `file not recognized: file format not recognized`
+
+This was a tooling race, not an EH577 code problem.
+
+Future runs should keep `meson compile` and `meson test` strictly sequential.
+
+### Interpretation
+
+This is the first successful upstream-integration milestone for EH577.
+
+At this point we now know:
+
+1. the EH577 driver skeleton can be integrated into the latest upstream tree,
+2. the current EH577 draft is buildable in a real `libfprint` environment,
+3. the first patch can likely stay bulk-first and defer interrupt integration,
+4. the next stage should move toward runtime enumeration and behavior testing of the built stack.
+
 ### Practical next actions after this batch
 
-1. Repeat the post-init finger-hold capture to check reproducibility.
-2. Compare multiple non-zero captures for spatial similarity and stability.
-3. Capture `usbmon` traces for a successful non-zero post-init finger-hold run.
-4. Update the EH577 libfprint draft to prefer the post-init-led capture path.
-5. Investigate whether the smaller state-byte shifts can be used as finger/capture readiness indicators.
+1. Test whether the built stack enumerates EH577 as a supported device.
+2. If enumeration works, test probe/open/activate behavior against the real device.
+3. Investigate whether the smaller state-byte shifts can be used as finger/capture readiness indicators.
+4. Decide explicitly whether the first libfprint patch should stay bulk-only and ignore interrupts.
+5. Capture `usbmon` traces for a successful non-zero post-init finger-hold run if runtime integration still leaves behavior gaps.

@@ -1,0 +1,28 @@
+(fprintd:181378): fprintd-DEBUG: 00:00:59.182: About to load configuration file '/etc/fprintd.conf'
+(fprintd:181378): fprintd-DEBUG: 00:00:59.182: Launching FprintObject
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.183: Initializing FpContext (libfprint version 1.94.10)
+(fprintd:181378): fprintd-DEBUG: 00:00:59.186: Preparing devices for resume
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 1D6B:0003
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 046D:085E
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 1D6B:0002
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 1D6B:0003
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 1D6B:0002
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 1D6B:0003
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 13D3:3604
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 1D6B:A4A7
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 046D:C548
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 046D:C52B
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 1D6B:0002
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 1D6B:0003
+(fprintd:181378): libfprint-context-DEBUG: 00:00:59.186: No driver found for USB device 1D6B:0002
+(fprintd:181378): libfprint-device-DEBUG: 00:00:59.186: Device reported probe completion
+(fprintd:181378): libfprint-device-DEBUG: 00:00:59.186: Completing action FPI_DEVICE_ACTION_PROBE in idle!
+(fprintd:181378): libfprint-device-DEBUG: 00:00:59.186: Updated temperature model after 0.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+(fprintd:181378): fprintd-DEBUG: 00:00:59.188: Device LighTuning Technology Inc. EgisTec EH577 scan type changed to 'swipe'
+(fprintd:181378): fprintd-DEBUG: 00:00:59.188: Device LighTuning Technology Inc. EgisTec EH577 enroll stages changed to 6
+(fprintd:181378): fprintd-DEBUG: 00:00:59.188: Finger present 0
+(fprintd:181378): fprintd-DEBUG: 00:00:59.188: Finger needed 0
+(fprintd:181378): fprintd-DEBUG: 00:00:59.188: Got delay inhibitor for sleep.
+(fprintd:181378): fprintd-DEBUG: 00:00:59.188: entering main loop
+(fprintd:181378): fprintd-DEBUG: 00:00:59.188: D-Bus service launched with name: net.reactivated.Fprint
+(fprintd:181378): fprintd-DEBUG: 00:01:08.497: main loop completed

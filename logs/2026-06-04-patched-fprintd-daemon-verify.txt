@@ -1,0 +1,46 @@
+(fprintd:204409): fprintd-DEBUG: 01:25:13.841: About to load configuration file '/etc/fprintd.conf'
+(fprintd:204409): fprintd-DEBUG: 01:25:13.841: Launching FprintObject
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.841: Initializing FpContext (libfprint version 1.94.10)
+(fprintd:204409): fprintd-DEBUG: 01:25:13.845: Preparing devices for resume
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 1D6B:0003
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 046D:085E
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 1D6B:0002
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 1D6B:0003
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 1D6B:0002
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 1D6B:0003
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 13D3:3604
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 1D6B:A4A7
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 046D:C548
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 046D:C52B
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 1D6B:0002
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 1D6B:0003
+(fprintd:204409): libfprint-context-DEBUG: 01:25:13.845: No driver found for USB device 1D6B:0002
+(fprintd:204409): libfprint-device-DEBUG: 01:25:13.846: Device reported probe completion
+(fprintd:204409): libfprint-device-DEBUG: 01:25:13.846: Completing action FPI_DEVICE_ACTION_PROBE in idle!
+(fprintd:204409): libfprint-device-DEBUG: 01:25:13.846: Updated temperature model after 0.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+(fprintd:204409): fprintd-DEBUG: 01:25:13.847: Device LighTuning Technology Inc. EgisTec EH577 scan type changed to 'swipe'
+(fprintd:204409): fprintd-DEBUG: 01:25:13.847: Device LighTuning Technology Inc. EgisTec EH577 enroll stages changed to 6
+(fprintd:204409): fprintd-DEBUG: 01:25:13.847: Finger present 0
+(fprintd:204409): fprintd-DEBUG: 01:25:13.847: Finger needed 0
+(fprintd:204409): fprintd-DEBUG: 01:25:13.847: entering main loop
+(fprintd:204409): fprintd-DEBUG: 01:25:13.847: Got delay inhibitor for sleep.
+(fprintd:204409): fprintd-DEBUG: 01:25:13.847: D-Bus service launched with name: net.reactivated.Fprint
+(fprintd:204409): fprintd-DEBUG: 01:25:16.845: Requesting authorization from :1.712 to call method 'Claim' for device 'LighTuning Technology Inc. EgisTec EH577'
+(fprintd:204409): fprintd-DEBUG: 01:25:16.845: Getting authorization to perform Polkit action net.reactivated.fprint.device.verify
+(fprintd:204409): fprintd-DEBUG: 01:25:16.848: Authorization granted to :1.712 to call method 'Claim' for device 'LighTuning Technology Inc. EgisTec EH577'!
+(fprintd:204409): fprintd-DEBUG: 01:25:16.848: user 'championswimmer' claiming the device: 0
+(fprintd:204409): libfprint-image_device-DEBUG: 01:25:16.848: Image device open completed
+(fprintd:204409): libfprint-device-DEBUG: 01:25:16.848: Device reported open completion
+(fprintd:204409): libfprint-device-DEBUG: 01:25:16.848: Completing action FPI_DEVICE_ACTION_OPEN in idle!
+(fprintd:204409): libfprint-device-DEBUG: 01:25:16.848: Updated temperature model after 3.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+(fprintd:204409): fprintd-DEBUG: 01:25:16.848: claimed device 0
+(fprintd:204409): fprintd-DEBUG: 01:25:16.848: Requesting authorization from :1.712 to call method 'ListEnrolledFingers' for device 'LighTuning Technology Inc. EgisTec EH577'
+(fprintd:204409): fprintd-DEBUG: 01:25:16.848: Getting authorization to perform Polkit action net.reactivated.fprint.device.verify
+(fprintd:204409): fprintd-DEBUG: 01:25:16.850: Authorization granted to :1.712 to call method 'ListEnrolledFingers' for device 'LighTuning Technology Inc. EgisTec EH577'!
+(fprintd:204409): fprintd-DEBUG: 01:25:16.850: file_storage_discover_prints() for user 'championswimmer' in '/var/lib/fprint/championswimmer/egis0577/0'
+(fprintd:204409): fprintd-DEBUG: 01:25:16.850: scan_dev_storedir(): opendir("/var/lib/fprint/championswimmer/egis0577/0") failed: Error opening directory “/var/lib/fprint/championswimmer/egis0577/0”: No such file or directory
+(fprintd:204409): libfprint-image_device-DEBUG: 01:25:16.851: Image device close completed
+(fprintd:204409): libfprint-device-DEBUG: 01:25:16.851: Device reported close completion
+(fprintd:204409): libfprint-device-DEBUG: 01:25:16.851: Completing action FPI_DEVICE_ACTION_CLOSE in idle!
+(fprintd:204409): libfprint-device-DEBUG: 01:25:16.851: Updated temperature model after 0.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+(fprintd:204409): fprintd-DEBUG: 01:25:16.949: main loop completed

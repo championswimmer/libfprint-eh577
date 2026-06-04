@@ -125,6 +125,8 @@ The bringup plan is considered materially successful when all of the following e
 - [x] Check whether any payload resembles image-strip structure rather than pure zeros/noise
 - [x] If needed, add a small analysis helper under `tools/` to summarize payload bytes or render them for inspection
 - [x] Record payload conclusions in a new log or doc entry
+- [x] Repeat the successful post-init finger-hold capture to confirm reproducibility
+- [x] Compare multiple non-zero payload frames for image stability
 
 ### Phase 5 — external research leads
 
@@ -138,17 +140,17 @@ The bringup plan is considered materially successful when all of the following e
 - [x] Create `wip-libfprint/drivers/egis0577.c`
 - [x] Create `wip-libfprint/drivers/egis0577.h`
 - [x] Set the EH577 USB ID in the WIP driver skeleton
-- [ ] Review the EH577 WIP driver for any leftover EH575 assumptions that conflict with observed EH577 behavior
-- [ ] Relax reply parsing wherever EH577 state bytes are known to vary
+- [x] Review the EH577 WIP driver for any leftover EH575 assumptions that conflict with observed EH577 behavior
+- [x] Relax reply parsing wherever EH577 state bytes are known to vary
 - [ ] Decide whether interrupt integration belongs in the first patch or a later phase
-- [ ] Turn the WIP files into an applyable patch against `refs/libfprint/`
-- [ ] Document patch assumptions directly in code comments where behavior is not yet fully proven
+- [x] Turn the WIP files into an applyable patch against `refs/libfprint/`
+- [x] Document patch assumptions directly in code comments where behavior is not yet fully proven
 
 ### Phase 7 — build and integration validation
 
-- [ ] Set up a local `refs/libfprint/build` directory with Meson
-- [ ] Build the modified libfprint tree successfully
-- [ ] Record any dependency/package issues encountered during build
+- [x] Set up a local `refs/libfprint/build` directory with Meson
+- [x] Build the modified libfprint tree successfully
+- [x] Record any dependency/package issues encountered during build
 - [ ] Test whether the built stack enumerates EH577 as a supported device
 - [ ] If enumeration works, test probe/open/activate behavior
 - [ ] If image or capture code fails, record the exact failure stage rather than generalizing
@@ -156,6 +158,6 @@ The bringup plan is considered materially successful when all of the following e
 ### Phase 8 — finish criteria for the first bringup milestone
 
 - [ ] Have a documented answer for whether EH577 is operationally “EH575-compatible enough” for a first driver patch
-- [ ] Have at least one buildable EH577 patch artifact
+- [x] Have at least one buildable EH577 patch artifact
 - [ ] Have enough logs/dumps/docs that a future agent can resume without rediscovering the protocol family
 - [ ] Update `AGENTS.md`, `docs/research-log.md`, and this plan with the final status of the milestone

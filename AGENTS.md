@@ -29,7 +29,7 @@ The most important finding so far is:
 Important nuance:
 
 - some response bytes vary across runs / state
-- the 5356-byte payload is **all zeros when idle**, but becomes **non-zero during a successful post-init finger-hold capture**
+- the 5356-byte payload is **all zeros when idle**, but becomes **non-zero during repeated successful post-init finger-hold captures**
 - interrupt endpoints `0x83` / `0x84` have remained **silent** in short idle, post-init, and guided finger-interaction polls
 
 So the current working hypothesis is:
@@ -90,10 +90,14 @@ Most important logs right now:
   - early-state reply variation analysis
 - `logs/2026-06-03-eh577-finger-analysis.txt`
   - guided finger-interaction analysis including the first non-zero payload capture
+- `logs/2026-06-03-eh577-postinit-fingerhold-reproducibility.txt`
+  - comparison of multiple successful non-zero post-init finger-hold frames
 - `logs/2026-06-03-eh577-guided-interrupt-finger-2cycle.txt`
   - guided interrupt poll during touch/remove cycles
 - `logs/2026-06-03-eh577-guided-postinit-fingerhold-01.txt`
-  - guided post-init finger-hold capture log
+  - first successful guided post-init finger-hold capture log
+- `logs/2026-06-03-eh577-guided-postinit-fingerhold-03.txt`
+  - second successful guided post-init finger-hold capture log confirming reproducibility
 
 ### dumps/
 
@@ -105,6 +109,10 @@ Currently most important dump sets:
 - `dumps/2026-06-03-postinit-fingerhold-01/`
   - raw `.bin` responses for a successful guided post-init finger-hold run
   - packet 17 file is the first non-zero 5356-byte payload capture
+  - also contains a rendered `.pgm` made from that payload
+- `dumps/2026-06-03-postinit-fingerhold-03/`
+  - raw `.bin` responses for the second successful guided post-init finger-hold run
+  - packet 17 file is a second non-zero payload confirming reproducibility
   - also contains a rendered `.pgm` made from that payload
 
 Note:
@@ -339,7 +347,9 @@ These are the strongest validated results so far:
 4. **EH577 returns non-zero image-like data during post-init finger hold**
    - idle captures are zero-filled
    - repeat-path finger-hold captures stayed zero-filled
-   - post-init finger-hold capture produced `1305` non-zero bytes and a structured frame-like payload
+   - one post-init finger-hold capture produced `1305` non-zero bytes
+   - a second successful post-init finger-hold capture produced `1594` non-zero bytes
+   - the two successful frames differ, which strongly suggests real variable scan data
 
 5. **An EH577 driver skeleton now exists**
    - `wip-libfprint/drivers/egis0577.c/.h`
