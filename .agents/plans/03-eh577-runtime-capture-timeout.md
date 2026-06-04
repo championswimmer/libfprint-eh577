@@ -91,7 +91,7 @@ This plan is successful when all of the following are true:
 - [x] Rebuild `refs/libfprint` sequentially (`meson compile` then `meson test`)
 - [x] Re-run `img-capture` with the patched tree
 - [x] Record whether the timeout moved, disappeared, or changed shape
-- [ ] If still blocked, iterate once more with the next smallest evidence-backed fix
+- [x] If still blocked, iterate once more with the next smallest evidence-backed fix
 
 ### Phase 4 — patched fprintd runtime re-test
 

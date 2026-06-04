@@ -1,0 +1,34 @@
+# EH577 recovery attempt after guided touch 05 preflight failure
+
+Date: 2026-06-04
+Context: guided touch 05 was blocked by the wrapper because EH577 was enumerated but failed live libusb preflight.
+
+## Starting failure state
+
+Kernel log already showed the usual wedge pattern:
+
+- `usb 3-3: USB disconnect`
+- repeated `device descriptor read/64, error -110`
+- later `device not accepting address ..., error -62`
+- `usb usb3-port3: unable to enumerate USB device`
+
+## Recovery attempts tried
+
+1. xHCI unbind/bind on `0000:c9:00.0`
+2. PCI remove/rescan fallback on `0000:c9:00.0`
+3. plain libusb smoketest after recovery attempts
+
+## Result
+
+- xHCI unbind/bind path was not completed cleanly because `sudo-rs` again reported interactive authentication required during that sequence
+- PCI remove/rescan fallback completed, but EH577 still did not become openable
+- plain libusb smoketest still ended with `Could not open 1c7a:0577`
+
+## Current meaning
+
+At this point the active blocker is once again **USB health**, not libfprint runtime behavior.
+The next useful runtime/frame-dump guided run cannot proceed until EH577 is back in a healthy openable state.
+
+## Next step
+
+Most reliable next step: cold reboot, then immediately retry the frame-dump guided run while the device is healthy.

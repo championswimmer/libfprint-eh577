@@ -1,0 +1,45 @@
+# EH577 img-capture guided touch 02 summary
+
+Date: 2026-06-04
+Command used:
+
+```bash
+./tools/eh577_guided_img_capture.sh \
+  --log "$PWD/logs/2026-06-04-img-capture-guided-touch-02.txt" \
+  --label "EH577 img-capture guided touch 02"
+```
+
+## Result
+
+- EH577 stayed healthy on USB for the full run
+- libfprint completed post-init successfully
+- libfprint entered its polling loop successfully
+- no USB disconnect or open error occurred during this run
+- no non-zero frames were observed
+- no finger-on transition was observed
+- no image submission was observed
+
+## Important detail
+
+Every large frame logged during the polling loop remained:
+
+- `len=5356`
+- `nonzero=0`
+
+and finger status stayed `off`.
+
+## Interpretation
+
+This strongly suggests the remaining issue is not transport or basic timing-helper failure.
+Instead, the runtime path is still polling the wrong capture mode for EH577.
+
+Earlier standalone probe evidence showed:
+
+- meaningful EH577 data appears on the **post-init** path
+- the **repeat** path stayed zero-filled even during finger hold
+
+The libfprint runtime was still switching into repeat polling after the first post-init frame, which is likely why guided touch 02 still saw only zero frames.
+
+## Next fix chosen
+
+Patch the driver to keep EH577 on **post-init polling** instead of switching into the repeat-only loop after the first `64 14 ec` frame.

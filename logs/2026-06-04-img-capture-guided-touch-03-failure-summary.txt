@@ -1,0 +1,33 @@
+# EH577 img-capture guided touch 03 failure summary
+
+Date: 2026-06-04
+Context: first guided touch attempt after changing EH577 runtime polling to stay on the post-init path.
+
+## Result
+
+This run did not actually exercise the new runtime logic.
+
+`img-capture` failed during device open with:
+
+- `libusb couldn't open USB device /dev/bus/usb/003/004, errno=5`
+- `Failed to open device: USB error on device 1c7a:0577 : Input/Output Error [-1]`
+
+## Kernel evidence
+
+Immediately afterward, kernel log showed:
+
+- `usb 3-3: USB disconnect, device number 4`
+- repeated `device descriptor read/64, error -110`
+- repeated re-enumeration attempts with new device numbers
+
+## Meaning
+
+This run is not evidence against the new post-init-polling change, because the driver never got past device open.
+
+## Next step
+
+Before the next guided run:
+
+1. recover EH577 with a cold reboot or equivalent full power recovery
+2. tighten the guided wrapper so it performs a live libusb preflight immediately before launching `img-capture`
+3. only then rerun the post-init-polling test

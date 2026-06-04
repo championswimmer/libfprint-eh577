@@ -1,0 +1,47 @@
+# EH577 non-cold recovery summary
+
+Date: 2026-06-04
+Context: after guided touch 03 wedged the EH577 off the USB bus with open-time `errno=5`, disconnect, and repeated `error -110` / `error -62` enumeration failures.
+
+## What was tried
+
+Software recovery attempts performed after the wedge:
+
+1. repeated xHCI controller unbind/bind on PCI device `0000:c9:00.0`
+2. direct PCI `reset` via `/sys/bus/pci/devices/0000:c9:00.0/reset`
+3. PCI controller remove/rescan via:
+   - `/sys/bus/pci/devices/0000:c9:00.0/remove`
+   - `/sys/bus/pci/rescan`
+
+## Observed effect
+
+The strongest visible non-cold recovery evidence was:
+
+- the xHCI controller was re-created cleanly
+- `usb 3-3: new high-speed USB device number 4 using xhci_hcd` reappeared
+- later, the EH577 again became visible to userspace
+- `lsusb` once again showed `1c7a:0577`
+- a live plain-libusb smoketest again succeeded:
+  - device opened successfully
+  - configuration 1 reported
+  - interface 0 claimed
+  - first bulk OUT `45 47 49 53 60 00 fc` completed successfully
+
+## Important caveat
+
+The exact single step that restored the device cannot be isolated with certainty from these logs alone, because the successful recovery was observed only after the series of controller-level recovery operations.
+
+## Current conclusion
+
+A cold reboot is **not** the only possible way back.
+A sufficiently low-level USB-controller recovery sequence can restore EH577 to a healthy state on this machine.
+
+The best currently known non-cold recovery path is:
+
+1. xHCI unbind/bind on `0000:c9:00.0`
+2. if that is insufficient, PCI remove/rescan of `0000:c9:00.0`
+3. then verify with the plain libusb smoketest before any guided runtime attempt
+
+## Next step
+
+While the device is healthy again, use the guided wrapper with the latest post-init-polling driver and a fresh log filename to continue Plan 05.

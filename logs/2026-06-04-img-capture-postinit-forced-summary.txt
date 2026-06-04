@@ -1,0 +1,33 @@
+# EH577 img-capture post-init-forced summary
+
+Date: 2026-06-04
+Context: after patching the EH577 driver to stay on the post-init path even when `60 01 fc` returns exact `SIGE 01 01 01`.
+
+## Result
+
+The patched `img-capture` run no longer fails in the PRE_INIT branch.
+
+Observed behavior:
+
+1. driver opened successfully
+2. post-init sequence completed successfully even though packet `60 01 fc` returned `SIGE 01 01 01`
+3. packet `64 14 ec` completed successfully with a 5356-byte response
+4. driver switched into the repeat polling loop
+5. repeat packet `64 14 ec` also completed successfully with 5356-byte responses
+6. in the idle run, every large frame seen so far was all-zero
+7. image-device state stayed at `AWAIT_FINGER_ON`
+8. no finger-present event or image submission was observed in the idle run
+
+## Important meaning
+
+This confirms that the earlier runtime blocker was the PRE_INIT misbranch, not a transport failure.
+
+It also narrows the next live issue:
+
+- EH577 can now run through post-init and repeat polling inside libfprint
+- but idle polling alone does not produce a non-zero frame or finger-on transition
+- this matches earlier standalone-probe evidence that meaningful EH577 data appears specifically during a correctly timed post-init finger-hold capture
+
+## Likely next step
+
+Run `img-capture` again with coordinated user finger timing so the sensor is already being touched during the initial post-init `64 14 ec` capture window, then inspect whether that produces non-zero data and a finger-on transition.

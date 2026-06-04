@@ -50,6 +50,7 @@ struct _FpDeviceEgis0577
   const Packet *pkt_array;
   int           pkt_array_len;
   int           current_index;
+  guint         frame_counter;
 };
 
 enum sm_states {
@@ -118,6 +119,46 @@ count_nonzero_bytes (FpiUsbTransfer *transfer)
   return nonzero;
 }
 
+static void
+dump_frame_if_requested (FpDeviceEgis0577 *self,
+                         FpiUsbTransfer    *transfer,
+                         gsize              nonzero)
+{
+  const gchar *dump_dir = g_getenv ("EGIS0577_FRAME_DUMP_DIR");
+  g_autofree gchar *path = NULL;
+  g_autofree gchar *base = NULL;
+  g_autoptr(GError) error = NULL;
+
+  if (!dump_dir || dump_dir[0] == '\0')
+    return;
+
+  if (transfer->actual_length != EGIS0577_IMGSIZE)
+    return;
+
+  if (g_mkdir_with_parents (dump_dir, 0755) != 0)
+    {
+      fp_warn ("Failed to create EH577 frame dump dir: %s", dump_dir);
+      return;
+    }
+
+  base = g_strdup_printf ("%04u-%s-nonzero-%zu.bin",
+                          self->frame_counter++,
+                          packet_array_name (self->pkt_array),
+                          nonzero);
+  path = g_build_filename (dump_dir, base, NULL);
+
+  if (!g_file_set_contents (path,
+                            (const gchar *) transfer->buffer,
+                            transfer->actual_length,
+                            &error))
+    {
+      fp_warn ("Failed to dump EH577 frame to %s: %s", path, error->message);
+      return;
+    }
+
+  fp_dbg ("Dumped EH577 frame to %s", path);
+}
+
 /*
  * ==================== Data processing ====================
  */
@@ -165,6 +206,8 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
           nonzero,
           self->strips_len,
           self->stop);
+
+  dump_frame_if_requested (self, transfer, nonzero);
 
   /*
    * EH577 idle captures are often all-zero, including the first 5356-byte
@@ -323,12 +366,21 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
 
   if (self->current_index == self->pkt_array_len - 1)
     {
-      if (self->pkt_array == EGIS0577_REPEAT_PACKETS || self->pkt_array == EGIS0577_POST_INIT_PACKETS)
+      if (self->pkt_array == EGIS0577_POST_INIT_PACKETS)
         {
-          fp_dbg ("Completed %s sequence, switching to repeat/data handling",
-                  packet_array_name (self->pkt_array));
-          self->pkt_array = EGIS0577_REPEAT_PACKETS;
-          self->pkt_array_len = EGIS0577_REPEAT_PACKETS_LENGTH;
+          fp_dbg ("Completed post-init sequence, saving frame and staying on post-init polling");
+          self->pkt_array = EGIS0577_POST_INIT_PACKETS;
+          self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
+          self->current_index = 0;
+
+          save_img (transfer, dev);
+          return;
+        }
+      else if (self->pkt_array == EGIS0577_REPEAT_PACKETS)
+        {
+          fp_dbg ("Completed repeat sequence, saving frame and returning to post-init polling");
+          self->pkt_array = EGIS0577_POST_INIT_PACKETS;
+          self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
           self->current_index = 0;
 
           save_img (transfer, dev);
@@ -428,6 +480,7 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
       self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
       self->current_index = 0;
       self->finger_reported = FALSE;
+      self->frame_counter = 0;
 
       self->strips_len = 0;
       self->strips = NULL;
