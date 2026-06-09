@@ -1,0 +1,38 @@
+# EH577 libfprint pacing hook summary
+
+Date: 2026-06-04
+Context: guided touch 05 proved that libfprint runtime `64 14 ec` frames were byte-identical to the standalone idle zero frame, so the next experiment should target timing/pacing before heuristic tuning.
+
+## Change made
+
+Added two opt-in pacing controls to the EH577 runtime driver:
+
+- `EGIS0577_PRE_FRAME_DELAY_MS`
+  - delays the `64 14 ec` frame request before sending it
+- `EGIS0577_POLL_LOOP_DELAY_MS`
+  - delays the next return to `SM_REQ` between polling loops
+
+Files updated:
+
+- `refs/libfprint/libfprint/drivers/egis0577.c`
+- `wip-libfprint/drivers/egis0577.c`
+- `tools/eh577_guided_img_capture.sh`
+
+## Wrapper support
+
+`tools/eh577_guided_img_capture.sh` now accepts:
+
+- `--pre-frame-delay-ms N`
+- `--poll-loop-delay-ms N`
+
+and exports them to the runtime driver.
+
+## Validation
+
+- wrapper syntax check passed
+- `meson compile -C refs/libfprint/build` passed
+- `meson test -C refs/libfprint/build --print-errorlogs` passed
+
+## Intended next step
+
+Run a new guided touch capture with conservative pacing enabled and runtime frame dumps saved, then compare whether any `64 14 ec` frame stops matching the known idle zero payload.

@@ -89,9 +89,13 @@ This plan is successful when all of the following are true:
 ### Phase 3 — choose the next evidence-backed branch
 
 - [x] If post-init polling still gives all-zero frames, decide whether to add targeted frame dumps inside libfprint
-- [ ] Add targeted frame dumps inside libfprint and collect a guided-touch runtime sample
+- [x] Add targeted frame dumps inside libfprint and collect a guided-touch runtime sample
+- [x] Compare libfprint runtime frame dumps against standalone idle and successful finger-hold dumps
 - [ ] If post-init polling gives non-zero frames without progress, inspect the finger heuristic threshold next
-- [ ] If runtime diverges in an unclear way, promote `usbmon` capture to the next local step
+- [x] If runtime zero frames remain byte-identical to standalone idle captures, investigate timing/pacing before tuning heuristics
+- [x] Run a guided capture with conservative pacing enabled and compare dumped frames
+- [x] Run a stronger pacing experiment and compare dumped frames
+- [x] If runtime still stays idle-identical after strong pacing, promote `usbmon` capture to the next local step
 - [ ] If runtime progresses meaningfully, fold the result back into the fprintd-enroll path
 
 ### Phase 4 — documentation and handoff

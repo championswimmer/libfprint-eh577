@@ -87,12 +87,20 @@ cleanup() {
 
 acquire_sudo_upfront() {
   log "requesting sudo credentials up front"
-  sudo -v
+
+  if sudo -n true >/dev/null 2>&1; then
+    log "sudo access available non-interactively"
+  elif [[ -t 0 && -t 1 ]]; then
+    sudo -v
+  else
+    log "warning: upfront sudo validation unavailable in non-interactive mode; continuing"
+    return 0
+  fi
 
   (
     while true; do
       sleep 15
-      sudo -n -v >/dev/null 2>&1 || exit 0
+      sudo -n true >/dev/null 2>&1 || exit 0
     done
   ) &
   SUDO_KEEPALIVE_PID=$!

@@ -83,7 +83,7 @@ This plan is successful when all of the following are true:
 - [x] Compare driver packet ordering with `tools/eh577_usbfs_probe.c`
 - [x] Compare runtime assumptions against the successful post-init finger-hold captures
 - [x] Decide whether the current runtime path should force post-init-led polling before any pre-init branch
-- [ ] Decide whether the finger-detection heuristic is too strict for EH577 frames
+- [x] Decide that the finger-detection heuristic is not the current blocker because libfprint runtime dumps are byte-identical to the standalone idle zero frame
 
 ### Phase 3 — targeted runtime fixes
 
@@ -101,7 +101,8 @@ This plan is successful when all of the following are true:
 
 ### Phase 5 — trace escalation if needed
 
-- [ ] If runtime still diverges, capture `usbmon` for a patched `img-capture` or patched `fprintd-enroll` run
+- [x] Decide that runtime still diverges after timing/pacing experiments
+- [ ] Capture `usbmon` for a patched `img-capture` or patched `fprintd-enroll` run
 - [ ] Compare the runtime USB sequence against the standalone successful probe sequence
 - [ ] Record the first meaningful divergence point
 

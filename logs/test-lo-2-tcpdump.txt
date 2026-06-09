@@ -1,0 +1,2 @@
+[ WARN:0@0.190] global cap.cpp:204 open VIDEOIO(V4L2): backend is generally available but can't be used to capture by name
+sudo-rs: interactive authentication is required

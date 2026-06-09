@@ -15,6 +15,8 @@ TIMEOUT_SECONDS=20
 LABEL="EH577 img-capture guided touch"
 LOG_PATH="$ROOT_DIR/logs/$(date +%F)-img-capture-guided-touch.txt"
 FRAME_DUMP_DIR=""
+PRE_FRAME_DELAY_MS=""
+POLL_LOOP_DELAY_MS=""
 
 usage() {
   cat <<EOF
@@ -31,6 +33,8 @@ Options:
   --timeout N              img-capture timeout in seconds (default: $TIMEOUT_SECONDS)
   --label TEXT             Session label
   --frame-dump-dir PATH    Dump raw 5356-byte runtime frames to PATH
+  --pre-frame-delay-ms N   Delay before sending 64 14 ec (default: unset)
+  --poll-loop-delay-ms N   Delay before restarting next poll loop (default: unset)
   -h, --help               Show this help
 EOF
 }
@@ -93,6 +97,16 @@ while (($#)); do
       ;;
     --frame-dump-dir)
       FRAME_DUMP_DIR="$2"
+      shift 2
+      ;;
+    --pre-frame-delay-ms)
+      is_nonneg_int "${2:-}" || { echo "invalid value for --pre-frame-delay-ms" >&2; exit 2; }
+      PRE_FRAME_DELAY_MS="$2"
+      shift 2
+      ;;
+    --poll-loop-delay-ms)
+      is_nonneg_int "${2:-}" || { echo "invalid value for --poll-loop-delay-ms" >&2; exit 2; }
+      POLL_LOOP_DELAY_MS="$2"
       shift 2
       ;;
     -h|--help)
@@ -159,7 +173,13 @@ echo "Log: $LOG_PATH"
 dump_env=""
 if [[ -n "$FRAME_DUMP_DIR" ]]; then
   mkdir -p "$FRAME_DUMP_DIR"
-  dump_env="EGIS0577_FRAME_DUMP_DIR=\"$FRAME_DUMP_DIR\" "
+  dump_env+="EGIS0577_FRAME_DUMP_DIR=\"$FRAME_DUMP_DIR\" "
+fi
+if [[ -n "$PRE_FRAME_DELAY_MS" ]]; then
+  dump_env+="EGIS0577_PRE_FRAME_DELAY_MS=\"$PRE_FRAME_DELAY_MS\" "
+fi
+if [[ -n "$POLL_LOOP_DELAY_MS" ]]; then
+  dump_env+="EGIS0577_POLL_LOOP_DELAY_MS=\"$POLL_LOOP_DELAY_MS\" "
 fi
 
 action_cmd="cd \"$ROOT_DIR\" && sudo -n sh -c '${dump_env}LD_LIBRARY_PATH=\"$LIBFP_DIR\" G_MESSAGES_DEBUG=all timeout --foreground ${TIMEOUT_SECONDS}s \"$IMG_CAPTURE\"' > \"$LOG_PATH\" 2>&1"

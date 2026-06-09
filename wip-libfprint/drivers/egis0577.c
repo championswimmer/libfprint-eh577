@@ -51,6 +51,9 @@ struct _FpDeviceEgis0577
   int           pkt_array_len;
   int           current_index;
   guint         frame_counter;
+  guint         pre_frame_delay_ms;
+  guint         poll_loop_delay_ms;
+  gboolean      frame_delay_armed;
 };
 
 enum sm_states {
@@ -117,6 +120,33 @@ count_nonzero_bytes (FpiUsbTransfer *transfer)
       nonzero++;
 
   return nonzero;
+}
+
+static guint
+get_env_ms_or_default (const char *name,
+                       guint       default_value)
+{
+  const gchar *value = g_getenv (name);
+  gchar *endptr = NULL;
+  guint64 parsed = 0;
+
+  if (!value || value[0] == '\0')
+    return default_value;
+
+  parsed = g_ascii_strtoull (value, &endptr, 10);
+  if (!endptr || endptr[0] != '\0')
+    {
+      fp_warn ("Ignoring invalid %s value: %s", name, value);
+      return default_value;
+    }
+
+  if (parsed > G_MAXUINT)
+    {
+      fp_warn ("Ignoring too-large %s value: %s", name, value);
+      return default_value;
+    }
+
+  return (guint) parsed;
 }
 
 static void
@@ -191,6 +221,22 @@ finger_present (FpiUsbTransfer *transfer)
 }
 
 static void
+jump_to_req_with_optional_delay (FpDeviceEgis0577 *self,
+                                 FpiSsm           *ssm,
+                                 const char       *reason)
+{
+  if (self->poll_loop_delay_ms > 0)
+    {
+      fp_dbg ("Delaying next poll loop by %u ms (%s)", self->poll_loop_delay_ms, reason);
+      fpi_ssm_jump_to_state_delayed (ssm, SM_REQ, self->poll_loop_delay_ms);
+    }
+  else
+    {
+      fpi_ssm_jump_to_state (ssm, SM_REQ);
+    }
+}
+
+static void
 save_img (FpiUsbTransfer *transfer, FpDevice *dev)
 {
   FpImageDevice *img_self = FP_IMAGE_DEVICE (dev);
@@ -233,7 +279,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
         goto START_PROCESSING;
 
       report_finger_status (self, img_self, FALSE, "all-zero frame");
-      fpi_ssm_jump_to_state (transfer->ssm, SM_REQ);
+      jump_to_req_with_optional_delay (self, transfer->ssm, "all-zero frame");
       return;
     }
 
@@ -276,7 +322,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
   if (self->strips_len < EGIS0577_CONSECUTIVE_CAPTURES)
     {
       fp_dbg ("Continuing polling loop with %zu strips buffered", self->strips_len);
-      fpi_ssm_jump_to_state (transfer->ssm, SM_REQ);
+      jump_to_req_with_optional_delay (self, transfer->ssm, "collecting more strips");
     }
   else
 START_PROCESSING:
@@ -326,7 +372,7 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
   else
     {
       fp_dbg ("Image-device state is not CAPTURE yet, returning to polling loop");
-      fpi_ssm_jump_to_state (ssm, SM_REQ);
+      jump_to_req_with_optional_delay (self, ssm, "image-device state not CAPTURE yet");
     }
 }
 
@@ -416,7 +462,7 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
       self->current_index += 1;
     }
 
-  fpi_ssm_jump_to_state (transfer->ssm, SM_REQ);
+  jump_to_req_with_optional_delay (self, transfer->ssm, "advance packet sequence");
 }
 
 static void
@@ -481,10 +527,16 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
       self->current_index = 0;
       self->finger_reported = FALSE;
       self->frame_counter = 0;
+      self->pre_frame_delay_ms = get_env_ms_or_default ("EGIS0577_PRE_FRAME_DELAY_MS", 0);
+      self->poll_loop_delay_ms = get_env_ms_or_default ("EGIS0577_POLL_LOOP_DELAY_MS", 0);
+      self->frame_delay_armed = FALSE;
 
       self->strips_len = 0;
       self->strips = NULL;
       fp_dbg ("Initial packet array: %s", packet_array_name (self->pkt_array));
+      fp_dbg ("EH577 pacing config: pre_frame_delay_ms=%u poll_loop_delay_ms=%u",
+              self->pre_frame_delay_ms,
+              self->poll_loop_delay_ms);
       fpi_ssm_next_state (ssm);
       break;
 
@@ -506,6 +558,21 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
               packet_array_name (self->pkt_array),
               self->current_index,
               self->pkt_array_len);
+
+      if (self->pkt_array[self->current_index].response_length == EGIS0577_IMGSIZE &&
+          self->pre_frame_delay_ms > 0 &&
+          !self->frame_delay_armed)
+        {
+          self->frame_delay_armed = TRUE;
+          fp_dbg ("Delaying frame request %s[%d] by %u ms before sending 64 14 ec",
+                  packet_array_name (self->pkt_array),
+                  self->current_index,
+                  self->pre_frame_delay_ms);
+          fpi_ssm_jump_to_state_delayed (ssm, SM_REQ, self->pre_frame_delay_ms);
+          break;
+        }
+
+      self->frame_delay_armed = FALSE;
       send_req (ssm, dev, &self->pkt_array[self->current_index]);
       break;
 

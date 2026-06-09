@@ -1,0 +1,52 @@
+# 2026-06-04 usbmon capture prep summary
+
+Plan 06 was started but not fully executed.
+
+Completed prep work:
+- verified the active plan and artifact names under `.agents/plans/06-eh577-usbmon-runtime-comparison.md`
+- confirmed the EH577 is enumerated as `1c7a:0577`
+- earlier in this session, confirmed the live libusb smoketest succeeds and `usbmon3` is present
+- created:
+  - `dumps/2026-06-04-libfprint-usbmon-runtime-01/`
+  - `dumps/2026-06-04-usbfs-usbmon-postinit-01/`
+- added `tools/eh577_usbmon_capture.sh` to wrap one capture command with start/stop of `tcpdump`
+- updated `tools/eh577_guided_capture.sh` so non-interactive harness runs warn instead of hard-failing when upfront sudo validation is unavailable
+
+Important blocker observed from the agent harness:
+- generic `sudo tcpdump ...` still may require interactive authentication here even when targeted EH577 probe commands sometimes work with `sudo -n`
+- because of that, the actual runtime and standalone usbmon captures should be launched from an interactive terminal session
+- meaningful standalone comparison still also needs a real finger hold during the guided capture window
+
+Recommended next commands from an interactive terminal:
+
+Runtime:
+```bash
+./tools/eh577_usbmon_capture.sh \
+  --iface usbmon3 \
+  --pcap "$PWD/logs/2026-06-04-usbmon-libfprint-runtime-01.pcap" \
+  --tcpdump-log "$PWD/logs/2026-06-04-usbmon-libfprint-runtime-01-tcpdump.txt" \
+  -- ./tools/eh577_guided_img_capture.sh \
+       --log "$PWD/logs/2026-06-04-img-capture-usbmon-runtime-01.txt" \
+       --label "EH577 usbmon runtime 01" \
+       --hold 14 \
+       --timeout 30 \
+       --frame-dump-dir "$PWD/dumps/2026-06-04-libfprint-usbmon-runtime-01"
+```
+
+Standalone:
+```bash
+./tools/eh577_usbmon_capture.sh \
+  --iface usbmon3 \
+  --pcap "$PWD/logs/2026-06-04-usbmon-usbfs-postinit-01.pcap" \
+  --tcpdump-log "$PWD/logs/2026-06-04-usbmon-usbfs-postinit-01-tcpdump.txt" \
+  -- bash -lc './tools/eh577_guided_capture.sh \
+       --sudo-upfront \
+       --delay-before-start 3 \
+       --delay-before-touch 1 \
+       --hold 10 \
+       --delay-after-remove 2 \
+       --cycles 1 \
+       --label "EH577 usbfs post-init usbmon 01" \
+       -- sudo -n bash -lc '\''export EH577_DUMP_DIR="$PWD/dumps/2026-06-04-usbfs-usbmon-postinit-01"; ./build/eh577_usbfs_probe /dev/bus/usb/003/004 eh575-postinit 18'\'' \
+       > "$PWD/logs/2026-06-04-usbfs-postinit-usbmon-01.txt" 2>&1'
+```

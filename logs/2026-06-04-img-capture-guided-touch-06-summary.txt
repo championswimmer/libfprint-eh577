@@ -1,0 +1,46 @@
+# EH577 img-capture guided touch 06 summary
+
+Date: 2026-06-04
+Command used:
+
+```bash
+./tools/eh577_guided_img_capture.sh \
+  --log "$PWD/logs/2026-06-04-img-capture-guided-touch-06.txt" \
+  --label "EH577 img-capture guided touch 06 paced" \
+  --hold 14 \
+  --timeout 30 \
+  --frame-dump-dir "$PWD/dumps/2026-06-04-libfprint-guided-touch-06" \
+  --pre-frame-delay-ms 20 \
+  --poll-loop-delay-ms 10
+```
+
+## Result
+
+The pacing hooks were active and clearly visible in the runtime log:
+
+- `EH577 pacing config: pre_frame_delay_ms=20 poll_loop_delay_ms=10`
+- repeated `Delaying frame request ... by 20 ms before sending 64 14 ec`
+- repeated `Delaying next poll loop by 10 ms ...`
+
+Observed output:
+
+- `136` runtime frame dumps captured
+- every frame remained:
+  - `len=5356`
+  - `nonzero=0`
+- all `136` dumped frames had the same SHA-256 hash:
+  - `bd2386946403b82cd740767b15507502a27a7d5b4c86440a5af0966c71ad8a38`
+
+## Comparison
+
+That hash is still exactly equal to the standalone idle post-init frame hash and still differs from both successful standalone finger-hold frame hashes.
+
+So conservative pacing changed loop rate but did **not** change capture content.
+
+## Conclusion
+
+A small delay experiment is not enough to move EH577 runtime behavior off the idle zero-frame path.
+The next useful branch is either:
+
+1. a stronger pacing experiment,
+2. or `usbmon` comparison if stronger pacing also leaves the runtime stuck on the idle-identical payload.
