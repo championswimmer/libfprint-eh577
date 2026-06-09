@@ -23,7 +23,7 @@
 - [x] **Fix the egis0577 libfprint driver to run pre-init sequence once at device open before the post-init loop** — SM_INIT now starts with EGIS0577_PRE_INIT_PACKETS; both wip-libfprint and refs/libfprint updated and rebuilt
 - [x] Test the rebuilt libfprint driver end-to-end: confirmed 8 nonzero frames captured, 8 strips assembled into 136×178 fingerprint image, saved to finger.pgm
 - [ ] Build libfprint with pixman support to enable the resize step (currently skipped with a CRITICAL warning)
-- [ ] Test enrollment and verification flow with the patched driver — see [`docs/plan-enroll-verify.md`](plan-enroll-verify.md)
+- [x] Test enrollment and verification flow with the patched driver — see [`docs/plan-enroll-verify.md`](plan-enroll-verify.md)
 - [ ] Consider upstreaming the driver as a patch to libfprint
 
 ## Likely deeper reverse-engineering work
