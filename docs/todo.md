@@ -17,9 +17,10 @@
 - [x] Characterize EH577 state variation on `EGIS 60 00/01 fc` (`aa` vs `ab`, `01` vs `05`)
 - [x] Save and analyze the raw `5356`-byte payload from `64 14 ec`
 - [x] Poll interrupts while physically touching/removing a finger
-- [ ] Reproduce the earlier `01 01 01` response and reconcile it with the EH575 pre-init branch logic
-- [ ] Repeat the successful non-zero post-init finger-hold capture to confirm reproducibility
-- [ ] Compare multiple non-zero payload frames for image stability
+- [x] Reproduce the earlier `01 01 01` response and reconcile it with the EH575 pre-init branch logic
+- [x] Repeat the successful non-zero post-init finger-hold capture to confirm reproducibility (runs 5-8 all produced 1500+ nonzero bytes after pre-init)
+- [x] Compare multiple non-zero payload frames for image stability (4 good frames, 245 unique values in best)
+- [ ] **Fix the egis0577 libfprint driver to run pre-init sequence once at device open before the post-init loop** — this is the confirmed root cause of all-zero runtime frames
 
 ## Likely deeper reverse-engineering work
 

@@ -1,0 +1,116 @@
+TX[00] 60 00 00 (7): 45 47 49 53 60 00 00
+  wrote 7 bytes
+  RX[00] 7 bytes: 53 49 47 45 00 aa 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-00-60_00_00.bin
+TX[01] 60 01 00 (7): 45 47 49 53 60 01 00
+  wrote 7 bytes
+  RX[01] 7 bytes: 53 49 47 45 01 00 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-01-60_01_00.bin
+TX[02] 61 0a fd (7): 45 47 49 53 61 0a fd
+  wrote 7 bytes
+  RX[02] 7 bytes: 53 49 47 45 0a fd 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-02-61_0a_fd.bin
+TX[03] 61 35 02 (7): 45 47 49 53 61 35 02
+  wrote 7 bytes
+  RX[03] 7 bytes: 53 49 47 45 35 02 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-03-61_35_02.bin
+TX[04] 61 80 00 (7): 45 47 49 53 61 80 00
+  wrote 7 bytes
+  RX[04] 7 bytes: 53 49 47 45 80 00 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-04-61_80_00.bin
+TX[05] 60 80 00 (7): 45 47 49 53 60 80 00
+  wrote 7 bytes
+  RX[05] 7 bytes: 53 49 47 45 80 02 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-05-60_80_00.bin
+TX[06] 61 0a fc (7): 45 47 49 53 61 0a fc
+  wrote 7 bytes
+  RX[06] 7 bytes: 53 49 47 45 0a fc 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-06-61_0a_fc.bin
+TX[07] 63 01 ... (9): 45 47 49 53 63 01 02 0f 03
+  wrote 9 bytes
+  RX[07] 9 bytes: 53 49 47 45 01 02 01 0f 03
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-07-63_01____.bin
+TX[08] 61 0c 22 (7): 45 47 49 53 61 0c 22
+  wrote 7 bytes
+  RX[08] 7 bytes: 53 49 47 45 0c 22 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-08-61_0c_22.bin
+TX[09] 61 09 83 (7): 45 47 49 53 61 09 83
+  wrote 7 bytes
+  RX[09] 7 bytes: 53 49 47 45 09 83 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-09-61_09_83.bin
+TX[10] 63 26 ... (13): 45 47 49 53 63 26 06 06 60 06 05 2f 06
+  wrote 13 bytes
+  RX[10] 13 bytes: 53 49 47 45 26 06 01 06 60 06 05 2f 06
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-10-63_26____.bin
+TX[11] 61 0a f4 (7): 45 47 49 53 61 0a f4
+  wrote 7 bytes
+  RX[11] 7 bytes: 53 49 47 45 0a f4 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-11-61_0a_f4.bin
+TX[12] 61 0c 44 (7): 45 47 49 53 61 0c 44
+  wrote 7 bytes
+  RX[12] 7 bytes: 53 49 47 45 0c 44 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-12-61_0c_44.bin
+TX[13] 61 50 03 (7): 45 47 49 53 61 50 03
+  wrote 7 bytes
+  RX[13] 7 bytes: 53 49 47 45 50 03 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-13-61_50_03.bin
+TX[14] 60 50 03 (7): 45 47 49 53 60 50 03
+  wrote 7 bytes
+  RX[14] 7 bytes: 53 49 47 45 50 82 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-14-60_50_03.bin
+TX[15] 73 14 ec (7): 45 47 49 53 73 14 ec
+  wrote 7 bytes
+  RX[15] 7 bytes: 73 98 fa ff 9c 26 88
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-15-73_14_ec.bin
+TX[16] 60 40 ec (7): 45 47 49 53 60 40 ec
+  wrote 7 bytes
+  RX[16] 7 bytes: 53 49 47 45 40 00 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-16-60_40_ec.bin
+TX[17] 63 09 ... (18): 45 47 49 53 63 09 0b 83 24 00 44 0f 08 20 20 01 05 12
+  wrote 18 bytes
+  RX[17] 18 bytes: 53 49 47 45 09 0b 01 83 24 00 44 0f 08 20 20 01 05 12
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-17-63_09____.bin
+TX[18] 63 26 ... (13): 45 47 49 53 63 26 06 06 60 06 05 2f 06
+  wrote 13 bytes
+  RX[18] 13 bytes: 53 49 47 45 26 06 01 06 60 06 05 2f 06
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-18-63_26____.bin
+TX[19] 61 23 00 (7): 45 47 49 53 61 23 00
+  wrote 7 bytes
+  RX[19] 7 bytes: 53 49 47 45 23 00 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-19-61_23_00.bin
+TX[20] 61 24 33 (7): 45 47 49 53 61 24 33
+  wrote 7 bytes
+  RX[20] 7 bytes: 53 49 47 45 24 33 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-20-61_24_33.bin
+TX[21] 61 20 00 (7): 45 47 49 53 61 20 00
+  wrote 7 bytes
+  RX[21] 7 bytes: 53 49 47 45 20 00 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-21-61_20_00.bin
+TX[22] 61 21 66 (7): 45 47 49 53 61 21 66
+  wrote 7 bytes
+  RX[22] 7 bytes: 53 49 47 45 21 66 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-22-61_21_66.bin
+TX[23] 60 00 66 (7): 45 47 49 53 60 00 66
+  wrote 7 bytes
+  RX[23] 7 bytes: 53 49 47 45 00 aa 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-23-60_00_66.bin
+TX[24] 60 01 66 (7): 45 47 49 53 60 01 66
+  wrote 7 bytes
+  RX[24] 7 bytes: 53 49 47 45 01 00 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-24-60_01_66.bin
+TX[25] 60 40 66 (7): 45 47 49 53 60 40 66
+  wrote 7 bytes
+  RX[25] 7 bytes: 53 49 47 45 40 00 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-25-60_40_66.bin
+TX[26] 61 0c 22 (7): 45 47 49 53 61 0c 22
+  wrote 7 bytes
+  RX[26] 7 bytes: 53 49 47 45 0c 22 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-26-61_0c_22.bin
+TX[27] 61 0b 03 (7): 45 47 49 53 61 0b 03
+  wrote 7 bytes
+  RX[27] 7 bytes: 53 49 47 45 0b 03 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-27-61_0b_03.bin
+TX[28] 61 0a fc (7): 45 47 49 53 61 0a fc
+  wrote 7 bytes
+  RX[28] 7 bytes: 53 49 47 45 0a fc 01
+  dumped to /home/championswimmer/Development/Cpp/libfprint-eh577/dumps/preinit-capture-20260609-235532/run-07/preinit/eh575-preinit-28-61_0a_fc.bin

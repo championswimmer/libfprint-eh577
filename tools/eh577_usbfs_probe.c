@@ -163,9 +163,10 @@ static void usage(const char *argv0) {
           "  %s /dev/bus/usb/BBB/DDD poll-int [loops]\n"
           "  %s /dev/bus/usb/BBB/DDD eh575-preinit [count]\n"
           "  %s /dev/bus/usb/BBB/DDD eh575-postinit [count]\n"
+          "  %s /dev/bus/usb/BBB/DDD eh575-postinit-reset [count]\n"
           "  %s /dev/bus/usb/BBB/DDD eh575-repeat [count]\n"
           "  %s /dev/bus/usb/BBB/DDD eh575-auto [count]\n",
-          argv0, argv0, argv0, argv0, argv0, argv0);
+          argv0, argv0, argv0, argv0, argv0, argv0, argv0);
 }
 
 static void sanitize_name(const char *in, char *out, size_t out_sz) {
@@ -380,6 +381,18 @@ int main(int argc, char **argv) {
   } else if (strcmp(mode, "eh575-postinit") == 0) {
     int count = argc >= 4 ? atoi(argv[3]) : (int)(sizeof(eh575_post_init) / sizeof(eh575_post_init[0]));
     rc = run_sequence(fd, eh575_post_init, (int)(sizeof(eh575_post_init) / sizeof(eh575_post_init[0])), count, "eh575-postinit");
+  } else if (strcmp(mode, "eh575-postinit-reset") == 0) {
+    /* Matches EH575 Rust prototype: claim interface FIRST, then reset, then send.
+     * This is different from the separate "reset" mode which resets before claiming. */
+    printf("Resetting device after claim (EH575 prototype style)...\n");
+    if (reset_dev(fd) < 0) {
+      perror("reset-after-claim");
+      rc = 3;
+    } else {
+      printf("Reset ok, sending post-init sequence...\n");
+      int count = argc >= 4 ? atoi(argv[3]) : (int)(sizeof(eh575_post_init) / sizeof(eh575_post_init[0]));
+      rc = run_sequence(fd, eh575_post_init, (int)(sizeof(eh575_post_init) / sizeof(eh575_post_init[0])), count, "eh575-postinit-reset");
+    }
   } else if (strcmp(mode, "eh575-repeat") == 0) {
     int count = argc >= 4 ? atoi(argv[3]) : (int)(sizeof(eh575_repeat) / sizeof(eh575_repeat[0]));
     rc = run_sequence(fd, eh575_repeat, (int)(sizeof(eh575_repeat) / sizeof(eh575_repeat[0])), count, "eh575-repeat");
