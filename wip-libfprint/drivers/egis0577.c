@@ -522,8 +522,8 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
     {
     case SM_INIT:
       fp_dbg ("Starting capture");
-      self->pkt_array = EGIS0577_POST_INIT_PACKETS;
-      self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
+      self->pkt_array = EGIS0577_PRE_INIT_PACKETS;
+      self->pkt_array_len = EGIS0577_PRE_INIT_PACKETS_LENGTH;
       self->current_index = 0;
       self->finger_reported = FALSE;
       self->frame_counter = 0;

@@ -20,7 +20,8 @@
 - [x] Reproduce the earlier `01 01 01` response and reconcile it with the EH575 pre-init branch logic
 - [x] Repeat the successful non-zero post-init finger-hold capture to confirm reproducibility (runs 5-8 all produced 1500+ nonzero bytes after pre-init)
 - [x] Compare multiple non-zero payload frames for image stability (4 good frames, 245 unique values in best)
-- [ ] **Fix the egis0577 libfprint driver to run pre-init sequence once at device open before the post-init loop** — this is the confirmed root cause of all-zero runtime frames
+- [x] **Fix the egis0577 libfprint driver to run pre-init sequence once at device open before the post-init loop** — SM_INIT now starts with EGIS0577_PRE_INIT_PACKETS; both wip-libfprint and refs/libfprint updated and rebuilt
+- [ ] Test the rebuilt libfprint driver end-to-end: run `img-capture` with the patched library and verify nonzero frames are received
 
 ## Likely deeper reverse-engineering work
 
