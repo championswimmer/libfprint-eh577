@@ -165,7 +165,7 @@ while true; do
   if [[ "$RESULT" == "IDENTIFIED!" ]]; then
     [[ -z "$MATCHED" ]] && MATCHED="(name unavailable — check log for 'matched finger')"
     log "✓  MATCHED: $MATCHED"
-    [[ -n "$BZ3" ]] && log "   BZ3 score: $BZ3 (threshold: $(grep EGIS0577_BZ3_THRESHOLD '$REPO/refs/libfprint/libfprint/drivers/egis0577.h' | grep -oP '\d+' | head -1))"
+    [[ -n "$BZ3" ]] && log "   BZ3 score: $BZ3 (threshold: $(grep -oP 'EGIS0577_BZ3_THRESHOLD \K\d+' "$REPO/refs/libfprint/libfprint/drivers/egis0577.h"))"
   elif [[ "$RESULT" == "NOT IDENTIFIED!" ]]; then
     log "✗  NO MATCH — finger not in enrolled set."
     [[ -n "$BZ3" ]] && log "   Highest BZ3 score: $BZ3"
