@@ -1,0 +1,6 @@
+[submodule "refs/EgisTec-EH575"]
+	path = refs/EgisTec-EH575
+	url = https://github.com/Animeshz/EgisTec-EH575.git
+[submodule "refs/libfprint"]
+	path = refs/libfprint
+	url = https://github.com/championswimmer/libfprint.git
