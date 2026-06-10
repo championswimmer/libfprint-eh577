@@ -1,0 +1,103 @@
+
+════════════════════════════════════════
+  EH577 Mismatch Test  [20260610-220618]
+════════════════════════════════════════
+
+Purpose: enroll one finger, verify with a DIFFERENT finger.
+Expected result: NO MATCH.  A MATCH here means a false-match bug.
+Repo: /home/championswimmer/Development/Cpp/libfprint-eh577
+Log:  /home/championswimmer/Development/Cpp/libfprint-eh577/logs/mismatch-20260610-220618.txt
+
+Enroll finger: 0 (left thumb)
+Verify finger: 5 (right thumb)
+
+════════════════════════════════════════
+  PHASE 1: ENROLL (finger 0 — left thumb)
+════════════════════════════════════════
+
+Keep your finger flat and still on the sensor.
+
+Get ready — TOUCH enroll finger on sensor in:
+
+>>> TOUCH NOW (left thumb) <<<
+
+This program will enroll the selected finger overwriting any print for the same finger that was enrolled previously. Fingerprint updates without erasing old data are possible on devices supporting that. Ctrl+C interrupts program execution.
+Choose the finger to enroll:
+  [0] left thumb
+  [1] left index
+  [2] left middle
+  [3] left ring
+  [4] left little
+  [5] right thumb
+  [6] right index
+  [7] right middle
+  [8] right ring
+  [9] right little
+> Selected device 0 (LighTuning Technology Inc. EgisTec EH577) claimed by egis0577 driver
+
+(process:22612): libfprint-WARNING **: 22:06:32.600: EOF encountered while reading a character
+Opened device.
+The device supports fingerprint updates.
+Should an existing fingerprint be updated instead of being replaced (if present)? Enter Y/y or N/n to make a choice.
+It's now time to enroll your finger.
+
+You will need to successfully scan your left thumb finger 5 times to complete the process.
+
+Scan your finger now.
+Wrote scanned image to enrolled.pgm
+Enroll stage 1 of 5 passed. Yay!
+Wrote scanned image to enrolled.pgm
+Enroll stage 2 of 5 passed. Yay!
+Wrote scanned image to enrolled.pgm
+Enroll stage 3 of 5 passed. Yay!
+Wrote scanned image to enrolled.pgm
+Enroll stage 4 of 5 passed. Yay!
+Wrote scanned image to enrolled.pgm
+Enroll stage 5 of 5 passed. Yay!
+
+>>> REMOVE finger now <<<
+
+Enroll data saved.
+Lift enroll finger. Prepare your DIFFERENT finger. Verify starts in:
+
+
+════════════════════════════════════════
+  PHASE 2: VERIFY (finger 5 — right thumb)
+════════════════════════════════════════
+
+Place your DIFFERENT finger (right thumb) on the sensor.
+Expected result: NO MATCH
+
+Get ready — TOUCH DIFFERENT finger on sensor in:
+
+>>> TOUCH NOW (right thumb — DIFFERENT FINGER) <<<
+
+Selected device 0 (LighTuning Technology Inc. EgisTec EH577) claimed by egis0577 driver
+Opened device. Choose the finger to verify:
+  [0] left thumb
+  [1] left index
+  [2] left middle
+  [3] left ring
+  [4] left little
+  [5] right thumb
+  [6] right index
+  [7] right middle
+  [8] right ring
+  [9] right little
+> Loading previously enrolled right thumb finger data...
+Print loaded. Time to verify!
+Print image saved as verify.pgm
+NO MATCH!
+Verify again? [Y/n]? 
+>>> REMOVE finger <<<
+
+
+════════════════════════════════════════
+  RESULT
+════════════════════════════════════════
+
+CORRECT — different finger was rejected (NO MATCH).
+
+Session log:    /home/championswimmer/Development/Cpp/libfprint-eh577/logs/mismatch-20260610-220618.txt
+Enroll image:   /home/championswimmer/Development/Cpp/libfprint-eh577/enrolled.pgm
+Verify image:   /home/championswimmer/Development/Cpp/libfprint-eh577/verify.pgm
