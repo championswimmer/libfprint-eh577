@@ -24,6 +24,7 @@
 - [x] Test the rebuilt libfprint driver end-to-end: confirmed 8 nonzero frames captured, 8 strips assembled into 136×178 fingerprint image, saved to finger.pgm
 - [x] Build libfprint with pixman support to enable the resize step (currently skipped with a CRITICAL warning)
 - [x] Test enrollment and verification flow with the patched driver — see [`docs/plan-enroll-verify.md`](plan-enroll-verify.md)
+- [ ] Execute the EH577 finger-touch / temperature guard follow-up plan — see [`.agents/plans/08-eh577-touch-temperature-guards.md`](../.agents/plans/08-eh577-touch-temperature-guards.md)
 - [ ] Consider upstreaming the driver as a patch to libfprint
 
 ## Likely deeper reverse-engineering work

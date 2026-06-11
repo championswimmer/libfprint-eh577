@@ -143,6 +143,7 @@ The bringup plan is considered materially successful when all of the following e
 - [x] Review the EH577 WIP driver for any leftover EH575 assumptions that conflict with observed EH577 behavior
 - [x] Relax reply parsing wherever EH577 state bytes are known to vary
 - [ ] Decide whether interrupt integration belongs in the first patch or a later phase
+- [ ] Add an explicit EH577 finger-touch / temperature guard policy and track it in `.agents/plans/08-eh577-touch-temperature-guards.md`
 - [x] Turn the WIP files into an applyable patch against `refs/libfprint/`
 - [x] Document patch assumptions directly in code comments where behavior is not yet fully proven
 
