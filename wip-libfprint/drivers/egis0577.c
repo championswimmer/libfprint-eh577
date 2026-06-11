@@ -246,6 +246,26 @@ jump_to_init_with_optional_delay (FpDeviceEgis0577 *self,
     }
 }
 
+/* Restart the POST_INIT sequence (without running PRE_INIT) after a frame.
+ * Used for within-stage polling: no-finger waits and consecutive strip
+ * collection.  A short delay prevents device command saturation — running
+ * POST_INIT back-to-back with no pause causes a timeout at packet 5. */
+static void
+restart_post_init (FpDeviceEgis0577 *self, FpiSsm *ssm, const char *reason)
+{
+  guint delay = self->poll_loop_delay_ms > 0
+                  ? self->poll_loop_delay_ms
+                  : EGIS0577_INTER_FRAME_DELAY_MS;
+
+  self->pkt_array = EGIS0577_POST_INIT_PACKETS;
+  self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
+  self->current_index = 0;
+  self->frame_delay_armed = FALSE;
+
+  fp_dbg ("Restarting post-init in %u ms (%s)", delay, reason);
+  fpi_ssm_jump_to_state_delayed (ssm, SM_REQ, delay);
+}
+
 static void
 save_img (FpiUsbTransfer *transfer, FpDevice *dev)
 {
@@ -289,7 +309,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
         goto START_PROCESSING;
 
       report_finger_status (self, img_self, FALSE, "all-zero frame");
-      jump_to_init_with_optional_delay (self, transfer->ssm, "all-zero frame");
+      restart_post_init (self, transfer->ssm, "all-zero frame");
       return;
     }
 
@@ -343,7 +363,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
   if (self->strips_len < EGIS0577_CONSECUTIVE_CAPTURES)
     {
       fp_dbg ("Continuing polling loop with %zu strips buffered", self->strips_len);
-      jump_to_init_with_optional_delay (self, transfer->ssm, "collecting more strips");
+      restart_post_init (self, transfer->ssm, "collecting more strips");
     }
   else
 START_PROCESSING:

@@ -1,6 +1,7 @@
 /*
  * Egis Technology Inc. (aka. LighTuning) 0577 driver for libfprint
- * Copyright (C) 2026 Arnav Gupta <dev@championsiwmmer.in>
+ * Copyright (C) 2021 Animesh Sahu <animeshsahu19@yahoo.com>
+ * Local EH577 adaptation work (C) 2026 workspace contributors
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -164,6 +165,15 @@ static const Packet EGIS0577_REPEAT_PACKETS[] = {
  * 1.5 s is enough for the user to lift their finger; the actual touch detection
  * is then done purely on pixel count (≥ EGIS0577_MIN_ACTIVE_PIXELS).
  */
+/*
+ * Milliseconds to pause between within-stage POST_INIT re-runs (no-finger
+ * polling and consecutive strip collection).  Running POST_INIT immediately
+ * back-to-back causes the device to stop responding at packet 5; a short
+ * pause lets the sensor settle.  PRE_INIT (the full SM_INIT reset) is only
+ * run between enrollment stages, not between individual frame captures.
+ */
+#define EGIS0577_INTER_FRAME_DELAY_MS 500
+
 #define EGIS0577_INTER_STAGE_DELAY_MS 1500
 
 #define EGIS0577_CONSECUTIVE_CAPTURES 3
