@@ -90,14 +90,17 @@ while true; do
   NR_STAGES=5   # matches IMG_ENROLL_STAGES in libfprint
   log "--- Enrolling: $FNAME (index $CHOICE) ---"
 
-  # Angle hints for each stage — vary placement so the template covers
-  # multiple orientations and matches from different approach angles.
+  # Placement hints for each stage.
+  # Stage 4 is deliberately the 180°-rotated orientation (fingertip away
+  # from you / sensor upside-down).  Bozorth3's ±11° beta tolerance cannot
+  # accommodate a 180° image rotation, so without that stage a rotated touch
+  # will always score 0.  Enrolling one stage at 180° covers it directly.
   STAGE_HINTS=(
-    "centre — flat and straight"
-    "tilt slightly left"
-    "tilt slightly right"
-    "press from top (tip-heavy)"
-    "press from bottom (base-heavy)"
+    "normal — fingertip toward you, flat"
+    "tilt slightly left (~20°)"
+    "tilt slightly right (~20°)"
+    "ROTATED 180° — fingertip pointing away from you"
+    "normal again — flat"
   )
 
   say ""
