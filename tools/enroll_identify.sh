@@ -93,55 +93,26 @@ while true; do
   log "Enrolling: $FNAME (index $CHOICE) — $NR_STAGES separate presses required"
   log ""
 
-  # Run the enroll binary in the background so we can interleave stage prompts.
-  # A temp FIFO feeds the finger-number answer + "N" for the update question.
-  ENROLL_LOG=$(mktemp)
-  ENROLL_FIFO=$(mktemp -u)
-  mkfifo "$ENROLL_FIFO"
+  cue "Stage 1/$NR_STAGES — TOUCH your $FNAME in:" 3
+  log ">>> TOUCH NOW ($FNAME — stage 1/$NR_STAGES) <<<"
+  log ""
 
-  # Keep the FIFO open for writing so the binary doesn't get EOF prematurely.
-  exec 9>"$ENROLL_FIFO"
-  printf "%d\nN\n" "$CHOICE" >&9
-
-  sudo sh -c "
+  # Use process substitution so the while-read loop runs in the current shell
+  # (not a subshell), allowing COMPLETED to be updated and read after the loop.
+  COMPLETED=0
+  while IFS= read -r line; do
+    log "$line"
+    if [[ "$line" == *"passed. Yay!"* ]]; then
+      COMPLETED=$((COMPLETED + 1))
+      if [[ $COMPLETED -lt $NR_STAGES ]]; then
+        log "✓  Stage $COMPLETED/$NR_STAGES — >>> REMOVE finger, then TOUCH again for stage $((COMPLETED+1))/$NR_STAGES <<<"
+        log ""
+      fi
+    fi
+  done < <(printf "%d\nN\n" "$CHOICE" | sudo sh -c "
     cd '$REPO'
     exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint-egis0577 '$ENROLL_BIN'
-  " <"$ENROLL_FIFO" 2>&1 | tee -a "$LOG" > "$ENROLL_LOG" &
-  ENROLL_PID=$!
-
-  COMPLETED=0
-  while [[ $COMPLETED -lt $NR_STAGES ]]; do
-    NEXT=$((COMPLETED + 1))
-    cue ">>> Stage $NEXT/$NR_STAGES — TOUCH your $FNAME on the sensor in:" 3
-    log ">>> TOUCH NOW ($FNAME — stage $NEXT/$NR_STAGES) <<<"
-
-    # Wait for this stage's "passed. Yay!" line in the log.
-    DEADLINE=$((SECONDS + 30))
-    while [[ $SECONDS -lt $DEADLINE ]]; do
-      DONE_COUNT=$(grep -c "passed\. Yay!" "$ENROLL_LOG" 2>/dev/null || true)
-      if [[ "$DONE_COUNT" -gt "$COMPLETED" ]]; then
-        COMPLETED=$DONE_COUNT
-        break
-      fi
-      sleep 0.3
-    done
-
-    if [[ $COMPLETED -lt $NEXT ]]; then
-      log "✗  Stage $NEXT timed out or failed — check output above."
-      break
-    fi
-
-    log "✓  Stage $COMPLETED/$NR_STAGES passed."
-    if [[ $COMPLETED -lt $NR_STAGES ]]; then
-      log ">>> REMOVE finger now, then get ready for stage $((COMPLETED+1)) <<<"
-      sleep 1
-    fi
-  done
-
-  # Close the FIFO write end and wait for the binary to finish.
-  exec 9>&-
-  wait "$ENROLL_PID" 2>/dev/null || true
-  rm -f "$ENROLL_FIFO" "$ENROLL_LOG"
+  " 2>&1)
 
   sudo chown "$(id -u):$(id -g)" "$REPO/test-storage.variant" "$REPO/enrolled.pgm" 2>/dev/null || true
   log ""
