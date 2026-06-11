@@ -6,6 +6,9 @@
 #
 # Phase 2: Touch any enrolled finger.  Script reports which finger
 #          matched (or "NO MATCH" if none did).  Type 'done' to exit.
+#
+# Terminal output is limited to clean step-by-step prompts.
+# All driver/debug output is written silently to $LOG.
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 LIBFP="$REPO/refs/libfprint/build/libfprint"
@@ -17,16 +20,9 @@ LOG="$REPO/logs/identify-session-$SESSION.txt"
 
 mkdir -p "$REPO/logs"
 
-log()    { echo "$@" | tee -a "$LOG"; }
-banner() { log ""; log "════════════════════════════════════════"; log "  $*"; log "════════════════════════════════════════"; log ""; }
-
-cue() {
-  local msg="$1" delay="${2:-3}"
-  log "$msg"
-  for i in $(seq "$delay" -1 1); do printf "  %d... " "$i"; sleep 1; done
-  echo ""
-  log ""
-}
+log() { echo "$@" >> "$LOG"; }          # file only
+say() { echo "$@"; }                    # terminal only
+tee_log() { tee -a "$LOG" > /dev/null; } # pipe: file only, swallow terminal
 
 FINGER_NAMES=(
   "left thumb"   "left index"   "left middle"  "left ring"   "left little"
@@ -34,79 +30,80 @@ FINGER_NAMES=(
 )
 
 # ── pre-flight ────────────────────────────────────────────────────────────────
-banner "EH577 Enroll + Identify  [$SESSION]"
+log "=== EH577 Enroll + Identify [$SESSION] ==="
 log "Log: $LOG"
-log ""
 
 if ! lsusb | grep -q '1c7a:0577'; then
-  log "ERROR: EH577 not found. Check USB connection."; exit 1
+  say "ERROR: EH577 not found. Check USB connection."; exit 1
 fi
 if systemctl is-active --quiet fprintd; then
-  log "Stopping fprintd..."; sudo systemctl stop fprintd
+  sudo systemctl stop fprintd 2>&1 | tee_log
 fi
 sudo bash -c 'echo "on" > /sys/bus/usb/devices/3-3/power/control' 2>/dev/null || true
 
 # ── optional storage clear ────────────────────────────────────────────────────
-echo ""
+say ""
 printf "Clear all previously enrolled prints before starting? [y/N] "
 read -r CLEAR_CHOICE
 if [[ "$CLEAR_CHOICE" =~ ^[yY]$ ]]; then
-  log "Clearing storage..."
+  say "Clearing storage..."
   printf "Y\n" | sudo sh -c "
     cd '$REPO'
     exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=all '$CLEAR_BIN'
-  " 2>&1 | tee -a "$LOG" || true
+  " 2>&1 | tee_log || true
   sudo chown "$(id -u):$(id -g)" "$REPO/test-storage.variant" 2>/dev/null || true
-  log "Storage cleared."
+  say "Done."
 fi
 
 # ── PHASE 1: Enrollment loop ──────────────────────────────────────────────────
-banner "PHASE 1: ENROLL FINGERS"
-log "Enroll as many fingers as you like.  Type 'd' when done."
+say ""
+say "══════════════════════════"
+say "  ENROLL FINGERS"
+say "══════════════════════════"
+say "(log → $LOG)"
 ENROLLED_NAMES=()
 ENROLLED_INDICES=()
 
 while true; do
-  echo ""
-  echo "Pick a finger to enroll — or 'd' to finish:"
-  echo "  [0] left thumb    [5] right thumb"
-  echo "  [1] left index    [6] right index"
-  echo "  [2] left middle   [7] right middle"
-  echo "  [3] left ring     [8] right ring"
-  echo "  [4] left little   [9] right little"
-  echo "  [d] done enrolling"
+  say ""
+  say "Pick a finger to enroll, or 'd' to finish:"
+  say "  [0] left thumb    [5] right thumb"
+  say "  [1] left index    [6] right index"
+  say "  [2] left middle   [7] right middle"
+  say "  [3] left ring     [8] right ring"
+  say "  [4] left little   [9] right little"
+  say "  [d] done"
   read -rp "> " CHOICE
 
   if [[ "$CHOICE" =~ ^[dD]$ ]]; then
     if [[ ${#ENROLLED_NAMES[@]} -eq 0 ]]; then
-      echo "Enroll at least one finger first."; continue
+      say "Enroll at least one finger first."; continue
     fi
     break
   fi
 
   if [[ ! "$CHOICE" =~ ^[0-9]$ ]]; then
-    echo "Invalid — enter 0–9 or 'd'."; continue
+    say "Invalid — enter 0–9 or 'd'."; continue
   fi
 
   FNAME="${FINGER_NAMES[$CHOICE]}"
   NR_STAGES=5   # matches IMG_ENROLL_STAGES in libfprint
-  log "Enrolling: $FNAME (index $CHOICE) — $NR_STAGES separate presses required"
-  log ""
+  log "--- Enrolling: $FNAME (index $CHOICE) ---"
 
-  cue "Stage 1/$NR_STAGES — TOUCH your $FNAME in:" 3
-  log ">>> TOUCH NOW ($FNAME — stage 1/$NR_STAGES) <<<"
-  log ""
+  say ""
+  say "  Enrolling: $FNAME ($NR_STAGES touches)"
+  say ""
+  say "  ▶  Touch 1/$NR_STAGES — place your finger on the sensor"
 
-  # Use process substitution so the while-read loop runs in the current shell
-  # (not a subshell), allowing COMPLETED to be updated and read after the loop.
   COMPLETED=0
   while IFS= read -r line; do
-    log "$line"
+    log "$line"   # all driver output goes silently to log
     if [[ "$line" == *"passed. Yay!"* ]]; then
       COMPLETED=$((COMPLETED + 1))
+      say "  ✓  Touch $COMPLETED/$NR_STAGES captured — lift your finger"
       if [[ $COMPLETED -lt $NR_STAGES ]]; then
-        log "✓  Stage $COMPLETED/$NR_STAGES — >>> REMOVE finger, then TOUCH again for stage $((COMPLETED+1))/$NR_STAGES <<<"
-        log ""
+        sleep 1   # visual beat while driver runs its 1.5 s inter-stage reset
+        say "  ▶  Touch $((COMPLETED+1))/$NR_STAGES — place your finger again"
       fi
     fi
   done < <(printf "%d\nN\n" "$CHOICE" | sudo sh -c "
@@ -115,77 +112,73 @@ while true; do
   " 2>&1)
 
   sudo chown "$(id -u):$(id -g)" "$REPO/test-storage.variant" "$REPO/enrolled.pgm" 2>/dev/null || true
-  log ""
-  log ">>> REMOVE finger <<<"
 
+  say ""
   if [[ $COMPLETED -eq $NR_STAGES ]]; then
-    log "✓  $FNAME enrolled (all $NR_STAGES stages complete)."
+    say "  ✓✓  $FNAME enrolled ($NR_STAGES/$NR_STAGES)"
     ENROLLED_NAMES+=("$FNAME")
     ENROLLED_INDICES+=("$CHOICE")
+    log "Enrolled: $FNAME"
   else
-    log "✗  Enrollment incomplete ($COMPLETED/$NR_STAGES stages). Try again."
+    say "  ✗   Enrollment incomplete ($COMPLETED/$NR_STAGES) — try again."
+    log "Enrollment incomplete: $FNAME ($COMPLETED/$NR_STAGES)"
   fi
 done
 
-log ""
-log "Enrolled fingers:"
-for F in "${ENROLLED_NAMES[@]}"; do log "  • $F"; done
+say ""
+say "Enrolled:"
+for F in "${ENROLLED_NAMES[@]}"; do say "  • $F"; done
 
 # ── PHASE 2: Identification loop ──────────────────────────────────────────────
-banner "PHASE 2: IDENTIFY FINGERS"
-log "Touch any enrolled finger to identify it."
-log "Enrolled: ${ENROLLED_NAMES[*]}"
-log "Type 'done' to exit."
+say ""
+say "══════════════════════════"
+say "  IDENTIFY FINGERS"
+say "══════════════════════════"
+say "Enrolled: ${ENROLLED_NAMES[*]}"
+say "Type 'done' to exit."
 
 while true; do
-  echo ""
-  printf "Press Enter to scan a finger (or type 'done' to exit): "
+  say ""
+  printf "Press Enter to scan (or 'done' to exit): "
   read -r CHOICE
 
   if [[ "$CHOICE" =~ ^[dD](one)?$ ]]; then
-    log "Session ended."; break
+    break
   fi
 
-  cue "Get ready — TOUCH a finger on the sensor in:" 3
-  log ">>> TOUCH NOW <<<"
-  log ""
+  say "  ▶  Place your finger on the sensor"
 
-  # Use a temp file to capture the full debug output for parsing.
-  # `exec env` sets G_MESSAGES_DEBUG=all explicitly so GLib shows:
-  #   - NULL-domain debug (identify.c's "matched finger X successfully")
-  #   - libfprint-print debug (bozorth3 "score X/threshold" lines)
-  #   - libfprint-egis0577 debug (driver frames)
-  # tee splits: LOG gets everything; terminal gets only non-DEBUG lines.
   IDTMP=$(mktemp)
   printf "n\n" | sudo sh -c "
     cd '$REPO'
     exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=all '$IDENTIFY_BIN'
-  " 2>&1 | tee -a "$LOG" | tee "$IDTMP" | grep -vE "^\(process:"
+  " 2>&1 | tee -a "$LOG" > "$IDTMP"
 
   sudo chown "$(id -u):$(id -g)" "$REPO/identify.pgm" 2>/dev/null || true
 
-  log ""
-  log ">>> REMOVE finger <<<"
-
-  # Parse results from the temp file that has the full debug stream.
   BZ3=$(grep -oP "score \K[0-9]+(?=/)" "$IDTMP" | sort -n | tail -1)
   MATCHED=$(grep -oP "matched finger \K.+?(?= successfully)" "$IDTMP" | tail -1)
   RESULT=$(grep -E "^(NOT )?IDENTIFIED!$" "$IDTMP" | tail -1)
   rm -f "$IDTMP"
 
+  say "  ▶  Lift your finger"
+  say ""
   if [[ "$RESULT" == "IDENTIFIED!" ]]; then
-    [[ -z "$MATCHED" ]] && MATCHED="(name unavailable — check log for 'matched finger')"
-    log "✓  MATCHED: $MATCHED"
-    [[ -n "$BZ3" ]] && log "   BZ3 score: $BZ3 (threshold: $(grep -oP 'EGIS0577_BZ3_THRESHOLD \K\d+' "$REPO/refs/libfprint/libfprint/drivers/egis0577.h"))"
+    [[ -z "$MATCHED" ]] && MATCHED="(see log)"
+    say "  ✓  MATCHED: $MATCHED"
+    [[ -n "$BZ3" ]] && say "     BZ3 score: $BZ3"
   elif [[ "$RESULT" == "NOT IDENTIFIED!" ]]; then
-    log "✗  NO MATCH — finger not in enrolled set."
-    [[ -n "$BZ3" ]] && log "   Highest BZ3 score: $BZ3"
+    say "  ✗  NO MATCH"
+    [[ -n "$BZ3" ]] && say "     Best BZ3: $BZ3"
   else
-    log "?  Unknown result — check log."
+    say "  ?  No result — check log: $LOG"
   fi
 done
 
 # ── summary ───────────────────────────────────────────────────────────────────
-banner "SESSION COMPLETE"
-log "Enrolled fingers: ${ENROLLED_NAMES[*]}"
-log "Log: $LOG"
+say ""
+say "══════════════════════════"
+say "  SESSION COMPLETE"
+say "══════════════════════════"
+say "Enrolled: ${ENROLLED_NAMES[*]}"
+say "Log: $LOG"
