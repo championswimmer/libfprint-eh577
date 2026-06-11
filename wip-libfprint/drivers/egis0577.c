@@ -407,14 +407,19 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
       self->strips = NULL;
       self->strips_len = 0;
 
-      /* Report finger-off and wait EGIS0577_INTER_STAGE_DELAY_MS before the
-       * next stage.  The delay gives the user time to lift their finger and
-       * resets the sensor via SM_INIT (PRE_INIT → POST_INIT), which clears the
-       * AGC shift that makes idle frames look like partial touches. */
+      /* Report finger-off, then restart POST_INIT (without PRE_INIT) after
+       * INTER_STAGE_DELAY_MS.  Running PRE_INIT after a real capture causes
+       * POST_INIT to fail at packet ~10: the sensor pipeline needs the simpler
+       * POST_INIT-only restart, same as the within-stage strip-collection path.
+       * PRE_INIT only runs once at cold startup (SM_INIT from dev_start). */
       report_finger_status (self, img_self, FALSE, "image submitted — inter-stage gap");
-      fp_dbg ("Image submitted; pausing %d ms then resetting for next stage",
+      fp_dbg ("Image submitted; pausing %d ms then restarting post-init for next stage",
               EGIS0577_INTER_STAGE_DELAY_MS);
-      fpi_ssm_jump_to_state_delayed (ssm, SM_INIT, EGIS0577_INTER_STAGE_DELAY_MS);
+      self->pkt_array = EGIS0577_POST_INIT_PACKETS;
+      self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
+      self->current_index = 0;
+      self->frame_delay_armed = FALSE;
+      fpi_ssm_jump_to_state_delayed (ssm, SM_REQ, EGIS0577_INTER_STAGE_DELAY_MS);
     }
   else
     {
