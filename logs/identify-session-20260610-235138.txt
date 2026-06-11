@@ -16538,3 +16538,1369 @@ Identify again? [Y/n]? (process:66975): libfprint-egis0577-DEBUG: 23:53:14.275: 
 >>> REMOVE finger <<<
 ✗  NO MATCH — finger not in enrolled set.
    Highest BZ3 score: 11
+Get ready — TOUCH a finger on the sensor in:
+
+>>> TOUCH NOW <<<
+
+(process:127328): libfprint-context-DEBUG: 12:13:40.018: Initializing FpContext (libfprint version 1.94.10)
+(process:127328): libfprint-context-DEBUG: 12:13:40.022: No driver found for USB device 1D6B:0003
+(process:127328): libfprint-context-DEBUG: 12:13:40.022: No driver found for USB device 046D:085E
+(process:127328): libfprint-context-DEBUG: 12:13:40.022: No driver found for USB device 1D6B:0002
+(process:127328): libfprint-context-DEBUG: 12:13:40.022: No driver found for USB device 1D6B:0003
+(process:127328): libfprint-context-DEBUG: 12:13:40.022: No driver found for USB device 1D6B:0002
+(process:127328): libfprint-context-DEBUG: 12:13:40.022: No driver found for USB device 1D6B:0003
+(process:127328): libfprint-context-DEBUG: 12:13:40.022: No driver found for USB device 13D3:3604
+(process:127328): libfprint-context-DEBUG: 12:13:40.022: No driver found for USB device 1D6B:A4A7
+(process:127328): libfprint-context-DEBUG: 12:13:40.023: No driver found for USB device 046D:C548
+(process:127328): libfprint-context-DEBUG: 12:13:40.023: No driver found for USB device 046D:C52B
+(process:127328): libfprint-context-DEBUG: 12:13:40.023: No driver found for USB device 1D6B:0002
+(process:127328): libfprint-context-DEBUG: 12:13:40.023: No driver found for USB device 1D6B:0003
+(process:127328): libfprint-context-DEBUG: 12:13:40.023: No driver found for USB device 1D6B:0002
+(process:127328): libfprint-device-DEBUG: 12:13:40.023: Device reported probe completion
+(process:127328): libfprint-device-DEBUG: 12:13:40.023: Completing action FPI_DEVICE_ACTION_PROBE in idle!
+(process:127328): libfprint-device-DEBUG: 12:13:40.023: Updated temperature model after 0.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+Selected device 0 (LighTuning Technology Inc. EgisTec EH577) claimed by egis0577 driver
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.023: Opening EH577 device
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.023: Claiming interface 0
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.023: Image device open completed
+(process:127328): libfprint-device-DEBUG: 12:13:40.023: Device reported open completion
+(process:127328): libfprint-device-DEBUG: 12:13:40.023: Completing action FPI_DEVICE_ACTION_OPEN in idle!
+(process:127328): libfprint-device-DEBUG: 12:13:40.023: Updated temperature model after 0.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+Opened device. Gallery loaded. Time to identify!
+(process:127328): libfprint-device-DEBUG: 12:13:40.023: Updated temperature model after 0.00 seconds, ratio 0.27 -> 0.27, active 1 -> 1, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.023: Activating image device
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.023: Image device internal state change from FPI_IMAGE_DEVICE_STATE_INACTIVE to FPI_IMAGE_DEVICE_STATE_ACTIVATING
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.023: Activate requested
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.023: [egis0577] SM_STATES_NUM entering state 0
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.023: Starting capture
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.023: Initial packet array: pre-init
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.023: EH577 pacing config: pre_frame_delay_ms=0 poll_loop_delay_ms=0
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.023: [egis0577] SM_STATES_NUM entering state 1
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.023: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.023: SSM_REQ using pre-init[0/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.023: Submitting bulk OUT for pre-init[0/29]: 60 00 00 len=7 expect=7
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.023: Image device activation completed
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.023: Image device internal state change from FPI_IMAGE_DEVICE_STATE_ACTIVATING to FPI_IMAGE_DEVICE_STATE_IDLE
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.023: Image device internal state change from FPI_IMAGE_DEVICE_STATE_IDLE to FPI_IMAGE_DEVICE_STATE_AWAIT_FINGER_ON
+(process:127328): libfprint-device-DEBUG: 12:13:40.023: Device reported finger status change: FP_FINGER_STATUS_NEEDED
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.023: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.023: SSM_RESP waiting on pre-init[0/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.023: Submitting bulk IN for pre-init[0], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.024: RX complete for pre-init[0]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.024: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.024: SSM_REQ using pre-init[1/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.024: Submitting bulk OUT for pre-init[1/29]: 60 01 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.024: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.024: SSM_RESP waiting on pre-init[1/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.024: Submitting bulk IN for pre-init[1], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.024: RX complete for pre-init[1]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.024: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.024: SSM_REQ using pre-init[2/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.024: Submitting bulk OUT for pre-init[2/29]: 61 0a fd len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.024: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.024: SSM_RESP waiting on pre-init[2/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.024: Submitting bulk IN for pre-init[2], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.025: RX complete for pre-init[2]: actual=7 first-bytes=53 49 47 45 0a fd 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.025: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.025: SSM_REQ using pre-init[3/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.025: Submitting bulk OUT for pre-init[3/29]: 61 35 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.025: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.025: SSM_RESP waiting on pre-init[3/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.025: Submitting bulk IN for pre-init[3], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.026: RX complete for pre-init[3]: actual=7 first-bytes=53 49 47 45 35 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.026: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.026: SSM_REQ using pre-init[4/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.026: Submitting bulk OUT for pre-init[4/29]: 61 80 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.026: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.026: SSM_RESP waiting on pre-init[4/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.026: Submitting bulk IN for pre-init[4], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.027: RX complete for pre-init[4]: actual=7 first-bytes=53 49 47 45 80 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.027: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.027: SSM_REQ using pre-init[5/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.027: Submitting bulk OUT for pre-init[5/29]: 60 80 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.027: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.027: SSM_RESP waiting on pre-init[5/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.027: Submitting bulk IN for pre-init[5], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.027: RX complete for pre-init[5]: actual=7 first-bytes=53 49 47 45 80 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.027: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.027: SSM_REQ using pre-init[6/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.027: Submitting bulk OUT for pre-init[6/29]: 61 0a fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.028: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.028: SSM_RESP waiting on pre-init[6/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.028: Submitting bulk IN for pre-init[6], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.028: RX complete for pre-init[6]: actual=7 first-bytes=53 49 47 45 0a fc 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.028: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.028: SSM_REQ using pre-init[7/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.028: Submitting bulk OUT for pre-init[7/29]: 63 01 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.028: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.028: SSM_RESP waiting on pre-init[7/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.028: Submitting bulk IN for pre-init[7], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.029: RX complete for pre-init[7]: actual=9 first-bytes=53 49 47 45 01 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.029: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.029: SSM_REQ using pre-init[8/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.029: Submitting bulk OUT for pre-init[8/29]: 61 0c 22 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.029: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.029: SSM_RESP waiting on pre-init[8/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.029: Submitting bulk IN for pre-init[8], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.030: RX complete for pre-init[8]: actual=7 first-bytes=53 49 47 45 0c 22 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.030: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.030: SSM_REQ using pre-init[9/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.030: Submitting bulk OUT for pre-init[9/29]: 61 09 83 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.030: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.030: SSM_RESP waiting on pre-init[9/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.030: Submitting bulk IN for pre-init[9], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.031: RX complete for pre-init[9]: actual=7 first-bytes=53 49 47 45 09 83 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.031: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.031: SSM_REQ using pre-init[10/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.031: Submitting bulk OUT for pre-init[10/29]: 63 26 06 len=13 expect=13
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.031: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.031: SSM_RESP waiting on pre-init[10/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.031: Submitting bulk IN for pre-init[10], expecting 13 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.031: RX complete for pre-init[10]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.031: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.031: SSM_REQ using pre-init[11/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.031: Submitting bulk OUT for pre-init[11/29]: 61 0a f4 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.031: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.031: SSM_RESP waiting on pre-init[11/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.031: Submitting bulk IN for pre-init[11], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.032: RX complete for pre-init[11]: actual=7 first-bytes=53 49 47 45 0a f4 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.032: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.032: SSM_REQ using pre-init[12/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.032: Submitting bulk OUT for pre-init[12/29]: 61 0c 44 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.032: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.032: SSM_RESP waiting on pre-init[12/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.032: Submitting bulk IN for pre-init[12], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.033: RX complete for pre-init[12]: actual=7 first-bytes=53 49 47 45 0c 44 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.033: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.033: SSM_REQ using pre-init[13/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.033: Submitting bulk OUT for pre-init[13/29]: 61 50 03 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.033: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.033: SSM_RESP waiting on pre-init[13/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.033: Submitting bulk IN for pre-init[13], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.033: RX complete for pre-init[13]: actual=7 first-bytes=53 49 47 45 50 03 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.033: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.033: SSM_REQ using pre-init[14/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.034: Submitting bulk OUT for pre-init[14/29]: 60 50 03 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.034: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.034: SSM_RESP waiting on pre-init[14/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.034: Submitting bulk IN for pre-init[14], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.034: RX complete for pre-init[14]: actual=7 first-bytes=53 49 47 45 50 82 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.034: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.034: SSM_REQ using pre-init[15/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.034: Submitting bulk OUT for pre-init[15/29]: 73 14 ec len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.034: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.034: SSM_RESP waiting on pre-init[15/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.034: Submitting bulk IN for pre-init[15], expecting 7 bytes
+(process:127328): libfprint-device-DEBUG: 12:13:40.123: Updated temperature model after 0.10 seconds, ratio 0.27 -> 0.27, active 1 -> 1, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_WARM
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.546: RX complete for pre-init[15]: actual=7 first-bytes=00 ff ff 5b ce 00 13
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.547: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.547: SSM_REQ using pre-init[16/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.547: Submitting bulk OUT for pre-init[16/29]: 60 40 ec len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.547: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.547: SSM_RESP waiting on pre-init[16/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.547: Submitting bulk IN for pre-init[16], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.548: RX complete for pre-init[16]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.548: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.548: SSM_REQ using pre-init[17/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.548: Submitting bulk OUT for pre-init[17/29]: 63 09 0b len=18 expect=18
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.548: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.548: SSM_RESP waiting on pre-init[17/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.548: Submitting bulk IN for pre-init[17], expecting 18 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.549: RX complete for pre-init[17]: actual=18 first-bytes=53 49 47 45 09 0b 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.549: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.549: SSM_REQ using pre-init[18/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.549: Submitting bulk OUT for pre-init[18/29]: 63 26 06 len=13 expect=13
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.549: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.549: SSM_RESP waiting on pre-init[18/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.549: Submitting bulk IN for pre-init[18], expecting 13 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.549: RX complete for pre-init[18]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.549: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.549: SSM_REQ using pre-init[19/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.549: Submitting bulk OUT for pre-init[19/29]: 61 23 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.550: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.550: SSM_RESP waiting on pre-init[19/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.550: Submitting bulk IN for pre-init[19], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.550: RX complete for pre-init[19]: actual=7 first-bytes=53 49 47 45 23 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.550: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.550: SSM_REQ using pre-init[20/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.550: Submitting bulk OUT for pre-init[20/29]: 61 24 33 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.550: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.550: SSM_RESP waiting on pre-init[20/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.550: Submitting bulk IN for pre-init[20], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.551: RX complete for pre-init[20]: actual=7 first-bytes=53 49 47 45 24 33 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.551: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.551: SSM_REQ using pre-init[21/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.551: Submitting bulk OUT for pre-init[21/29]: 61 20 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.551: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.551: SSM_RESP waiting on pre-init[21/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.551: Submitting bulk IN for pre-init[21], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.552: RX complete for pre-init[21]: actual=7 first-bytes=53 49 47 45 20 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.552: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.552: SSM_REQ using pre-init[22/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.552: Submitting bulk OUT for pre-init[22/29]: 61 21 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.552: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.552: SSM_RESP waiting on pre-init[22/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.552: Submitting bulk IN for pre-init[22], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.552: RX complete for pre-init[22]: actual=7 first-bytes=53 49 47 45 21 66 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.552: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.552: SSM_REQ using pre-init[23/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.552: Submitting bulk OUT for pre-init[23/29]: 60 00 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.552: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.552: SSM_RESP waiting on pre-init[23/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.552: Submitting bulk IN for pre-init[23], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.553: RX complete for pre-init[23]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.553: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.553: SSM_REQ using pre-init[24/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.553: Submitting bulk OUT for pre-init[24/29]: 60 01 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.553: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.553: SSM_RESP waiting on pre-init[24/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.553: Submitting bulk IN for pre-init[24], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.554: RX complete for pre-init[24]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.554: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.554: SSM_REQ using pre-init[25/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.554: Submitting bulk OUT for pre-init[25/29]: 60 40 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.554: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.554: SSM_RESP waiting on pre-init[25/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.554: Submitting bulk IN for pre-init[25], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.555: RX complete for pre-init[25]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.555: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.555: SSM_REQ using pre-init[26/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.555: Submitting bulk OUT for pre-init[26/29]: 61 0c 22 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.555: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.555: SSM_RESP waiting on pre-init[26/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.555: Submitting bulk IN for pre-init[26], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.555: RX complete for pre-init[26]: actual=7 first-bytes=53 49 47 45 0c 22 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.555: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.555: SSM_REQ using pre-init[27/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.555: Submitting bulk OUT for pre-init[27/29]: 61 0b 03 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.555: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.555: SSM_RESP waiting on pre-init[27/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.555: Submitting bulk IN for pre-init[27], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.556: RX complete for pre-init[27]: actual=7 first-bytes=53 49 47 45 0b 03 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.556: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.556: SSM_REQ using pre-init[28/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.556: Submitting bulk OUT for pre-init[28/29]: 61 0a fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.556: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.556: SSM_RESP waiting on pre-init[28/29]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.556: Submitting bulk IN for pre-init[28], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.557: RX complete for pre-init[28]: actual=7 first-bytes=53 49 47 45 0a fc 01
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.557: Completed pre-init sequence, switching back to post-init
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.557: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.557: SSM_REQ using post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.557: Submitting bulk OUT for post-init[0/18]: 60 00 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.557: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.557: SSM_RESP waiting on post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.557: Submitting bulk IN for post-init[0], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.558: RX complete for post-init[0]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.558: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.558: SSM_REQ using post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.558: Submitting bulk OUT for post-init[1/18]: 60 01 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.558: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.558: SSM_RESP waiting on post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.558: Submitting bulk IN for post-init[1], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.558: RX complete for post-init[1]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.558: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.558: SSM_REQ using post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.558: Submitting bulk OUT for post-init[2/18]: 60 40 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.558: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.558: SSM_RESP waiting on post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.558: Submitting bulk IN for post-init[2], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.559: RX complete for post-init[2]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.559: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.559: SSM_REQ using post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.559: Submitting bulk OUT for post-init[3/18]: 63 09 0b len=18 expect=18
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.559: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.559: SSM_RESP waiting on post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.559: Submitting bulk IN for post-init[3], expecting 18 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.560: RX complete for post-init[3]: actual=18 first-bytes=53 49 47 45 09 0b 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.560: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.560: SSM_REQ using post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.560: Submitting bulk OUT for post-init[4/18]: 63 26 06 len=13 expect=13
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.560: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.560: SSM_RESP waiting on post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.560: Submitting bulk IN for post-init[4], expecting 13 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.561: RX complete for post-init[4]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.561: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.561: SSM_REQ using post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.561: Submitting bulk OUT for post-init[5/18]: 61 23 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.561: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.561: SSM_RESP waiting on post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.561: Submitting bulk IN for post-init[5], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.561: RX complete for post-init[5]: actual=7 first-bytes=53 49 47 45 23 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.561: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.561: SSM_REQ using post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.561: Submitting bulk OUT for post-init[6/18]: 61 24 33 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.561: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.561: SSM_RESP waiting on post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.561: Submitting bulk IN for post-init[6], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.562: RX complete for post-init[6]: actual=7 first-bytes=53 49 47 45 24 33 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.562: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.562: SSM_REQ using post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.562: Submitting bulk OUT for post-init[7/18]: 61 20 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.562: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.562: SSM_RESP waiting on post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.562: Submitting bulk IN for post-init[7], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.563: RX complete for post-init[7]: actual=7 first-bytes=53 49 47 45 20 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.563: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.563: SSM_REQ using post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.563: Submitting bulk OUT for post-init[8/18]: 61 21 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.563: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.563: SSM_RESP waiting on post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.563: Submitting bulk IN for post-init[8], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.564: RX complete for post-init[8]: actual=7 first-bytes=53 49 47 45 21 66 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.564: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.564: SSM_REQ using post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.564: Submitting bulk OUT for post-init[9/18]: 60 00 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.564: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.564: SSM_RESP waiting on post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.564: Submitting bulk IN for post-init[9], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.564: RX complete for post-init[9]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.564: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.564: SSM_REQ using post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.564: Submitting bulk OUT for post-init[10/18]: 60 01 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.564: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.564: SSM_RESP waiting on post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.564: Submitting bulk IN for post-init[10], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.565: RX complete for post-init[10]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.565: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.565: SSM_REQ using post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.565: Submitting bulk OUT for post-init[11/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.565: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.565: SSM_RESP waiting on post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.565: Submitting bulk IN for post-init[11], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.566: RX complete for post-init[11]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.566: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.566: SSM_REQ using post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.566: Submitting bulk OUT for post-init[12/18]: 60 2d 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.566: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.566: SSM_RESP waiting on post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.566: Submitting bulk IN for post-init[12], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.567: RX complete for post-init[12]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.567: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.567: SSM_REQ using post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.567: Submitting bulk OUT for post-init[13/18]: 62 67 03 len=7 expect=10
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.567: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.567: SSM_RESP waiting on post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.567: Submitting bulk IN for post-init[13], expecting 10 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.567: RX complete for post-init[13]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.567: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.567: SSM_REQ using post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.567: Submitting bulk OUT for post-init[14/18]: 60 0f 03 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.567: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.567: SSM_RESP waiting on post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.567: Submitting bulk IN for post-init[14], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.568: RX complete for post-init[14]: actual=7 first-bytes=53 49 47 45 0f 20 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.568: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.568: SSM_REQ using post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.568: Submitting bulk OUT for post-init[15/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.568: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.568: SSM_RESP waiting on post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.568: Submitting bulk IN for post-init[15], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.569: RX complete for post-init[15]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.569: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.569: SSM_REQ using post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.569: Submitting bulk OUT for post-init[16/18]: 60 00 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.569: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.569: SSM_RESP waiting on post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.569: Submitting bulk IN for post-init[16], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.570: RX complete for post-init[16]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.570: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.570: SSM_REQ using post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.570: Submitting bulk OUT for post-init[17/18]: 64 14 ec len=7 expect=5356
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.570: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.570: SSM_RESP waiting on post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.570: Submitting bulk IN for post-init[17], expecting 5356 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.575: RX complete for post-init[17]: actual=5356 first-bytes=00 ff ff 84 2e 00 56
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.575: Completed post-init sequence, saving frame and staying on post-init polling
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.575: Frame received from post-init[0]: len=5356 nonzero=162 strips=0 stop=0
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.575: Finger heuristic for current frame: present
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.575: Reporting finger present (frame variance exceeded threshold)
+(process:127328): libfprint-device-DEBUG: 12:13:40.575: Device reported finger status change: FP_FINGER_STATUS_NEEDED | FP_FINGER_STATUS_PRESENT
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.575: Image device reported finger status: on
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.575: Image device internal state change from FPI_IMAGE_DEVICE_STATE_AWAIT_FINGER_ON to FPI_IMAGE_DEVICE_STATE_CAPTURE
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.575: Appended strip 1/8
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.575: Continuing polling loop with 1 strips buffered
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.575: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.575: SSM_REQ using post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.575: Submitting bulk OUT for post-init[0/18]: 60 00 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.575: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.575: SSM_RESP waiting on post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.575: Submitting bulk IN for post-init[0], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.576: RX complete for post-init[0]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.576: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.576: SSM_REQ using post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.576: Submitting bulk OUT for post-init[1/18]: 60 01 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.576: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.576: SSM_RESP waiting on post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.576: Submitting bulk IN for post-init[1], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.576: RX complete for post-init[1]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.576: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.576: SSM_REQ using post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.576: Submitting bulk OUT for post-init[2/18]: 60 40 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.577: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.577: SSM_RESP waiting on post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.577: Submitting bulk IN for post-init[2], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.577: RX complete for post-init[2]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.577: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.577: SSM_REQ using post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.577: Submitting bulk OUT for post-init[3/18]: 63 09 0b len=18 expect=18
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.577: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.577: SSM_RESP waiting on post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.577: Submitting bulk IN for post-init[3], expecting 18 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.578: RX complete for post-init[3]: actual=18 first-bytes=53 49 47 45 09 0b 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.578: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.578: SSM_REQ using post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.578: Submitting bulk OUT for post-init[4/18]: 63 26 06 len=13 expect=13
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.578: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.578: SSM_RESP waiting on post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.578: Submitting bulk IN for post-init[4], expecting 13 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.579: RX complete for post-init[4]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.579: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.579: SSM_REQ using post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.579: Submitting bulk OUT for post-init[5/18]: 61 23 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.579: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.579: SSM_RESP waiting on post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.579: Submitting bulk IN for post-init[5], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.579: RX complete for post-init[5]: actual=7 first-bytes=53 49 47 45 23 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.579: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.579: SSM_REQ using post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.579: Submitting bulk OUT for post-init[6/18]: 61 24 33 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.579: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.579: SSM_RESP waiting on post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.579: Submitting bulk IN for post-init[6], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.580: RX complete for post-init[6]: actual=7 first-bytes=53 49 47 45 24 33 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.580: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.580: SSM_REQ using post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.580: Submitting bulk OUT for post-init[7/18]: 61 20 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.580: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.580: SSM_RESP waiting on post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.580: Submitting bulk IN for post-init[7], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.581: RX complete for post-init[7]: actual=7 first-bytes=53 49 47 45 20 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.581: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.581: SSM_REQ using post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.581: Submitting bulk OUT for post-init[8/18]: 61 21 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.581: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.581: SSM_RESP waiting on post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.581: Submitting bulk IN for post-init[8], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.582: RX complete for post-init[8]: actual=7 first-bytes=53 49 47 45 21 66 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.582: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.582: SSM_REQ using post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.582: Submitting bulk OUT for post-init[9/18]: 60 00 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.582: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.582: SSM_RESP waiting on post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.582: Submitting bulk IN for post-init[9], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.582: RX complete for post-init[9]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.582: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.582: SSM_REQ using post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.582: Submitting bulk OUT for post-init[10/18]: 60 01 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.582: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.582: SSM_RESP waiting on post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.582: Submitting bulk IN for post-init[10], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.583: RX complete for post-init[10]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.583: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.583: SSM_REQ using post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.583: Submitting bulk OUT for post-init[11/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.583: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.583: SSM_RESP waiting on post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.583: Submitting bulk IN for post-init[11], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.584: RX complete for post-init[11]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.584: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.584: SSM_REQ using post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.584: Submitting bulk OUT for post-init[12/18]: 60 2d 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.584: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.584: SSM_RESP waiting on post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.584: Submitting bulk IN for post-init[12], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.585: RX complete for post-init[12]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.585: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.585: SSM_REQ using post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.585: Submitting bulk OUT for post-init[13/18]: 62 67 03 len=7 expect=10
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.585: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.585: SSM_RESP waiting on post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.585: Submitting bulk IN for post-init[13], expecting 10 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.585: RX complete for post-init[13]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.585: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.585: SSM_REQ using post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.585: Submitting bulk OUT for post-init[14/18]: 60 0f 03 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.585: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.585: SSM_RESP waiting on post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.585: Submitting bulk IN for post-init[14], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.586: RX complete for post-init[14]: actual=7 first-bytes=53 49 47 45 0f 20 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.586: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.586: SSM_REQ using post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.586: Submitting bulk OUT for post-init[15/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.586: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.586: SSM_RESP waiting on post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.586: Submitting bulk IN for post-init[15], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.587: RX complete for post-init[15]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.587: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.587: SSM_REQ using post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.587: Submitting bulk OUT for post-init[16/18]: 60 00 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.587: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.587: SSM_RESP waiting on post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.587: Submitting bulk IN for post-init[16], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.588: RX complete for post-init[16]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.588: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.588: SSM_REQ using post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.588: Submitting bulk OUT for post-init[17/18]: 64 14 ec len=7 expect=5356
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.588: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.588: SSM_RESP waiting on post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.588: Submitting bulk IN for post-init[17], expecting 5356 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.593: RX complete for post-init[17]: actual=5356 first-bytes=00 ff ff 84 32 00 57
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.593: Completed post-init sequence, saving frame and staying on post-init polling
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.593: Frame received from post-init[0]: len=5356 nonzero=162 strips=1 stop=0
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.593: Finger heuristic for current frame: present
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.593: Finger remains present (frame variance exceeded threshold)
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.593: Image device reported finger status: on
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.593: Appended strip 2/8
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.593: Continuing polling loop with 2 strips buffered
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.593: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.593: SSM_REQ using post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.593: Submitting bulk OUT for post-init[0/18]: 60 00 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.593: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.593: SSM_RESP waiting on post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.593: Submitting bulk IN for post-init[0], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.594: RX complete for post-init[0]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.594: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.594: SSM_REQ using post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.594: Submitting bulk OUT for post-init[1/18]: 60 01 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.594: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.594: SSM_RESP waiting on post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.594: Submitting bulk IN for post-init[1], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.594: RX complete for post-init[1]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.594: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.594: SSM_REQ using post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.594: Submitting bulk OUT for post-init[2/18]: 60 40 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.594: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.594: SSM_RESP waiting on post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.594: Submitting bulk IN for post-init[2], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.595: RX complete for post-init[2]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.595: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.595: SSM_REQ using post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.595: Submitting bulk OUT for post-init[3/18]: 63 09 0b len=18 expect=18
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.595: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.595: SSM_RESP waiting on post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.595: Submitting bulk IN for post-init[3], expecting 18 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.596: RX complete for post-init[3]: actual=18 first-bytes=53 49 47 45 09 0b 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.596: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.596: SSM_REQ using post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.596: Submitting bulk OUT for post-init[4/18]: 63 26 06 len=13 expect=13
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.596: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.596: SSM_RESP waiting on post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.596: Submitting bulk IN for post-init[4], expecting 13 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.597: RX complete for post-init[4]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.597: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.597: SSM_REQ using post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.597: Submitting bulk OUT for post-init[5/18]: 61 23 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.597: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.597: SSM_RESP waiting on post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.597: Submitting bulk IN for post-init[5], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.597: RX complete for post-init[5]: actual=7 first-bytes=53 49 47 45 23 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.597: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.597: SSM_REQ using post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.597: Submitting bulk OUT for post-init[6/18]: 61 24 33 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.597: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.597: SSM_RESP waiting on post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.597: Submitting bulk IN for post-init[6], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.598: RX complete for post-init[6]: actual=7 first-bytes=53 49 47 45 24 33 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.598: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.598: SSM_REQ using post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.598: Submitting bulk OUT for post-init[7/18]: 61 20 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.598: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.598: SSM_RESP waiting on post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.598: Submitting bulk IN for post-init[7], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.599: RX complete for post-init[7]: actual=7 first-bytes=53 49 47 45 20 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.599: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.599: SSM_REQ using post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.599: Submitting bulk OUT for post-init[8/18]: 61 21 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.599: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.599: SSM_RESP waiting on post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.599: Submitting bulk IN for post-init[8], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.600: RX complete for post-init[8]: actual=7 first-bytes=53 49 47 45 21 66 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.600: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.600: SSM_REQ using post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.600: Submitting bulk OUT for post-init[9/18]: 60 00 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.600: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.600: SSM_RESP waiting on post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.600: Submitting bulk IN for post-init[9], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.600: RX complete for post-init[9]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.600: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.600: SSM_REQ using post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.600: Submitting bulk OUT for post-init[10/18]: 60 01 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.600: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.600: SSM_RESP waiting on post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.600: Submitting bulk IN for post-init[10], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.601: RX complete for post-init[10]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.601: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.601: SSM_REQ using post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.601: Submitting bulk OUT for post-init[11/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.601: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.601: SSM_RESP waiting on post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.601: Submitting bulk IN for post-init[11], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.602: RX complete for post-init[11]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.602: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.602: SSM_REQ using post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.602: Submitting bulk OUT for post-init[12/18]: 60 2d 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.602: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.602: SSM_RESP waiting on post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.602: Submitting bulk IN for post-init[12], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.603: RX complete for post-init[12]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.603: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.603: SSM_REQ using post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.603: Submitting bulk OUT for post-init[13/18]: 62 67 03 len=7 expect=10
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.603: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.603: SSM_RESP waiting on post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.603: Submitting bulk IN for post-init[13], expecting 10 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.603: RX complete for post-init[13]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.603: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.603: SSM_REQ using post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.603: Submitting bulk OUT for post-init[14/18]: 60 0f 03 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.603: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.603: SSM_RESP waiting on post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.603: Submitting bulk IN for post-init[14], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.604: RX complete for post-init[14]: actual=7 first-bytes=53 49 47 45 0f 20 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.604: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.604: SSM_REQ using post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.604: Submitting bulk OUT for post-init[15/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.604: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.604: SSM_RESP waiting on post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.604: Submitting bulk IN for post-init[15], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.605: RX complete for post-init[15]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.605: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.605: SSM_REQ using post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.605: Submitting bulk OUT for post-init[16/18]: 60 00 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.605: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.605: SSM_RESP waiting on post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.605: Submitting bulk IN for post-init[16], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.606: RX complete for post-init[16]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.606: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.606: SSM_REQ using post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.606: Submitting bulk OUT for post-init[17/18]: 64 14 ec len=7 expect=5356
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.606: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.606: SSM_RESP waiting on post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.606: Submitting bulk IN for post-init[17], expecting 5356 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.611: RX complete for post-init[17]: actual=5356 first-bytes=00 ff ff 87 33 00 57
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.611: Completed post-init sequence, saving frame and staying on post-init polling
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.611: Frame received from post-init[0]: len=5356 nonzero=162 strips=2 stop=0
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.611: Finger heuristic for current frame: present
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.611: Finger remains present (frame variance exceeded threshold)
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.611: Image device reported finger status: on
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.611: Appended strip 3/8
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.611: Continuing polling loop with 3 strips buffered
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.611: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.611: SSM_REQ using post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.611: Submitting bulk OUT for post-init[0/18]: 60 00 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.611: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.611: SSM_RESP waiting on post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.611: Submitting bulk IN for post-init[0], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.612: RX complete for post-init[0]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.612: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.612: SSM_REQ using post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.612: Submitting bulk OUT for post-init[1/18]: 60 01 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.612: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.612: SSM_RESP waiting on post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.612: Submitting bulk IN for post-init[1], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.612: RX complete for post-init[1]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.612: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.612: SSM_REQ using post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.612: Submitting bulk OUT for post-init[2/18]: 60 40 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.612: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.612: SSM_RESP waiting on post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.612: Submitting bulk IN for post-init[2], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.613: RX complete for post-init[2]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.613: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.613: SSM_REQ using post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.613: Submitting bulk OUT for post-init[3/18]: 63 09 0b len=18 expect=18
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.613: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.613: SSM_RESP waiting on post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.613: Submitting bulk IN for post-init[3], expecting 18 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.614: RX complete for post-init[3]: actual=18 first-bytes=53 49 47 45 09 0b 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.614: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.614: SSM_REQ using post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.614: Submitting bulk OUT for post-init[4/18]: 63 26 06 len=13 expect=13
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.614: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.614: SSM_RESP waiting on post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.614: Submitting bulk IN for post-init[4], expecting 13 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.615: RX complete for post-init[4]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.615: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.615: SSM_REQ using post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.615: Submitting bulk OUT for post-init[5/18]: 61 23 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.615: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.615: SSM_RESP waiting on post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.615: Submitting bulk IN for post-init[5], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.615: RX complete for post-init[5]: actual=7 first-bytes=53 49 47 45 23 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.615: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.615: SSM_REQ using post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.615: Submitting bulk OUT for post-init[6/18]: 61 24 33 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.615: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.615: SSM_RESP waiting on post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.615: Submitting bulk IN for post-init[6], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.616: RX complete for post-init[6]: actual=7 first-bytes=53 49 47 45 24 33 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.616: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.616: SSM_REQ using post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.616: Submitting bulk OUT for post-init[7/18]: 61 20 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.616: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.616: SSM_RESP waiting on post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.616: Submitting bulk IN for post-init[7], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.617: RX complete for post-init[7]: actual=7 first-bytes=53 49 47 45 20 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.617: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.617: SSM_REQ using post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.617: Submitting bulk OUT for post-init[8/18]: 61 21 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.617: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.617: SSM_RESP waiting on post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.617: Submitting bulk IN for post-init[8], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.618: RX complete for post-init[8]: actual=7 first-bytes=53 49 47 45 21 66 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.618: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.618: SSM_REQ using post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.618: Submitting bulk OUT for post-init[9/18]: 60 00 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.618: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.618: SSM_RESP waiting on post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.618: Submitting bulk IN for post-init[9], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.618: RX complete for post-init[9]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.618: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.618: SSM_REQ using post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.618: Submitting bulk OUT for post-init[10/18]: 60 01 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.618: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.618: SSM_RESP waiting on post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.618: Submitting bulk IN for post-init[10], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.619: RX complete for post-init[10]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.619: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.619: SSM_REQ using post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.619: Submitting bulk OUT for post-init[11/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.619: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.619: SSM_RESP waiting on post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.619: Submitting bulk IN for post-init[11], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.620: RX complete for post-init[11]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.620: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.620: SSM_REQ using post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.620: Submitting bulk OUT for post-init[12/18]: 60 2d 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.620: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.620: SSM_RESP waiting on post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.620: Submitting bulk IN for post-init[12], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.621: RX complete for post-init[12]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.621: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.621: SSM_REQ using post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.621: Submitting bulk OUT for post-init[13/18]: 62 67 03 len=7 expect=10
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.621: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.621: SSM_RESP waiting on post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.621: Submitting bulk IN for post-init[13], expecting 10 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.621: RX complete for post-init[13]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.621: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.621: SSM_REQ using post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.621: Submitting bulk OUT for post-init[14/18]: 60 0f 03 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.621: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.621: SSM_RESP waiting on post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.621: Submitting bulk IN for post-init[14], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.622: RX complete for post-init[14]: actual=7 first-bytes=53 49 47 45 0f 20 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.622: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.622: SSM_REQ using post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.622: Submitting bulk OUT for post-init[15/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.622: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.622: SSM_RESP waiting on post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.622: Submitting bulk IN for post-init[15], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.623: RX complete for post-init[15]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.623: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.623: SSM_REQ using post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.623: Submitting bulk OUT for post-init[16/18]: 60 00 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.623: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.623: SSM_RESP waiting on post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.623: Submitting bulk IN for post-init[16], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.624: RX complete for post-init[16]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.624: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.624: SSM_REQ using post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.624: Submitting bulk OUT for post-init[17/18]: 64 14 ec len=7 expect=5356
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.624: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.624: SSM_RESP waiting on post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.624: Submitting bulk IN for post-init[17], expecting 5356 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.629: RX complete for post-init[17]: actual=5356 first-bytes=00 ff ff 88 32 00 56
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.629: Completed post-init sequence, saving frame and staying on post-init polling
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.629: Frame received from post-init[0]: len=5356 nonzero=162 strips=3 stop=0
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.629: Finger heuristic for current frame: present
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.629: Finger remains present (frame variance exceeded threshold)
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.629: Image device reported finger status: on
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.629: Appended strip 4/8
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.629: Continuing polling loop with 4 strips buffered
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.629: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.629: SSM_REQ using post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.629: Submitting bulk OUT for post-init[0/18]: 60 00 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.629: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.629: SSM_RESP waiting on post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.629: Submitting bulk IN for post-init[0], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.630: RX complete for post-init[0]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.630: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.630: SSM_REQ using post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.630: Submitting bulk OUT for post-init[1/18]: 60 01 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.630: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.630: SSM_RESP waiting on post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.630: Submitting bulk IN for post-init[1], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.630: RX complete for post-init[1]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.630: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.630: SSM_REQ using post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.630: Submitting bulk OUT for post-init[2/18]: 60 40 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.630: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.630: SSM_RESP waiting on post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.630: Submitting bulk IN for post-init[2], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.631: RX complete for post-init[2]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.631: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.631: SSM_REQ using post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.631: Submitting bulk OUT for post-init[3/18]: 63 09 0b len=18 expect=18
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.631: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.631: SSM_RESP waiting on post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.631: Submitting bulk IN for post-init[3], expecting 18 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.632: RX complete for post-init[3]: actual=18 first-bytes=53 49 47 45 09 0b 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.632: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.632: SSM_REQ using post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.632: Submitting bulk OUT for post-init[4/18]: 63 26 06 len=13 expect=13
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.632: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.632: SSM_RESP waiting on post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.632: Submitting bulk IN for post-init[4], expecting 13 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.633: RX complete for post-init[4]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.633: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.633: SSM_REQ using post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.633: Submitting bulk OUT for post-init[5/18]: 61 23 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.633: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.633: SSM_RESP waiting on post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.633: Submitting bulk IN for post-init[5], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.633: RX complete for post-init[5]: actual=7 first-bytes=53 49 47 45 23 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.633: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.633: SSM_REQ using post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.633: Submitting bulk OUT for post-init[6/18]: 61 24 33 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.633: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.633: SSM_RESP waiting on post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.633: Submitting bulk IN for post-init[6], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.634: RX complete for post-init[6]: actual=7 first-bytes=53 49 47 45 24 33 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.634: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.634: SSM_REQ using post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.634: Submitting bulk OUT for post-init[7/18]: 61 20 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.634: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.634: SSM_RESP waiting on post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.634: Submitting bulk IN for post-init[7], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.635: RX complete for post-init[7]: actual=7 first-bytes=53 49 47 45 20 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.635: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.635: SSM_REQ using post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.635: Submitting bulk OUT for post-init[8/18]: 61 21 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.635: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.635: SSM_RESP waiting on post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.635: Submitting bulk IN for post-init[8], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.636: RX complete for post-init[8]: actual=7 first-bytes=53 49 47 45 21 66 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.636: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.636: SSM_REQ using post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.636: Submitting bulk OUT for post-init[9/18]: 60 00 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.636: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.636: SSM_RESP waiting on post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.636: Submitting bulk IN for post-init[9], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.636: RX complete for post-init[9]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.636: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.636: SSM_REQ using post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.636: Submitting bulk OUT for post-init[10/18]: 60 01 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.636: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.636: SSM_RESP waiting on post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.636: Submitting bulk IN for post-init[10], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.637: RX complete for post-init[10]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.637: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.637: SSM_REQ using post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.637: Submitting bulk OUT for post-init[11/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.637: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.637: SSM_RESP waiting on post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.637: Submitting bulk IN for post-init[11], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.638: RX complete for post-init[11]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.638: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.638: SSM_REQ using post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.638: Submitting bulk OUT for post-init[12/18]: 60 2d 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.638: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.638: SSM_RESP waiting on post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.638: Submitting bulk IN for post-init[12], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.639: RX complete for post-init[12]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.639: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.639: SSM_REQ using post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.639: Submitting bulk OUT for post-init[13/18]: 62 67 03 len=7 expect=10
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.639: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.639: SSM_RESP waiting on post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.639: Submitting bulk IN for post-init[13], expecting 10 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.639: RX complete for post-init[13]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.639: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.639: SSM_REQ using post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.639: Submitting bulk OUT for post-init[14/18]: 60 0f 03 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.639: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.639: SSM_RESP waiting on post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.639: Submitting bulk IN for post-init[14], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.640: RX complete for post-init[14]: actual=7 first-bytes=53 49 47 45 0f 20 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.640: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.640: SSM_REQ using post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.640: Submitting bulk OUT for post-init[15/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.640: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.640: SSM_RESP waiting on post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.640: Submitting bulk IN for post-init[15], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.641: RX complete for post-init[15]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.641: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.641: SSM_REQ using post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.641: Submitting bulk OUT for post-init[16/18]: 60 00 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.641: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.641: SSM_RESP waiting on post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.641: Submitting bulk IN for post-init[16], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.642: RX complete for post-init[16]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.642: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.642: SSM_REQ using post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.642: Submitting bulk OUT for post-init[17/18]: 64 14 ec len=7 expect=5356
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.642: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.642: SSM_RESP waiting on post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.642: Submitting bulk IN for post-init[17], expecting 5356 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.647: RX complete for post-init[17]: actual=5356 first-bytes=00 ff ff 88 33 00 57
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.647: Completed post-init sequence, saving frame and staying on post-init polling
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.647: Frame received from post-init[0]: len=5356 nonzero=164 strips=4 stop=0
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.647: Finger heuristic for current frame: present
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.647: Finger remains present (frame variance exceeded threshold)
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.647: Image device reported finger status: on
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.647: Appended strip 5/8
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.647: Continuing polling loop with 5 strips buffered
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.647: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.647: SSM_REQ using post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.647: Submitting bulk OUT for post-init[0/18]: 60 00 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.647: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.647: SSM_RESP waiting on post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.647: Submitting bulk IN for post-init[0], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.648: RX complete for post-init[0]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.648: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.648: SSM_REQ using post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.648: Submitting bulk OUT for post-init[1/18]: 60 01 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.648: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.648: SSM_RESP waiting on post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.648: Submitting bulk IN for post-init[1], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.648: RX complete for post-init[1]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.648: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.648: SSM_REQ using post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.648: Submitting bulk OUT for post-init[2/18]: 60 40 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.648: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.648: SSM_RESP waiting on post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.648: Submitting bulk IN for post-init[2], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.649: RX complete for post-init[2]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.649: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.649: SSM_REQ using post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.649: Submitting bulk OUT for post-init[3/18]: 63 09 0b len=18 expect=18
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.649: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.649: SSM_RESP waiting on post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.649: Submitting bulk IN for post-init[3], expecting 18 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.650: RX complete for post-init[3]: actual=18 first-bytes=53 49 47 45 09 0b 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.650: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.650: SSM_REQ using post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.650: Submitting bulk OUT for post-init[4/18]: 63 26 06 len=13 expect=13
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.650: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.650: SSM_RESP waiting on post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.650: Submitting bulk IN for post-init[4], expecting 13 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.651: RX complete for post-init[4]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.651: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.651: SSM_REQ using post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.651: Submitting bulk OUT for post-init[5/18]: 61 23 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.651: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.651: SSM_RESP waiting on post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.651: Submitting bulk IN for post-init[5], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.651: RX complete for post-init[5]: actual=7 first-bytes=53 49 47 45 23 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.651: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.651: SSM_REQ using post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.651: Submitting bulk OUT for post-init[6/18]: 61 24 33 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.651: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.651: SSM_RESP waiting on post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.651: Submitting bulk IN for post-init[6], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.652: RX complete for post-init[6]: actual=7 first-bytes=53 49 47 45 24 33 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.652: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.652: SSM_REQ using post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.652: Submitting bulk OUT for post-init[7/18]: 61 20 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.652: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.652: SSM_RESP waiting on post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.652: Submitting bulk IN for post-init[7], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.653: RX complete for post-init[7]: actual=7 first-bytes=53 49 47 45 20 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.653: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.653: SSM_REQ using post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.653: Submitting bulk OUT for post-init[8/18]: 61 21 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.653: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.653: SSM_RESP waiting on post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.653: Submitting bulk IN for post-init[8], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.654: RX complete for post-init[8]: actual=7 first-bytes=53 49 47 45 21 66 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.654: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.654: SSM_REQ using post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.654: Submitting bulk OUT for post-init[9/18]: 60 00 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.654: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.654: SSM_RESP waiting on post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.654: Submitting bulk IN for post-init[9], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.654: RX complete for post-init[9]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.654: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.654: SSM_REQ using post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.654: Submitting bulk OUT for post-init[10/18]: 60 01 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.654: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.654: SSM_RESP waiting on post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.654: Submitting bulk IN for post-init[10], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.655: RX complete for post-init[10]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.655: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.655: SSM_REQ using post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.655: Submitting bulk OUT for post-init[11/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.655: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.655: SSM_RESP waiting on post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.655: Submitting bulk IN for post-init[11], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.656: RX complete for post-init[11]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.656: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.656: SSM_REQ using post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.656: Submitting bulk OUT for post-init[12/18]: 60 2d 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.656: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.656: SSM_RESP waiting on post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.656: Submitting bulk IN for post-init[12], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.657: RX complete for post-init[12]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.657: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.657: SSM_REQ using post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.657: Submitting bulk OUT for post-init[13/18]: 62 67 03 len=7 expect=10
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.657: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.657: SSM_RESP waiting on post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.657: Submitting bulk IN for post-init[13], expecting 10 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.657: RX complete for post-init[13]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.657: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.657: SSM_REQ using post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.657: Submitting bulk OUT for post-init[14/18]: 60 0f 03 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.657: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.657: SSM_RESP waiting on post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.657: Submitting bulk IN for post-init[14], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.658: RX complete for post-init[14]: actual=7 first-bytes=53 49 47 45 0f 20 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.658: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.658: SSM_REQ using post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.658: Submitting bulk OUT for post-init[15/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.658: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.658: SSM_RESP waiting on post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.658: Submitting bulk IN for post-init[15], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.659: RX complete for post-init[15]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.659: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.659: SSM_REQ using post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.659: Submitting bulk OUT for post-init[16/18]: 60 00 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.659: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.659: SSM_RESP waiting on post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.659: Submitting bulk IN for post-init[16], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.660: RX complete for post-init[16]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.660: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.660: SSM_REQ using post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.660: Submitting bulk OUT for post-init[17/18]: 64 14 ec len=7 expect=5356
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.660: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.660: SSM_RESP waiting on post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.660: Submitting bulk IN for post-init[17], expecting 5356 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.665: RX complete for post-init[17]: actual=5356 first-bytes=00 ff ff 86 34 00 57
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.665: Completed post-init sequence, saving frame and staying on post-init polling
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.665: Frame received from post-init[0]: len=5356 nonzero=161 strips=5 stop=0
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.665: Finger heuristic for current frame: present
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.665: Finger remains present (frame variance exceeded threshold)
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.665: Image device reported finger status: on
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.665: Appended strip 6/8
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.665: Continuing polling loop with 6 strips buffered
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.665: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.665: SSM_REQ using post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.665: Submitting bulk OUT for post-init[0/18]: 60 00 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.665: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.665: SSM_RESP waiting on post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.665: Submitting bulk IN for post-init[0], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.666: RX complete for post-init[0]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.666: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.666: SSM_REQ using post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.666: Submitting bulk OUT for post-init[1/18]: 60 01 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.666: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.666: SSM_RESP waiting on post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.666: Submitting bulk IN for post-init[1], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.666: RX complete for post-init[1]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.666: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.666: SSM_REQ using post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.666: Submitting bulk OUT for post-init[2/18]: 60 40 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.666: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.666: SSM_RESP waiting on post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.666: Submitting bulk IN for post-init[2], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.667: RX complete for post-init[2]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.667: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.667: SSM_REQ using post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.667: Submitting bulk OUT for post-init[3/18]: 63 09 0b len=18 expect=18
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.667: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.667: SSM_RESP waiting on post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.667: Submitting bulk IN for post-init[3], expecting 18 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.668: RX complete for post-init[3]: actual=18 first-bytes=53 49 47 45 09 0b 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.668: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.668: SSM_REQ using post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.668: Submitting bulk OUT for post-init[4/18]: 63 26 06 len=13 expect=13
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.668: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.668: SSM_RESP waiting on post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.668: Submitting bulk IN for post-init[4], expecting 13 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.669: RX complete for post-init[4]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.669: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.669: SSM_REQ using post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.669: Submitting bulk OUT for post-init[5/18]: 61 23 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.669: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.669: SSM_RESP waiting on post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.669: Submitting bulk IN for post-init[5], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.669: RX complete for post-init[5]: actual=7 first-bytes=53 49 47 45 23 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.669: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.669: SSM_REQ using post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.669: Submitting bulk OUT for post-init[6/18]: 61 24 33 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.669: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.669: SSM_RESP waiting on post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.669: Submitting bulk IN for post-init[6], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.670: RX complete for post-init[6]: actual=7 first-bytes=53 49 47 45 24 33 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.670: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.670: SSM_REQ using post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.670: Submitting bulk OUT for post-init[7/18]: 61 20 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.670: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.670: SSM_RESP waiting on post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.670: Submitting bulk IN for post-init[7], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.671: RX complete for post-init[7]: actual=7 first-bytes=53 49 47 45 20 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.671: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.671: SSM_REQ using post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.671: Submitting bulk OUT for post-init[8/18]: 61 21 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.671: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.671: SSM_RESP waiting on post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.671: Submitting bulk IN for post-init[8], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.672: RX complete for post-init[8]: actual=7 first-bytes=53 49 47 45 21 66 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.672: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.672: SSM_REQ using post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.672: Submitting bulk OUT for post-init[9/18]: 60 00 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.672: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.672: SSM_RESP waiting on post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.672: Submitting bulk IN for post-init[9], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.672: RX complete for post-init[9]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.672: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.672: SSM_REQ using post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.672: Submitting bulk OUT for post-init[10/18]: 60 01 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.672: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.672: SSM_RESP waiting on post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.672: Submitting bulk IN for post-init[10], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.673: RX complete for post-init[10]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.673: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.673: SSM_REQ using post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.673: Submitting bulk OUT for post-init[11/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.673: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.673: SSM_RESP waiting on post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.673: Submitting bulk IN for post-init[11], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.674: RX complete for post-init[11]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.674: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.674: SSM_REQ using post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.674: Submitting bulk OUT for post-init[12/18]: 60 2d 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.674: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.674: SSM_RESP waiting on post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.674: Submitting bulk IN for post-init[12], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.675: RX complete for post-init[12]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.675: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.675: SSM_REQ using post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.675: Submitting bulk OUT for post-init[13/18]: 62 67 03 len=7 expect=10
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.675: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.675: SSM_RESP waiting on post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.675: Submitting bulk IN for post-init[13], expecting 10 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.675: RX complete for post-init[13]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.675: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.675: SSM_REQ using post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.675: Submitting bulk OUT for post-init[14/18]: 60 0f 03 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.675: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.675: SSM_RESP waiting on post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.675: Submitting bulk IN for post-init[14], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.676: RX complete for post-init[14]: actual=7 first-bytes=53 49 47 45 0f 20 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.676: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.676: SSM_REQ using post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.676: Submitting bulk OUT for post-init[15/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.676: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.676: SSM_RESP waiting on post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.676: Submitting bulk IN for post-init[15], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.677: RX complete for post-init[15]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.677: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.677: SSM_REQ using post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.677: Submitting bulk OUT for post-init[16/18]: 60 00 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.677: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.677: SSM_RESP waiting on post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.677: Submitting bulk IN for post-init[16], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.678: RX complete for post-init[16]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.678: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.678: SSM_REQ using post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.678: Submitting bulk OUT for post-init[17/18]: 64 14 ec len=7 expect=5356
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.678: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.678: SSM_RESP waiting on post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.678: Submitting bulk IN for post-init[17], expecting 5356 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.683: RX complete for post-init[17]: actual=5356 first-bytes=00 ff ff 87 32 00 54
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.683: Completed post-init sequence, saving frame and staying on post-init polling
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.683: Frame received from post-init[0]: len=5356 nonzero=163 strips=6 stop=0
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.683: Finger heuristic for current frame: present
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.683: Finger remains present (frame variance exceeded threshold)
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.683: Image device reported finger status: on
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.683: Appended strip 7/8
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.683: Continuing polling loop with 7 strips buffered
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.683: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.683: SSM_REQ using post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.683: Submitting bulk OUT for post-init[0/18]: 60 00 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.683: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.683: SSM_RESP waiting on post-init[0/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.683: Submitting bulk IN for post-init[0], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.684: RX complete for post-init[0]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.684: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.684: SSM_REQ using post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.684: Submitting bulk OUT for post-init[1/18]: 60 01 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.684: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.684: SSM_RESP waiting on post-init[1/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.684: Submitting bulk IN for post-init[1], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.684: RX complete for post-init[1]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.684: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.684: SSM_REQ using post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.684: Submitting bulk OUT for post-init[2/18]: 60 40 fc len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.684: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.684: SSM_RESP waiting on post-init[2/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.684: Submitting bulk IN for post-init[2], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.685: RX complete for post-init[2]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.685: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.685: SSM_REQ using post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.685: Submitting bulk OUT for post-init[3/18]: 63 09 0b len=18 expect=18
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.685: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.685: SSM_RESP waiting on post-init[3/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.685: Submitting bulk IN for post-init[3], expecting 18 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.686: RX complete for post-init[3]: actual=18 first-bytes=53 49 47 45 09 0b 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.686: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.686: SSM_REQ using post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.686: Submitting bulk OUT for post-init[4/18]: 63 26 06 len=13 expect=13
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.686: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.686: SSM_RESP waiting on post-init[4/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.686: Submitting bulk IN for post-init[4], expecting 13 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.687: RX complete for post-init[4]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.687: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.687: SSM_REQ using post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.687: Submitting bulk OUT for post-init[5/18]: 61 23 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.687: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.687: SSM_RESP waiting on post-init[5/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.687: Submitting bulk IN for post-init[5], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.687: RX complete for post-init[5]: actual=7 first-bytes=53 49 47 45 23 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.687: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.687: SSM_REQ using post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.687: Submitting bulk OUT for post-init[6/18]: 61 24 33 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.688: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.688: SSM_RESP waiting on post-init[6/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.688: Submitting bulk IN for post-init[6], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.688: RX complete for post-init[6]: actual=7 first-bytes=53 49 47 45 24 33 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.688: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.688: SSM_REQ using post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.688: Submitting bulk OUT for post-init[7/18]: 61 20 00 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.688: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.688: SSM_RESP waiting on post-init[7/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.688: Submitting bulk IN for post-init[7], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.689: RX complete for post-init[7]: actual=7 first-bytes=53 49 47 45 20 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.689: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.689: SSM_REQ using post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.689: Submitting bulk OUT for post-init[8/18]: 61 21 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.689: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.689: SSM_RESP waiting on post-init[8/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.689: Submitting bulk IN for post-init[8], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.690: RX complete for post-init[8]: actual=7 first-bytes=53 49 47 45 21 66 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.690: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.690: SSM_REQ using post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.690: Submitting bulk OUT for post-init[9/18]: 60 00 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.690: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.690: SSM_RESP waiting on post-init[9/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.690: Submitting bulk IN for post-init[9], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.690: RX complete for post-init[9]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.690: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.690: SSM_REQ using post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.690: Submitting bulk OUT for post-init[10/18]: 60 01 66 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.691: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.691: SSM_RESP waiting on post-init[10/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.691: Submitting bulk IN for post-init[10], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.691: RX complete for post-init[10]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.691: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.691: SSM_REQ using post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.691: Submitting bulk OUT for post-init[11/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.691: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.691: SSM_RESP waiting on post-init[11/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.691: Submitting bulk IN for post-init[11], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.692: RX complete for post-init[11]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.692: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.692: SSM_REQ using post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.692: Submitting bulk OUT for post-init[12/18]: 60 2d 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.692: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.692: SSM_RESP waiting on post-init[12/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.692: Submitting bulk IN for post-init[12], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.693: RX complete for post-init[12]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.693: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.693: SSM_REQ using post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.693: Submitting bulk OUT for post-init[13/18]: 62 67 03 len=7 expect=10
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.693: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.693: SSM_RESP waiting on post-init[13/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.693: Submitting bulk IN for post-init[13], expecting 10 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.694: RX complete for post-init[13]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.694: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.694: SSM_REQ using post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.694: Submitting bulk OUT for post-init[14/18]: 60 0f 03 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.694: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.694: SSM_RESP waiting on post-init[14/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.694: Submitting bulk IN for post-init[14], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.694: RX complete for post-init[14]: actual=7 first-bytes=53 49 47 45 0f 20 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.694: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.694: SSM_REQ using post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.694: Submitting bulk OUT for post-init[15/18]: 63 2c 02 len=9 expect=9
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.694: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.694: SSM_RESP waiting on post-init[15/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.694: Submitting bulk IN for post-init[15], expecting 9 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.695: RX complete for post-init[15]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.695: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.695: SSM_REQ using post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.695: Submitting bulk OUT for post-init[16/18]: 60 00 02 len=7 expect=7
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.695: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.695: SSM_RESP waiting on post-init[16/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.695: Submitting bulk IN for post-init[16], expecting 7 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.696: RX complete for post-init[16]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.696: [egis0577] SM_STATES_NUM entering state 2
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.696: SSM_REQ using post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.696: Submitting bulk OUT for post-init[17/18]: 64 14 ec len=7 expect=5356
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.696: [egis0577] SM_STATES_NUM entering state 3
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.696: SSM_RESP waiting on post-init[17/18]
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.696: Submitting bulk IN for post-init[17], expecting 5356 bytes
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.701: RX complete for post-init[17]: actual=5356 first-bytes=00 ff ff 85 32 00 5a
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.701: Completed post-init sequence, saving frame and staying on post-init polling
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.701: Frame received from post-init[0]: len=5356 nonzero=163 strips=7 stop=0
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.701: Finger heuristic for current frame: present
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.701: Finger remains present (frame variance exceeded threshold)
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.701: Image device reported finger status: on
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.701: Appended strip 8/8
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.701: Enough data collected, moving to image processing with 8 strips
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.701: [egis0577] SM_STATES_NUM entering state 4
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.701: Finger remains present (processing buffered strips)
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.701: Image device reported finger status: on
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.701: Processing 8 strips while image-device state=5
+(process:127328): libfprint-assembling-DEBUG: 12:13:40.710: calc delta completed in 0.008520 secs
+(process:127328): libfprint-assembling-DEBUG: 12:13:40.718: calc delta completed in 0.007973 secs
+(process:127328): libfprint-assembling-DEBUG: 12:13:40.718: errors: 13067 rev: 13066
+(process:127328): libfprint-assembling-DEBUG: 12:13:40.718: height is -129
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.718: Submitting assembled image from 8 strips
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.718: Image device captured an image
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.718: Image device internal state change from FPI_IMAGE_DEVICE_STATE_CAPTURE to FPI_IMAGE_DEVICE_STATE_AWAIT_FINGER_OFF
+(process:127328): libfprint-device-DEBUG: 12:13:40.718: Device reported finger status change: FP_FINGER_STATUS_PRESENT
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.718: Reporting finger absent (image submitted)
+(process:127328): libfprint-device-DEBUG: 12:13:40.718: Device reported finger status change: FP_FINGER_STATUS_NONE
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.718: Image device reported finger status: off
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.718: Image device internal state change from FPI_IMAGE_DEVICE_STATE_AWAIT_FINGER_OFF to FPI_IMAGE_DEVICE_STATE_IDLE
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.718: Deactivating image device
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.718: Image device internal state change from FPI_IMAGE_DEVICE_STATE_IDLE to FPI_IMAGE_DEVICE_STATE_DEACTIVATING
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.718: Deactivate requested, running=1
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.718: [egis0577] SM_STATES_NUM entering state 5
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.718: [egis0577] SM_STATES_NUM entering state 1
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.718: Stopping, completed capture
+(process:127328): libfprint-SSM-DEBUG: 12:13:40.718: [egis0577] SM_STATES_NUM completed successfully
+(process:127328): libfprint-egis0577-DEBUG: 12:13:40.718: Capture loop completed cleanly
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.718: Image device deactivation completed
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.718: Image device internal state change from FPI_IMAGE_DEVICE_STATE_DEACTIVATING to FPI_IMAGE_DEVICE_STATE_INACTIVE
+(process:127328): libfprint-image-DEBUG: 12:13:40.723: Minutiae scan completed in 0.004767 secs
+
+(process:127328): libfprint-image_device-WARNING **: 12:13:40.724: Failed to detect minutiae: No minutiae found
+(process:127328): libfprint-device-DEBUG: 12:13:40.724: Device reported identify result
+
+(process:127328): libfprint-WARNING **: 12:13:40.724: Identify report: No finger matched, retry error reported: Minutiae detection failed, please retry
+(process:127328): libfprint-device-DEBUG: 12:13:40.724: Device reported identify completion
+(process:127328): libfprint-device-DEBUG: 12:13:40.724: Completing action FPI_DEVICE_ACTION_IDENTIFY in idle!
+(process:127328): libfprint-device-DEBUG: 12:13:40.724: Updated temperature model after 0.60 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_WARM -> FP_TEMPERATURE_WARM
+
+(process:127328): libfprint-WARNING **: 12:13:40.724: Failed to identify print: Minutiae detection failed, please retry
+Identify again? [Y/n]? (process:127328): libfprint-egis0577-DEBUG: 12:13:40.724: Releasing interface 0
+(process:127328): libfprint-image_device-DEBUG: 12:13:40.724: Image device close completed
+(process:127328): libfprint-device-DEBUG: 12:13:40.724: Device reported close completion
+(process:127328): libfprint-device-DEBUG: 12:13:40.724: Completing action FPI_DEVICE_ACTION_CLOSE in idle!
+(process:127328): libfprint-device-DEBUG: 12:13:40.724: Updated temperature model after 0.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_WARM -> FP_TEMPERATURE_WARM
+
+>>> REMOVE finger <<<
+?  Unknown result — check log.
+Session ended.
+
+════════════════════════════════════════
+  SESSION COMPLETE
+════════════════════════════════════════
+
+Enrolled fingers: left thumb left index
+Log: /home/championswimmer/Development/Cpp/libfprint-eh577/logs/identify-session-20260610-235138.txt
