@@ -210,6 +210,26 @@ finger_present (FpiUsbTransfer *transfer)
   return nonzero >= EGIS0577_MIN_ACTIVE_PIXELS;
 }
 
+/* Used inside resp_cb to advance to the next packet in the current sequence. */
+static void
+jump_to_req_with_optional_delay (FpDeviceEgis0577 *self,
+                                  FpiSsm           *ssm,
+                                  const char       *reason)
+{
+  if (self->poll_loop_delay_ms > 0)
+    {
+      fp_dbg ("Delaying next packet by %u ms (%s)", self->poll_loop_delay_ms, reason);
+      fpi_ssm_jump_to_state_delayed (ssm, SM_REQ, self->poll_loop_delay_ms);
+    }
+  else
+    {
+      fpi_ssm_jump_to_state (ssm, SM_REQ);
+    }
+}
+
+/* Used in save_img / process_imgs to restart with a full PRE_INIT → POST_INIT
+ * reset cycle.  Re-running POST_INIT immediately without a reset times out at
+ * packet 5; a full SM_INIT gives the device the reset it needs. */
 static void
 jump_to_init_with_optional_delay (FpDeviceEgis0577 *self,
                                    FpiSsm           *ssm,
@@ -461,7 +481,7 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
       self->current_index += 1;
     }
 
-  jump_to_init_with_optional_delay (self, transfer->ssm, "advance packet sequence");
+  jump_to_req_with_optional_delay (self, transfer->ssm, "advance packet sequence");
 }
 
 static void
