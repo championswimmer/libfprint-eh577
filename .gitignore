@@ -1,3 +1,9 @@
 *.bin
 *.pgm
 *.variant
+
+# Large generated logs ignored because they are above 5 MB
+/logs/identify-session-20260611-130519.txt
+/logs/identify-session-20260611-131729.txt
+/logs/identify-session-20260611-125754.txt
+/logs/identify-session-20260611-121951.txt

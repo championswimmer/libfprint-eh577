@@ -1,0 +1,620 @@
+=== EH577 Enroll + Identify [20260611-221529] ===
+Log: /home/championswimmer/Development/Cpp/libfprint-eh577/logs/identify-session-20260611-221529.txt
+(process:22745): libfprint-context-DEBUG: 22:15:32.333: Initializing FpContext (libfprint version 1.94.10)
+(process:22745): libfprint-context-DEBUG: 22:15:32.337: No driver found for USB device 1D6B:0003
+(process:22745): libfprint-context-DEBUG: 22:15:32.337: No driver found for USB device 046D:085E
+(process:22745): libfprint-context-DEBUG: 22:15:32.338: No driver found for USB device 1D6B:0002
+(process:22745): libfprint-context-DEBUG: 22:15:32.338: No driver found for USB device 1D6B:0003
+(process:22745): libfprint-context-DEBUG: 22:15:32.338: No driver found for USB device 1D6B:0002
+(process:22745): libfprint-context-DEBUG: 22:15:32.338: No driver found for USB device 1D6B:0003
+(process:22745): libfprint-context-DEBUG: 22:15:32.338: No driver found for USB device 13D3:3604
+(process:22745): libfprint-context-DEBUG: 22:15:32.338: No driver found for USB device 1D6B:A4A7
+(process:22745): libfprint-context-DEBUG: 22:15:32.338: No driver found for USB device 046D:C548
+(process:22745): libfprint-context-DEBUG: 22:15:32.338: No driver found for USB device 046D:C52B
+(process:22745): libfprint-context-DEBUG: 22:15:32.338: No driver found for USB device 1D6B:0002
+(process:22745): libfprint-context-DEBUG: 22:15:32.338: No driver found for USB device 1D6B:0003
+(process:22745): libfprint-context-DEBUG: 22:15:32.338: No driver found for USB device 1D6B:0002
+(process:22745): libfprint-device-DEBUG: 22:15:32.338: Device reported probe completion
+(process:22745): libfprint-device-DEBUG: 22:15:32.338: Completing action FPI_DEVICE_ACTION_PROBE in idle!
+(process:22745): libfprint-device-DEBUG: 22:15:32.338: Updated temperature model after 0.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+Selected device 0 (LighTuning Technology Inc. EgisTec EH577) claimed by egis0577 driver
+(process:22745): libfprint-egis0577-DEBUG: 22:15:32.338: Opening EH577 device
+(process:22745): libfprint-egis0577-DEBUG: 22:15:32.338: Claiming interface 0
+(process:22745): libfprint-image_device-DEBUG: 22:15:32.338: Image device open completed
+(process:22745): libfprint-device-DEBUG: 22:15:32.338: Device reported open completion
+(process:22745): libfprint-device-DEBUG: 22:15:32.338: Completing action FPI_DEVICE_ACTION_OPEN in idle!
+(process:22745): libfprint-device-DEBUG: 22:15:32.338: Updated temperature model after 0.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+Opened device. Clear device storage? [Y/n]? 
+(process:22745): libfprint-WARNING **: 22:15:32.338: Failed to clear storage: Device has no storage.
+(process:22745): libfprint-egis0577-DEBUG: 22:15:32.338: Releasing interface 0
+(process:22745): libfprint-image_device-DEBUG: 22:15:32.338: Image device close completed
+(process:22745): libfprint-device-DEBUG: 22:15:32.338: Device reported close completion
+(process:22745): libfprint-device-DEBUG: 22:15:32.338: Completing action FPI_DEVICE_ACTION_CLOSE in idle!
+(process:22745): libfprint-device-DEBUG: 22:15:32.338: Updated temperature model after 0.00 seconds, ratio 0.27 -> 0.27, active 0 -> 0, FP_TEMPERATURE_COLD -> FP_TEMPERATURE_COLD
+--- Enrolling: left thumb (index 0) ---
+This program will enroll the selected finger overwriting any print for the same finger that was enrolled previously. Fingerprint updates without erasing old data are possible on devices supporting that. Ctrl+C interrupts program execution.
+Choose the finger to enroll:
+  [0] left thumb
+  [1] left index
+  [2] left middle
+  [3] left ring
+  [4] left little
+  [5] right thumb
+  [6] right index
+  [7] right middle
+  [8] right ring
+  [9] right little
+> Selected device 0 (LighTuning Technology Inc. EgisTec EH577) claimed by egis0577 driver
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.028: Opening EH577 device
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.028: Claiming interface 0
+Opened device.
+The device supports fingerprint updates.
+Should an existing fingerprint be updated instead of being replaced (if present)? Enter Y/y or N/n to make a choice.
+It's now time to enroll your finger.
+
+You will need to successfully scan your left thumb finger 10 times to complete the process.
+
+Scan your finger now.
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.028: Activate requested
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.028: Starting capture
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.028: Initial packet array: pre-init
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.028: EH577 pacing config: pre_frame_delay_ms=0 poll_loop_delay_ms=0
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.028: SSM_REQ using pre-init[0/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.028: Submitting bulk OUT for pre-init[0/29]: 60 00 00 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.029: SSM_RESP waiting on pre-init[0/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.029: Submitting bulk IN for pre-init[0], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.029: RX complete for pre-init[0]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.029: SSM_REQ using pre-init[1/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.029: Submitting bulk OUT for pre-init[1/29]: 60 01 00 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.029: SSM_RESP waiting on pre-init[1/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.029: Submitting bulk IN for pre-init[1], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.030: RX complete for pre-init[1]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.030: SSM_REQ using pre-init[2/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.030: Submitting bulk OUT for pre-init[2/29]: 61 0a fd len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.030: SSM_RESP waiting on pre-init[2/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.030: Submitting bulk IN for pre-init[2], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.031: RX complete for pre-init[2]: actual=7 first-bytes=53 49 47 45 0a fd 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.031: SSM_REQ using pre-init[3/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.031: Submitting bulk OUT for pre-init[3/29]: 61 35 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.031: SSM_RESP waiting on pre-init[3/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.031: Submitting bulk IN for pre-init[3], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.031: RX complete for pre-init[3]: actual=7 first-bytes=53 49 47 45 35 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.031: SSM_REQ using pre-init[4/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.031: Submitting bulk OUT for pre-init[4/29]: 61 80 00 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.031: SSM_RESP waiting on pre-init[4/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.031: Submitting bulk IN for pre-init[4], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.032: RX complete for pre-init[4]: actual=7 first-bytes=53 49 47 45 80 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.032: SSM_REQ using pre-init[5/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.032: Submitting bulk OUT for pre-init[5/29]: 60 80 00 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.032: SSM_RESP waiting on pre-init[5/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.032: Submitting bulk IN for pre-init[5], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.033: RX complete for pre-init[5]: actual=7 first-bytes=53 49 47 45 80 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.033: SSM_REQ using pre-init[6/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.033: Submitting bulk OUT for pre-init[6/29]: 61 0a fc len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.033: SSM_RESP waiting on pre-init[6/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.033: Submitting bulk IN for pre-init[6], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.034: RX complete for pre-init[6]: actual=7 first-bytes=53 49 47 45 0a fc 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.034: SSM_REQ using pre-init[7/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.034: Submitting bulk OUT for pre-init[7/29]: 63 01 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.034: SSM_RESP waiting on pre-init[7/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.034: Submitting bulk IN for pre-init[7], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.034: RX complete for pre-init[7]: actual=9 first-bytes=53 49 47 45 01 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.034: SSM_REQ using pre-init[8/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.034: Submitting bulk OUT for pre-init[8/29]: 61 0c 22 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.034: SSM_RESP waiting on pre-init[8/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.034: Submitting bulk IN for pre-init[8], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.035: RX complete for pre-init[8]: actual=7 first-bytes=53 49 47 45 0c 22 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.035: SSM_REQ using pre-init[9/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.035: Submitting bulk OUT for pre-init[9/29]: 61 09 83 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.035: SSM_RESP waiting on pre-init[9/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.035: Submitting bulk IN for pre-init[9], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.036: RX complete for pre-init[9]: actual=7 first-bytes=53 49 47 45 09 83 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.036: SSM_REQ using pre-init[10/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.036: Submitting bulk OUT for pre-init[10/29]: 63 26 06 len=13 expect=13
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.036: SSM_RESP waiting on pre-init[10/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.036: Submitting bulk IN for pre-init[10], expecting 13 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.037: RX complete for pre-init[10]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.037: SSM_REQ using pre-init[11/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.037: Submitting bulk OUT for pre-init[11/29]: 61 0a f4 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.037: SSM_RESP waiting on pre-init[11/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.037: Submitting bulk IN for pre-init[11], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.037: RX complete for pre-init[11]: actual=7 first-bytes=53 49 47 45 0a f4 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.037: SSM_REQ using pre-init[12/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.037: Submitting bulk OUT for pre-init[12/29]: 61 0c 44 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.037: SSM_RESP waiting on pre-init[12/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.037: Submitting bulk IN for pre-init[12], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.038: RX complete for pre-init[12]: actual=7 first-bytes=53 49 47 45 0c 44 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.038: SSM_REQ using pre-init[13/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.038: Submitting bulk OUT for pre-init[13/29]: 61 50 03 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.038: SSM_RESP waiting on pre-init[13/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.038: Submitting bulk IN for pre-init[13], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.039: RX complete for pre-init[13]: actual=7 first-bytes=53 49 47 45 50 03 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.039: SSM_REQ using pre-init[14/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.039: Submitting bulk OUT for pre-init[14/29]: 60 50 03 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.039: SSM_RESP waiting on pre-init[14/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.039: Submitting bulk IN for pre-init[14], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.040: RX complete for pre-init[14]: actual=7 first-bytes=53 49 47 45 50 82 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.040: SSM_REQ using pre-init[15/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.040: Submitting bulk OUT for pre-init[15/29]: 73 14 ec len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.040: SSM_RESP waiting on pre-init[15/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.040: Submitting bulk IN for pre-init[15], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.550: RX complete for pre-init[15]: actual=7 first-bytes=67 00 ff ff ff 46 92
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.550: SSM_REQ using pre-init[16/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.550: Submitting bulk OUT for pre-init[16/29]: 60 40 ec len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.550: SSM_RESP waiting on pre-init[16/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.550: Submitting bulk IN for pre-init[16], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.551: RX complete for pre-init[16]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.551: SSM_REQ using pre-init[17/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.551: Submitting bulk OUT for pre-init[17/29]: 63 09 0b len=18 expect=18
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.551: SSM_RESP waiting on pre-init[17/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.551: Submitting bulk IN for pre-init[17], expecting 18 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.552: RX complete for pre-init[17]: actual=18 first-bytes=53 49 47 45 09 0b 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.552: SSM_REQ using pre-init[18/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.552: Submitting bulk OUT for pre-init[18/29]: 63 26 06 len=13 expect=13
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.552: SSM_RESP waiting on pre-init[18/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.552: Submitting bulk IN for pre-init[18], expecting 13 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.553: RX complete for pre-init[18]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.553: SSM_REQ using pre-init[19/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.553: Submitting bulk OUT for pre-init[19/29]: 61 23 00 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.553: SSM_RESP waiting on pre-init[19/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.553: Submitting bulk IN for pre-init[19], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.553: RX complete for pre-init[19]: actual=7 first-bytes=53 49 47 45 23 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.553: SSM_REQ using pre-init[20/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.553: Submitting bulk OUT for pre-init[20/29]: 61 24 33 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.554: SSM_RESP waiting on pre-init[20/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.554: Submitting bulk IN for pre-init[20], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.554: RX complete for pre-init[20]: actual=7 first-bytes=53 49 47 45 24 33 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.554: SSM_REQ using pre-init[21/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.554: Submitting bulk OUT for pre-init[21/29]: 61 20 00 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.554: SSM_RESP waiting on pre-init[21/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.554: Submitting bulk IN for pre-init[21], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.555: RX complete for pre-init[21]: actual=7 first-bytes=53 49 47 45 20 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.555: SSM_REQ using pre-init[22/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.555: Submitting bulk OUT for pre-init[22/29]: 61 21 66 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.555: SSM_RESP waiting on pre-init[22/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.555: Submitting bulk IN for pre-init[22], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.556: RX complete for pre-init[22]: actual=7 first-bytes=53 49 47 45 21 66 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.556: SSM_REQ using pre-init[23/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.556: Submitting bulk OUT for pre-init[23/29]: 60 00 66 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.556: SSM_RESP waiting on pre-init[23/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.556: Submitting bulk IN for pre-init[23], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.557: RX complete for pre-init[23]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.557: SSM_REQ using pre-init[24/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.557: Submitting bulk OUT for pre-init[24/29]: 60 01 66 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.557: SSM_RESP waiting on pre-init[24/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.557: Submitting bulk IN for pre-init[24], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.557: RX complete for pre-init[24]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.557: SSM_REQ using pre-init[25/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.557: Submitting bulk OUT for pre-init[25/29]: 60 40 66 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.557: SSM_RESP waiting on pre-init[25/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.557: Submitting bulk IN for pre-init[25], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.558: RX complete for pre-init[25]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.558: SSM_REQ using pre-init[26/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.558: Submitting bulk OUT for pre-init[26/29]: 61 0c 22 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.558: SSM_RESP waiting on pre-init[26/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.558: Submitting bulk IN for pre-init[26], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.559: RX complete for pre-init[26]: actual=7 first-bytes=53 49 47 45 0c 22 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.559: SSM_REQ using pre-init[27/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.559: Submitting bulk OUT for pre-init[27/29]: 61 0b 03 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.559: SSM_RESP waiting on pre-init[27/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.559: Submitting bulk IN for pre-init[27], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.559: RX complete for pre-init[27]: actual=7 first-bytes=53 49 47 45 0b 03 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.559: SSM_REQ using pre-init[28/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.559: Submitting bulk OUT for pre-init[28/29]: 61 0a fc len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.560: SSM_RESP waiting on pre-init[28/29]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.560: Submitting bulk IN for pre-init[28], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.560: RX complete for pre-init[28]: actual=7 first-bytes=53 49 47 45 0a fc 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.560: Completed pre-init sequence, switching back to post-init
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.560: SSM_REQ using post-init[0/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.560: Submitting bulk OUT for post-init[0/18]: 60 00 fc len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.560: SSM_RESP waiting on post-init[0/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.560: Submitting bulk IN for post-init[0], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.561: RX complete for post-init[0]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.561: SSM_REQ using post-init[1/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.561: Submitting bulk OUT for post-init[1/18]: 60 01 fc len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.561: SSM_RESP waiting on post-init[1/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.561: Submitting bulk IN for post-init[1], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.562: RX complete for post-init[1]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.562: SSM_REQ using post-init[2/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.562: Submitting bulk OUT for post-init[2/18]: 60 40 fc len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.562: SSM_RESP waiting on post-init[2/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.562: Submitting bulk IN for post-init[2], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.562: RX complete for post-init[2]: actual=7 first-bytes=53 49 47 45 40 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.562: SSM_REQ using post-init[3/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.562: Submitting bulk OUT for post-init[3/18]: 63 09 0b len=18 expect=18
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.562: SSM_RESP waiting on post-init[3/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.562: Submitting bulk IN for post-init[3], expecting 18 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.563: RX complete for post-init[3]: actual=18 first-bytes=53 49 47 45 09 0b 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.563: SSM_REQ using post-init[4/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.563: Submitting bulk OUT for post-init[4/18]: 63 26 06 len=13 expect=13
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.563: SSM_RESP waiting on post-init[4/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.563: Submitting bulk IN for post-init[4], expecting 13 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.564: RX complete for post-init[4]: actual=13 first-bytes=53 49 47 45 26 06 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.564: SSM_REQ using post-init[5/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.564: Submitting bulk OUT for post-init[5/18]: 61 23 00 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.564: SSM_RESP waiting on post-init[5/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.564: Submitting bulk IN for post-init[5], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.565: RX complete for post-init[5]: actual=7 first-bytes=53 49 47 45 23 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.565: SSM_REQ using post-init[6/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.565: Submitting bulk OUT for post-init[6/18]: 61 24 33 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.565: SSM_RESP waiting on post-init[6/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.565: Submitting bulk IN for post-init[6], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.565: RX complete for post-init[6]: actual=7 first-bytes=53 49 47 45 24 33 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.565: SSM_REQ using post-init[7/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.565: Submitting bulk OUT for post-init[7/18]: 61 20 00 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.565: SSM_RESP waiting on post-init[7/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.565: Submitting bulk IN for post-init[7], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.566: RX complete for post-init[7]: actual=7 first-bytes=53 49 47 45 20 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.566: SSM_REQ using post-init[8/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.566: Submitting bulk OUT for post-init[8/18]: 61 21 66 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.566: SSM_RESP waiting on post-init[8/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.566: Submitting bulk IN for post-init[8], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.567: RX complete for post-init[8]: actual=7 first-bytes=53 49 47 45 21 66 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.567: SSM_REQ using post-init[9/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.567: Submitting bulk OUT for post-init[9/18]: 60 00 66 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.567: SSM_RESP waiting on post-init[9/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.567: Submitting bulk IN for post-init[9], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.568: RX complete for post-init[9]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.568: SSM_REQ using post-init[10/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.568: Submitting bulk OUT for post-init[10/18]: 60 01 66 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.568: SSM_RESP waiting on post-init[10/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.568: Submitting bulk IN for post-init[10], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.568: RX complete for post-init[10]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.568: SSM_REQ using post-init[11/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.568: Submitting bulk OUT for post-init[11/18]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.568: SSM_RESP waiting on post-init[11/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.568: Submitting bulk IN for post-init[11], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.569: RX complete for post-init[11]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.569: SSM_REQ using post-init[12/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.569: Submitting bulk OUT for post-init[12/18]: 60 2d 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.569: SSM_RESP waiting on post-init[12/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.569: Submitting bulk IN for post-init[12], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.570: RX complete for post-init[12]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.570: SSM_REQ using post-init[13/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.570: Submitting bulk OUT for post-init[13/18]: 62 67 03 len=7 expect=10
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.570: SSM_RESP waiting on post-init[13/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.570: Submitting bulk IN for post-init[13], expecting 10 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.571: RX complete for post-init[13]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.571: SSM_REQ using post-init[14/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.571: Submitting bulk OUT for post-init[14/18]: 60 0f 03 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.571: SSM_RESP waiting on post-init[14/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.571: Submitting bulk IN for post-init[14], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.571: RX complete for post-init[14]: actual=7 first-bytes=53 49 47 45 0f 20 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.571: SSM_REQ using post-init[15/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.571: Submitting bulk OUT for post-init[15/18]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.571: SSM_RESP waiting on post-init[15/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.572: Submitting bulk IN for post-init[15], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.572: RX complete for post-init[15]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.572: SSM_REQ using post-init[16/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.572: Submitting bulk OUT for post-init[16/18]: 60 00 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.572: SSM_RESP waiting on post-init[16/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.572: Submitting bulk IN for post-init[16], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.573: RX complete for post-init[16]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.573: SSM_REQ using post-init[17/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.573: Submitting bulk OUT for post-init[17/18]: 64 14 ec len=7 expect=5356
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.573: SSM_RESP waiting on post-init[17/18]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.573: Submitting bulk IN for post-init[17], expecting 5356 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.578: RX complete for post-init[17]: actual=5356 first-bytes=d3 00 ff ff ff 00 59
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.578: Completed post-init sequence, switching to repeat-path polling
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.578: Frame received from repeat[0]: len=5356 nonzero=347 strips=0 stop=0
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.578: finger_present: nonzero=347 threshold=1000
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.578: Finger heuristic for current frame: absent
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.578: Finger remains absent (non-zero frame below finger heuristic threshold)
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.578: Continuing polling loop with 0 strips buffered
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.578: SSM_REQ using repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.578: Submitting bulk OUT for repeat[0/9]: 61 2d 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.578: SSM_RESP waiting on repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.578: Submitting bulk IN for repeat[0], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.579: RX complete for repeat[0]: actual=7 first-bytes=53 49 47 45 2d 20 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.579: SSM_REQ using repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.579: Submitting bulk OUT for repeat[1/9]: 60 00 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.579: SSM_RESP waiting on repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.579: Submitting bulk IN for repeat[1], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.579: RX complete for repeat[1]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.579: SSM_REQ using repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.579: Submitting bulk OUT for repeat[2/9]: 60 01 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.580: SSM_RESP waiting on repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.580: Submitting bulk IN for repeat[2], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.580: RX complete for repeat[2]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.580: SSM_REQ using repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.580: Submitting bulk OUT for repeat[3/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.580: SSM_RESP waiting on repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.580: Submitting bulk IN for repeat[3], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.581: RX complete for repeat[3]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.581: SSM_REQ using repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.581: Submitting bulk OUT for repeat[4/9]: 60 2d 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.581: SSM_RESP waiting on repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.581: Submitting bulk IN for repeat[4], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.582: RX complete for repeat[4]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.582: SSM_REQ using repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.582: Submitting bulk OUT for repeat[5/9]: 62 67 03 len=7 expect=10
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.582: SSM_RESP waiting on repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.582: Submitting bulk IN for repeat[5], expecting 10 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.582: RX complete for repeat[5]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.582: SSM_REQ using repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.582: Submitting bulk OUT for repeat[6/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.582: SSM_RESP waiting on repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.582: Submitting bulk IN for repeat[6], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.583: RX complete for repeat[6]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.583: SSM_REQ using repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.583: Submitting bulk OUT for repeat[7/9]: 60 00 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.583: SSM_RESP waiting on repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.583: Submitting bulk IN for repeat[7], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.584: RX complete for repeat[7]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.584: SSM_REQ using repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.584: Submitting bulk OUT for repeat[8/9]: 64 14 ec len=7 expect=5356
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.584: SSM_RESP waiting on repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.584: Submitting bulk IN for repeat[8], expecting 5356 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.589: RX complete for repeat[8]: actual=5356 first-bytes=d1 00 ff ff ff 00 56
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.589: Completed repeat sequence, continuing repeat-path polling
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.589: Frame received from repeat[0]: len=5356 nonzero=349 strips=0 stop=0
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.589: finger_present: nonzero=349 threshold=1000
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.589: Finger heuristic for current frame: absent
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.589: Finger remains absent (non-zero frame below finger heuristic threshold)
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.589: Continuing polling loop with 0 strips buffered
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.589: SSM_REQ using repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.589: Submitting bulk OUT for repeat[0/9]: 61 2d 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.589: SSM_RESP waiting on repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.589: Submitting bulk IN for repeat[0], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.590: RX complete for repeat[0]: actual=7 first-bytes=53 49 47 45 2d 20 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.590: SSM_REQ using repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.590: Submitting bulk OUT for repeat[1/9]: 60 00 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.590: SSM_RESP waiting on repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.590: Submitting bulk IN for repeat[1], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.590: RX complete for repeat[1]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.590: SSM_REQ using repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.591: Submitting bulk OUT for repeat[2/9]: 60 01 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.591: SSM_RESP waiting on repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.591: Submitting bulk IN for repeat[2], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.591: RX complete for repeat[2]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.591: SSM_REQ using repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.591: Submitting bulk OUT for repeat[3/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.591: SSM_RESP waiting on repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.591: Submitting bulk IN for repeat[3], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.592: RX complete for repeat[3]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.592: SSM_REQ using repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.592: Submitting bulk OUT for repeat[4/9]: 60 2d 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.592: SSM_RESP waiting on repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.592: Submitting bulk IN for repeat[4], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.593: RX complete for repeat[4]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.593: SSM_REQ using repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.593: Submitting bulk OUT for repeat[5/9]: 62 67 03 len=7 expect=10
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.593: SSM_RESP waiting on repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.593: Submitting bulk IN for repeat[5], expecting 10 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.593: RX complete for repeat[5]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.593: SSM_REQ using repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.593: Submitting bulk OUT for repeat[6/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.593: SSM_RESP waiting on repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.593: Submitting bulk IN for repeat[6], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.594: RX complete for repeat[6]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.594: SSM_REQ using repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.594: Submitting bulk OUT for repeat[7/9]: 60 00 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.594: SSM_RESP waiting on repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.594: Submitting bulk IN for repeat[7], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.595: RX complete for repeat[7]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.595: SSM_REQ using repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.595: Submitting bulk OUT for repeat[8/9]: 64 14 ec len=7 expect=5356
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.595: SSM_RESP waiting on repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.595: Submitting bulk IN for repeat[8], expecting 5356 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.600: RX complete for repeat[8]: actual=5356 first-bytes=d4 00 ff ff ff 00 54
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.600: Completed repeat sequence, continuing repeat-path polling
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.600: Frame received from repeat[0]: len=5356 nonzero=350 strips=0 stop=0
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.600: finger_present: nonzero=350 threshold=1000
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.600: Finger heuristic for current frame: absent
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.600: Finger remains absent (non-zero frame below finger heuristic threshold)
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.600: Continuing polling loop with 0 strips buffered
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.600: SSM_REQ using repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.600: Submitting bulk OUT for repeat[0/9]: 61 2d 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.600: SSM_RESP waiting on repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.600: Submitting bulk IN for repeat[0], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.601: RX complete for repeat[0]: actual=7 first-bytes=53 49 47 45 2d 20 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.601: SSM_REQ using repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.601: Submitting bulk OUT for repeat[1/9]: 60 00 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.601: SSM_RESP waiting on repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.601: Submitting bulk IN for repeat[1], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.602: RX complete for repeat[1]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.602: SSM_REQ using repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.602: Submitting bulk OUT for repeat[2/9]: 60 01 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.602: SSM_RESP waiting on repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.602: Submitting bulk IN for repeat[2], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.602: RX complete for repeat[2]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.602: SSM_REQ using repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.602: Submitting bulk OUT for repeat[3/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.602: SSM_RESP waiting on repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.602: Submitting bulk IN for repeat[3], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.603: RX complete for repeat[3]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.603: SSM_REQ using repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.603: Submitting bulk OUT for repeat[4/9]: 60 2d 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.603: SSM_RESP waiting on repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.603: Submitting bulk IN for repeat[4], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.604: RX complete for repeat[4]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.604: SSM_REQ using repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.604: Submitting bulk OUT for repeat[5/9]: 62 67 03 len=7 expect=10
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.604: SSM_RESP waiting on repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.604: Submitting bulk IN for repeat[5], expecting 10 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.605: RX complete for repeat[5]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.605: SSM_REQ using repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.605: Submitting bulk OUT for repeat[6/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.605: SSM_RESP waiting on repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.605: Submitting bulk IN for repeat[6], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.605: RX complete for repeat[6]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.605: SSM_REQ using repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.605: Submitting bulk OUT for repeat[7/9]: 60 00 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.605: SSM_RESP waiting on repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.605: Submitting bulk IN for repeat[7], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.606: RX complete for repeat[7]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.606: SSM_REQ using repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.606: Submitting bulk OUT for repeat[8/9]: 64 14 ec len=7 expect=5356
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.606: SSM_RESP waiting on repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.606: Submitting bulk IN for repeat[8], expecting 5356 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.611: RX complete for repeat[8]: actual=5356 first-bytes=d3 00 ff ff ff 00 54
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.611: Completed repeat sequence, continuing repeat-path polling
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.611: Frame received from repeat[0]: len=5356 nonzero=352 strips=0 stop=0
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.611: finger_present: nonzero=352 threshold=1000
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.611: Finger heuristic for current frame: absent
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.611: Finger remains absent (non-zero frame below finger heuristic threshold)
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.611: Continuing polling loop with 0 strips buffered
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.611: SSM_REQ using repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.611: Submitting bulk OUT for repeat[0/9]: 61 2d 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.611: SSM_RESP waiting on repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.611: Submitting bulk IN for repeat[0], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.612: RX complete for repeat[0]: actual=7 first-bytes=53 49 47 45 2d 20 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.612: SSM_REQ using repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.612: Submitting bulk OUT for repeat[1/9]: 60 00 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.612: SSM_RESP waiting on repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.612: Submitting bulk IN for repeat[1], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.613: RX complete for repeat[1]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.613: SSM_REQ using repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.613: Submitting bulk OUT for repeat[2/9]: 60 01 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.613: SSM_RESP waiting on repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.613: Submitting bulk IN for repeat[2], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.613: RX complete for repeat[2]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.613: SSM_REQ using repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.613: Submitting bulk OUT for repeat[3/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.613: SSM_RESP waiting on repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.613: Submitting bulk IN for repeat[3], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.614: RX complete for repeat[3]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.614: SSM_REQ using repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.614: Submitting bulk OUT for repeat[4/9]: 60 2d 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.614: SSM_RESP waiting on repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.614: Submitting bulk IN for repeat[4], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.615: RX complete for repeat[4]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.615: SSM_REQ using repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.615: Submitting bulk OUT for repeat[5/9]: 62 67 03 len=7 expect=10
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.615: SSM_RESP waiting on repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.615: Submitting bulk IN for repeat[5], expecting 10 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.616: RX complete for repeat[5]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.616: SSM_REQ using repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.616: Submitting bulk OUT for repeat[6/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.616: SSM_RESP waiting on repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.616: Submitting bulk IN for repeat[6], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.616: RX complete for repeat[6]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.616: SSM_REQ using repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.616: Submitting bulk OUT for repeat[7/9]: 60 00 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.616: SSM_RESP waiting on repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.616: Submitting bulk IN for repeat[7], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.617: RX complete for repeat[7]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.617: SSM_REQ using repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.617: Submitting bulk OUT for repeat[8/9]: 64 14 ec len=7 expect=5356
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.617: SSM_RESP waiting on repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.617: Submitting bulk IN for repeat[8], expecting 5356 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.622: RX complete for repeat[8]: actual=5356 first-bytes=d3 00 ff ff ff 00 51
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.622: Completed repeat sequence, continuing repeat-path polling
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.622: Frame received from repeat[0]: len=5356 nonzero=349 strips=0 stop=0
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.622: finger_present: nonzero=349 threshold=1000
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.622: Finger heuristic for current frame: absent
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.622: Finger remains absent (non-zero frame below finger heuristic threshold)
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.622: Continuing polling loop with 0 strips buffered
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.622: SSM_REQ using repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.622: Submitting bulk OUT for repeat[0/9]: 61 2d 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.622: SSM_RESP waiting on repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.622: Submitting bulk IN for repeat[0], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.623: RX complete for repeat[0]: actual=7 first-bytes=53 49 47 45 2d 20 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.623: SSM_REQ using repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.623: Submitting bulk OUT for repeat[1/9]: 60 00 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.623: SSM_RESP waiting on repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.623: Submitting bulk IN for repeat[1], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.624: RX complete for repeat[1]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.624: SSM_REQ using repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.624: Submitting bulk OUT for repeat[2/9]: 60 01 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.624: SSM_RESP waiting on repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.624: Submitting bulk IN for repeat[2], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.624: RX complete for repeat[2]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.624: SSM_REQ using repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.625: Submitting bulk OUT for repeat[3/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.625: SSM_RESP waiting on repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.625: Submitting bulk IN for repeat[3], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.625: RX complete for repeat[3]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.625: SSM_REQ using repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.625: Submitting bulk OUT for repeat[4/9]: 60 2d 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.625: SSM_RESP waiting on repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.625: Submitting bulk IN for repeat[4], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.626: RX complete for repeat[4]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.626: SSM_REQ using repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.626: Submitting bulk OUT for repeat[5/9]: 62 67 03 len=7 expect=10
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.626: SSM_RESP waiting on repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.626: Submitting bulk IN for repeat[5], expecting 10 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.627: RX complete for repeat[5]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.627: SSM_REQ using repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.627: Submitting bulk OUT for repeat[6/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.627: SSM_RESP waiting on repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.627: Submitting bulk IN for repeat[6], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.628: RX complete for repeat[6]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.628: SSM_REQ using repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.628: Submitting bulk OUT for repeat[7/9]: 60 00 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.628: SSM_RESP waiting on repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.628: Submitting bulk IN for repeat[7], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.628: RX complete for repeat[7]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.628: SSM_REQ using repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.628: Submitting bulk OUT for repeat[8/9]: 64 14 ec len=7 expect=5356
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.628: SSM_RESP waiting on repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.628: Submitting bulk IN for repeat[8], expecting 5356 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.633: RX complete for repeat[8]: actual=5356 first-bytes=d3 00 ff ff ff 00 55
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.633: Completed repeat sequence, continuing repeat-path polling
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: Frame received from repeat[0]: len=5356 nonzero=352 strips=0 stop=0
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: finger_present: nonzero=352 threshold=1000
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: Finger heuristic for current frame: absent
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: Finger remains absent (non-zero frame below finger heuristic threshold)
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: Continuing polling loop with 0 strips buffered
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: SSM_REQ using repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: Submitting bulk OUT for repeat[0/9]: 61 2d 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: SSM_RESP waiting on repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: Submitting bulk IN for repeat[0], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: RX complete for repeat[0]: actual=7 first-bytes=53 49 47 45 2d 20 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: SSM_REQ using repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: Submitting bulk OUT for repeat[1/9]: 60 00 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: SSM_RESP waiting on repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.634: Submitting bulk IN for repeat[1], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.635: RX complete for repeat[1]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.635: SSM_REQ using repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.635: Submitting bulk OUT for repeat[2/9]: 60 01 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.635: SSM_RESP waiting on repeat[2/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.635: Submitting bulk IN for repeat[2], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.636: RX complete for repeat[2]: actual=7 first-bytes=53 49 47 45 01 00 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.636: SSM_REQ using repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.636: Submitting bulk OUT for repeat[3/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.636: SSM_RESP waiting on repeat[3/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.636: Submitting bulk IN for repeat[3], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.637: RX complete for repeat[3]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.637: SSM_REQ using repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.637: Submitting bulk OUT for repeat[4/9]: 60 2d 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.637: SSM_RESP waiting on repeat[4/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.637: Submitting bulk IN for repeat[4], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.637: RX complete for repeat[4]: actual=7 first-bytes=53 49 47 45 2d 47 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.637: SSM_REQ using repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.637: Submitting bulk OUT for repeat[5/9]: 62 67 03 len=7 expect=10
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.637: SSM_RESP waiting on repeat[5/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.637: Submitting bulk IN for repeat[5], expecting 10 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.638: RX complete for repeat[5]: actual=10 first-bytes=53 49 47 45 67 03 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.638: SSM_REQ using repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.638: Submitting bulk OUT for repeat[6/9]: 63 2c 02 len=9 expect=9
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.638: SSM_RESP waiting on repeat[6/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.638: Submitting bulk IN for repeat[6], expecting 9 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.639: RX complete for repeat[6]: actual=9 first-bytes=53 49 47 45 2c 02 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.639: SSM_REQ using repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.639: Submitting bulk OUT for repeat[7/9]: 60 00 02 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.639: SSM_RESP waiting on repeat[7/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.639: Submitting bulk IN for repeat[7], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.640: RX complete for repeat[7]: actual=7 first-bytes=53 49 47 45 00 ab 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.640: SSM_REQ using repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.640: Submitting bulk OUT for repeat[8/9]: 64 14 ec len=7 expect=5356
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.640: SSM_RESP waiting on repeat[8/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.640: Submitting bulk IN for repeat[8], expecting 5356 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.645: RX complete for repeat[8]: actual=5356 first-bytes=d4 00 ff ff ff 00 57
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.645: Completed repeat sequence, continuing repeat-path polling
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.645: Frame received from repeat[0]: len=5356 nonzero=349 strips=0 stop=0
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.645: finger_present: nonzero=349 threshold=1000
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.645: Finger heuristic for current frame: absent
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.645: Finger remains absent (non-zero frame below finger heuristic threshold)
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.645: Continuing polling loop with 0 strips buffered
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.645: SSM_REQ using repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.645: Submitting bulk OUT for repeat[0/9]: 61 2d 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.645: SSM_RESP waiting on repeat[0/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.645: Submitting bulk IN for repeat[0], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.646: RX complete for repeat[0]: actual=7 first-bytes=53 49 47 45 2d 20 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.646: SSM_REQ using repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.646: Submitting bulk OUT for repeat[1/9]: 60 00 20 len=7 expect=7
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.646: SSM_RESP waiting on repeat[1/9]
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.646: Submitting bulk IN for repeat[1], expecting 7 bytes
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.646: RX complete for repeat[1]: actual=7 first-bytes=53 49 47 45 00 aa 01
+(process:22761): libfprint-egis0577-DEBUG: 22:15:35.646: SSM_REQ using repeat[2/9]

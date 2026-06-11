@@ -54,6 +54,7 @@ struct _FpDeviceEgis0577
   guint         pre_frame_delay_ms;
   guint         poll_loop_delay_ms;
   gboolean      frame_delay_armed;
+
 };
 
 enum sm_states {
@@ -204,20 +205,10 @@ valid_data (FpiUsbTransfer *transfer)
 static gboolean
 finger_present (FpiUsbTransfer *transfer)
 {
-  unsigned char *buffer = transfer->buffer;
-  int length = transfer->actual_length;
-  double mean = 0;
-  double variance = 0;
+  gsize nonzero = count_nonzero_bytes (transfer);
 
-  for (size_t i = 0; i < length; i++)
-    mean += buffer[i];
-  mean /= length;
-
-  for (size_t i = 0; i < length; i++)
-    variance += (buffer[i] - mean) * (buffer[i] - mean);
-  variance /= length;
-
-  return variance > EGIS0577_MIN_SD * EGIS0577_MIN_SD;
+  fp_dbg ("finger_present: nonzero=%zu threshold=%d", nonzero, EGIS0577_MIN_ACTIVE_PIXELS);
+  return nonzero >= EGIS0577_MIN_ACTIVE_PIXELS;
 }
 
 static void
@@ -298,13 +289,24 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
 
   if (!detected_finger)
     {
-      if (self->strips_len > 0)
+      if (self->strips_len >= EGIS0577_MIN_STRIPS_FOR_MATCH)
         {
           fp_dbg ("Finger no longer detected after %zu strips, processing image", self->strips_len);
           goto START_PROCESSING;
         }
-
-      report_finger_status (self, img_self, FALSE, "non-zero frame below finger heuristic threshold");
+      else if (self->strips_len > 0)
+        {
+          fp_dbg ("Only %zu strip(s) collected (need %d), discarding spurious capture",
+                  self->strips_len, EGIS0577_MIN_STRIPS_FOR_MATCH);
+          g_slist_free_full (self->strips, g_free);
+          self->strips = NULL;
+          self->strips_len = 0;
+          report_finger_status (self, img_self, FALSE, "too few strips — spurious frame discarded");
+        }
+      else
+        {
+          report_finger_status (self, img_self, FALSE, "non-zero frame below finger heuristic threshold");
+        }
     }
   else
     {
@@ -315,7 +317,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
       self->strips = g_slist_prepend (self->strips, stripe);
       self->strips_len += 1;
 
-      report_finger_status (self, img_self, TRUE, "frame variance exceeded threshold");
+      report_finger_status (self, img_self, TRUE, "active pixel count exceeded threshold");
       fp_dbg ("Appended strip %zu/%d", self->strips_len, EGIS0577_CONSECUTIVE_CAPTURES);
     }
 
@@ -366,8 +368,14 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
       self->strips = NULL;
       self->strips_len = 0;
 
-      report_finger_status (self, img_self, FALSE, "image submitted");
-      fpi_ssm_next_state (ssm);
+      /* Report finger-off and wait EGIS0577_INTER_STAGE_DELAY_MS before the
+       * next stage.  The delay gives the user time to lift their finger and
+       * resets the sensor via SM_INIT (PRE_INIT → POST_INIT), which clears the
+       * AGC shift that makes idle frames look like partial touches. */
+      report_finger_status (self, img_self, FALSE, "image submitted — inter-stage gap");
+      fp_dbg ("Image submitted; pausing %d ms then resetting for next stage",
+              EGIS0577_INTER_STAGE_DELAY_MS);
+      fpi_ssm_jump_to_state_delayed (ssm, SM_INIT, EGIS0577_INTER_STAGE_DELAY_MS);
     }
   else
     {
@@ -414,9 +422,9 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
     {
       if (self->pkt_array == EGIS0577_POST_INIT_PACKETS)
         {
-          fp_dbg ("Completed post-init sequence, saving frame and staying on post-init polling");
-          self->pkt_array = EGIS0577_POST_INIT_PACKETS;
-          self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
+          fp_dbg ("Completed post-init sequence, switching to repeat-path polling");
+          self->pkt_array = EGIS0577_REPEAT_PACKETS;
+          self->pkt_array_len = EGIS0577_REPEAT_PACKETS_LENGTH;
           self->current_index = 0;
 
           save_img (transfer, dev);
@@ -424,9 +432,9 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
         }
       else if (self->pkt_array == EGIS0577_REPEAT_PACKETS)
         {
-          fp_dbg ("Completed repeat sequence, saving frame and returning to post-init polling");
-          self->pkt_array = EGIS0577_POST_INIT_PACKETS;
-          self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
+          fp_dbg ("Completed repeat sequence, continuing repeat-path polling");
+          self->pkt_array = EGIS0577_REPEAT_PACKETS;
+          self->pkt_array_len = EGIS0577_REPEAT_PACKETS_LENGTH;
           self->current_index = 0;
 
           save_img (transfer, dev);
@@ -702,6 +710,7 @@ fpi_device_egis0577_class_init (FpDeviceEgis0577Class *klass)
   dev_class->type = FP_DEVICE_TYPE_USB;
   dev_class->id_table = id_table;
   dev_class->scan_type = FP_SCAN_TYPE_SWIPE;
+  dev_class->nr_enroll_stages = 10;
 
   img_class->img_open = dev_init;
   img_class->img_close = dev_deinit;

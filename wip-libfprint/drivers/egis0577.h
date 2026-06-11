@@ -136,13 +136,44 @@ static const Packet EGIS0577_REPEAT_PACKETS[] = {
 #define EGIS0577_IMGHEIGHT 52
 #define EGIS0577_IMGSIZE (EGIS0577_IMGWIDTH * EGIS0577_IMGHEIGHT)
 
-#define EGIS0577_BZ3_THRESHOLD 15
+#define EGIS0577_BZ3_THRESHOLD 40
 #define EGIS0577_RFMGHEIGHT 24
 #define EGIS0577_RFMDIS (EGIS0577_IMGHEIGHT - EGIS0577_RFMGHEIGHT) / 2
 #define EGIS0577_RESIZE 2
 
-/* Minimum standard deviation required to validate finger is present, usual value roam around 20-50 */
-#define EGIS0577_MIN_SD 18
+/*
+ * Minimum number of nonzero pixels required to classify a frame as finger-present.
+ *
+ * Measured on real hardware (2026-06-11):
+ *   Idle (no finger, cold):         ~111 nonzero pixels at value ~190 (hot pixels).
+ *   Post-capture AGC shift (no finger): 519–755 nonzero (sensor AGC warms up; may
+ *                                       persist even after SM_INIT reset in some runs).
+ *   Real finger:                    1305–1594 nonzero pixels at value 1–105.
+ *
+ * 1000 sits between the worst-case no-finger baseline (~755) and the minimum
+ * observed real-finger count (1305), with ~250 pixels of margin on each side.
+ * 700 was still allowing spurious stage completions without a finger present.
+ */
+#define EGIS0577_MIN_ACTIVE_PIXELS 1000
 #define EGIS0577_TIMEOUT 10000
 
+/*
+ * Milliseconds to pause after submitting an enrollment image before allowing
+ * the next stage to begin.  During this gap the driver jumps to SM_INIT to
+ * run the full PRE_INIT → POST_INIT reset sequence, putting the sensor back in
+ * a known-cold state (AGC reset, baseline returns to ~111 nonzero).
+ * 1.5 s is enough for the user to lift their finger; the actual touch detection
+ * is then done purely on pixel count (≥ EGIS0577_MIN_ACTIVE_PIXELS).
+ */
+#define EGIS0577_INTER_STAGE_DELAY_MS 1500
+
 #define EGIS0577_CONSECUTIVE_CAPTURES 8
+
+/*
+ * Minimum number of strips that must be collected before submitting an image
+ * for matching. A real finger press delivers up to CONSECUTIVE_CAPTURES strips;
+ * requiring at least this many prevents a single spurious high-variance frame
+ * (followed by one sub-threshold frame) from triggering a match attempt.
+ * Set to roughly CONSECUTIVE_CAPTURES/2 so brief but real touches still work.
+ */
+#define EGIS0577_MIN_STRIPS_FOR_MATCH 3
