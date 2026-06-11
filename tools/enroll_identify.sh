@@ -90,10 +90,21 @@ while true; do
   NR_STAGES=5   # matches IMG_ENROLL_STAGES in libfprint
   log "--- Enrolling: $FNAME (index $CHOICE) ---"
 
+  # Angle hints for each stage — vary placement so the template covers
+  # multiple orientations and matches from different approach angles.
+  STAGE_HINTS=(
+    "centre — flat and straight"
+    "tilt slightly left"
+    "tilt slightly right"
+    "press from top (tip-heavy)"
+    "press from bottom (base-heavy)"
+  )
+
   say ""
-  say "  Enrolling: $FNAME ($NR_STAGES touches)"
+  say "  Enrolling: $FNAME ($NR_STAGES touches — vary angle each time)"
+  say "  Tip: different placements make matching more robust."
   say ""
-  say "  ▶  Touch 1/$NR_STAGES — place your finger on the sensor"
+  say "  ▶  Touch 1/$NR_STAGES — ${STAGE_HINTS[0]}"
 
   COMPLETED=0
   while IFS= read -r line; do
@@ -103,7 +114,8 @@ while true; do
       say "  ✓  Touch $COMPLETED/$NR_STAGES captured — lift your finger"
       if [[ $COMPLETED -lt $NR_STAGES ]]; then
         sleep 1   # visual beat while driver runs its 1.5 s inter-stage reset
-        say "  ▶  Touch $((COMPLETED+1))/$NR_STAGES — place your finger again"
+        HINT="${STAGE_HINTS[$COMPLETED]}"
+        say "  ▶  Touch $((COMPLETED+1))/$NR_STAGES — $HINT"
       fi
     fi
   done < <(printf "%d\nN\n" "$CHOICE" | sudo sh -c "
