@@ -3,11 +3,6 @@
 *.variant
 
 # Large generated logs ignored because they are above 2 MB
-/logs/identify-session-20260611-130519.txt
-/logs/identify-session-20260611-131729.txt
-/logs/identify-session-20260611-125754.txt
-/logs/identify-session-20260611-121951.txt
+/logs/identify-session-*.txt
 /logs/enroll-20260610-002523.txt
-/logs/identify-session-20260611-124312.txt
 /logs/2026-06-04-img-capture-guided-touch-06.txt
-/logs/identify-session-20260611-124528.txt
