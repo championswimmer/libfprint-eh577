@@ -212,18 +212,18 @@ finger_present (FpiUsbTransfer *transfer)
 }
 
 static void
-jump_to_req_with_optional_delay (FpDeviceEgis0577 *self,
-                                 FpiSsm           *ssm,
-                                 const char       *reason)
+jump_to_init_with_optional_delay (FpDeviceEgis0577 *self,
+                                   FpiSsm           *ssm,
+                                   const char       *reason)
 {
   if (self->poll_loop_delay_ms > 0)
     {
-      fp_dbg ("Delaying next poll loop by %u ms (%s)", self->poll_loop_delay_ms, reason);
-      fpi_ssm_jump_to_state_delayed (ssm, SM_REQ, self->poll_loop_delay_ms);
+      fp_dbg ("Delaying next init cycle by %u ms (%s)", self->poll_loop_delay_ms, reason);
+      fpi_ssm_jump_to_state_delayed (ssm, SM_INIT, self->poll_loop_delay_ms);
     }
   else
     {
-      fpi_ssm_jump_to_state (ssm, SM_REQ);
+      fpi_ssm_jump_to_state (ssm, SM_INIT);
     }
 }
 
@@ -270,7 +270,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
         goto START_PROCESSING;
 
       report_finger_status (self, img_self, FALSE, "all-zero frame");
-      jump_to_req_with_optional_delay (self, transfer->ssm, "all-zero frame");
+      jump_to_init_with_optional_delay (self, transfer->ssm, "all-zero frame");
       return;
     }
 
@@ -324,7 +324,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
   if (self->strips_len < EGIS0577_CONSECUTIVE_CAPTURES)
     {
       fp_dbg ("Continuing polling loop with %zu strips buffered", self->strips_len);
-      jump_to_req_with_optional_delay (self, transfer->ssm, "collecting more strips");
+      jump_to_init_with_optional_delay (self, transfer->ssm, "collecting more strips");
     }
   else
 START_PROCESSING:
@@ -380,7 +380,7 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
   else
     {
       fp_dbg ("Image-device state is not CAPTURE yet, returning to polling loop");
-      jump_to_req_with_optional_delay (self, ssm, "image-device state not CAPTURE yet");
+      jump_to_init_with_optional_delay (self, ssm, "image-device state not CAPTURE yet");
     }
 }
 
@@ -422,27 +422,19 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
     {
       if (self->pkt_array == EGIS0577_POST_INIT_PACKETS)
         {
-          fp_dbg ("Completed post-init sequence, switching to repeat-path polling");
-          self->pkt_array = EGIS0577_REPEAT_PACKETS;
-          self->pkt_array_len = EGIS0577_REPEAT_PACKETS_LENGTH;
+          /* Post-init complete: frame (5356 bytes) is in transfer->buffer.
+           * save_img decides whether to jump to SM_INIT for another cycle
+           * (zero/sub-threshold frame, or collecting more strips) or to
+           * SM_PROCESS_IMG when enough strips are assembled. */
+          fp_dbg ("Completed post-init sequence, passing frame to save_img");
           self->current_index = 0;
-
-          save_img (transfer, dev);
-          return;
-        }
-      else if (self->pkt_array == EGIS0577_REPEAT_PACKETS)
-        {
-          fp_dbg ("Completed repeat sequence, continuing repeat-path polling");
-          self->pkt_array = EGIS0577_REPEAT_PACKETS;
-          self->pkt_array_len = EGIS0577_REPEAT_PACKETS_LENGTH;
-          self->current_index = 0;
-
           save_img (transfer, dev);
           return;
         }
       else
         {
-          fp_dbg ("Completed pre-init sequence, switching back to post-init");
+          /* Pre-init complete — switch to post-init for the frame capture. */
+          fp_dbg ("Completed pre-init sequence, switching to post-init");
           self->pkt_array = EGIS0577_POST_INIT_PACKETS;
           self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
           self->current_index = 0;
@@ -470,7 +462,7 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
       self->current_index += 1;
     }
 
-  jump_to_req_with_optional_delay (self, transfer->ssm, "advance packet sequence");
+  jump_to_init_with_optional_delay (self, transfer->ssm, "advance packet sequence");
 }
 
 static void
@@ -539,8 +531,10 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
       self->poll_loop_delay_ms = get_env_ms_or_default ("EGIS0577_POLL_LOOP_DELAY_MS", 0);
       self->frame_delay_armed = FALSE;
 
-      self->strips_len = 0;
-      self->strips = NULL;
+      /* Do NOT clear strips here — they must survive across reinit cycles when
+       * we are mid-collection (collecting CONSECUTIVE_CAPTURES strips, each
+       * requiring a full PRE_INIT → POST_INIT reset to get a fresh frame).
+       * Strips are freed by: save_img stop paths, and process_imgs after submit. */
       fp_dbg ("Initial packet array: %s", packet_array_name (self->pkt_array));
       fp_dbg ("EH577 pacing config: pre_frame_delay_ms=%u poll_loop_delay_ms=%u",
               self->pre_frame_delay_ms,

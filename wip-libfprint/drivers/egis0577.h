@@ -167,7 +167,7 @@ static const Packet EGIS0577_REPEAT_PACKETS[] = {
  */
 #define EGIS0577_INTER_STAGE_DELAY_MS 1500
 
-#define EGIS0577_CONSECUTIVE_CAPTURES 8
+#define EGIS0577_CONSECUTIVE_CAPTURES 3
 
 /*
  * Minimum number of strips that must be collected before submitting an image
