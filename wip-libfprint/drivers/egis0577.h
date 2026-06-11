@@ -168,11 +168,11 @@ static const Packet EGIS0577_REPEAT_PACKETS[] = {
 /*
  * Milliseconds to pause between within-stage POST_INIT re-runs (no-finger
  * polling and consecutive strip collection).  Running POST_INIT immediately
- * back-to-back causes the device to stop responding at packet 5; a short
- * pause lets the sensor settle.  PRE_INIT (the full SM_INIT reset) is only
- * run between enrollment stages, not between individual frame captures.
+ * back-to-back causes the device to stop responding at packet 5.  After a
+ * real finger capture the image pipeline needs ~1500 ms to flush; 500 ms was
+ * enough for idle frames but timed out at post-init[16] after a real capture.
  */
-#define EGIS0577_INTER_FRAME_DELAY_MS 500
+#define EGIS0577_INTER_FRAME_DELAY_MS 1500
 
 #define EGIS0577_INTER_STAGE_DELAY_MS 1500
 
