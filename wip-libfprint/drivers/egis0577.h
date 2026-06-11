@@ -1,7 +1,6 @@
 /*
  * Egis Technology Inc. (aka. LighTuning) 0577 driver for libfprint
- * Copyright (C) 2021 Animesh Sahu <animeshsahu19@yahoo.com>
- * Local EH577 adaptation work (C) 2026 workspace contributors
+ * Copyright (C) 2026 Arnav Gupta <dev@championsiwmmer.in>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
