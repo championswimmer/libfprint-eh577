@@ -26,10 +26,10 @@ Plan:
 - `.agents/plans/08-eh577-touch-temperature-guards.md`
 
 Open tasks:
-- [ ] Decide the long-term `finger_present` threshold / hysteresis policy
-- [ ] Decide whether EH577 should explicitly opt into or out of libfprint temperature throttling
-- [ ] Validate idle / touch / hold / remove behavior after guard tuning
-- [ ] Record the chosen guard policy in both code and docs
+- [x] Decide the long-term `finger_present` threshold / hysteresis policy
+- [x] Decide whether EH577 should explicitly opt into or out of libfprint temperature throttling
+- [x] Validate idle / touch / hold / remove behavior after guard tuning
+- [x] Record the chosen guard policy in both code and docs
 
 ## Medium priority
 

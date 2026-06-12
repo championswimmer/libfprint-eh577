@@ -69,21 +69,21 @@ Turn the current ad-hoc EH577 finger detection and implicit libfprint temperatur
 
 ## Validation
 
-- A written note exists summarizing the Windows `FingerOn*` / detect-mode evidence and how trustworthy each clue is.
-- A driver comparison note exists showing which libfprint drivers use software finger heuristics and which ones opt into or out of temperature throttling.
-- EH577 has an explicit temperature policy in the plan and, when implemented, in the driver source.
-- Guided idle/touch/remove runs can be used to measure false-positive and false-negative finger detection before and after the guard changes.
-- The follow-up implementation path clearly distinguishes:
+- [x] A written note exists summarizing the Windows `FingerOn*` / detect-mode evidence and how trustworthy each clue is.
+- [x] A driver comparison note exists showing which libfprint drivers use software finger heuristics and which ones opt into or out of temperature throttling.
+- [x] EH577 has an explicit temperature policy in the plan and, when implemented, in the driver source.
+- [x] Guided idle/touch/remove runs can be used to measure false-positive and false-negative finger detection before and after the guard changes.
+- [x] The follow-up implementation path clearly distinguishes:
   - what can be done now from Linux-only evidence
   - what requires proprietary-stack traffic capture
 
 ## Todo
 
-- [ ] Copy the Windows INF and DLL guard clues into a dedicated note or research-log section with exact key/value pairs and strings.
-- [ ] Audit `egis0570`, `upektc`, and at least two more libfprint drivers for finger-on/finger-off guard patterns worth borrowing.
-- [ ] Decide whether EH577 should explicitly disable libfprint temperature throttling for now (`temp_hot_seconds = -1`) or intentionally keep the generic model, and record why.
-- [ ] Derive a stricter EH577 finger-present/finger-absent guard design from existing nonzero-pixel counts, including hysteresis or loose/strict thresholds if needed.
+- [x] Copy the Windows INF and DLL guard clues into a dedicated note or research-log section with exact key/value pairs and strings.
+- [x] Audit `egis0570`, `upektc`, and at least two more libfprint drivers for finger-on/finger-off guard patterns worth borrowing.
+- [x] Decide whether EH577 should explicitly disable libfprint temperature throttling for now (`temp_hot_seconds = -1`) or intentionally keep the generic model, and record why.
+- [x] Derive a stricter EH577 finger-present/finger-absent guard design from existing nonzero-pixel counts, including hysteresis or loose/strict thresholds if needed.
 - [ ] Identify which Windows/proprietary-stack capture would most likely reveal `FingerOnMode`, detect-mode tuning, or remote-wakeup commands.
-- [ ] Add the chosen guard policy to `refs/libfprint/libfprint/drivers/egis0577.c` and mirror it into `wip-libfprint/drivers/egis0577.c` when implementation starts.
-- [ ] Validate the guard behavior with guided idle, touch, hold, and remove runs; record false positives, false negatives, and any temperature-property changes.
-- [ ] Update `docs/todo.md`, `docs/research-log.md`, and the bringup plan with the resulting policy and any remaining blockers.
+- [x] Add the chosen guard policy to `refs/libfprint/libfprint/drivers/egis0577.c` and mirror it into `wip-libfprint/drivers/egis0577.c` when implementation starts.
+- [x] Validate the guard behavior with guided idle, touch, hold, and remove runs; record false positives, false negatives, and any temperature-property changes.
+- [x] Update `docs/todo.md`, `docs/research-log.md`, and the bringup plan with the resulting policy and any remaining blockers.

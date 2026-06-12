@@ -150,11 +150,14 @@ static const Packet EGIS0577_REPEAT_PACKETS[] = {
  *                                       persist even after SM_INIT reset in some runs).
  *   Real finger:                    1305–1594 nonzero pixels at value 1–105.
  *
- * 1000 sits between the worst-case no-finger baseline (~755) and the minimum
- * observed real-finger count (1305), with ~250 pixels of margin on each side.
- * 700 was still allowing spurious stage completions without a finger present.
+ * We implement hysteresis using STRICT and LOOSE thresholds matching the Windows driver
+ * conceptually (FingerOnThreshold vs FingerOnThresholdLoose).
+ * 1000 sits safely above the worst-case no-finger baseline (~755).
+ * 700 allows a capture already in progress to continue even if the finger lifts slightly,
+ * but is low enough to reject a completely empty frame.
  */
-#define EGIS0577_MIN_ACTIVE_PIXELS 1000
+#define EGIS0577_MIN_ACTIVE_PIXELS_STRICT 1000
+#define EGIS0577_MIN_ACTIVE_PIXELS_LOOSE  700
 #define EGIS0577_TIMEOUT 10000
 
 /*
