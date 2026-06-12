@@ -1,6 +1,0 @@
-
-(fprintd:180951): fprintd-WARNING **: 00:00:02.401: Failed to install a sleep delay inhibitor: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.login1 was not provided by any .service files
-Using device /net/reactivated/Fprint/Device/0
-
-(fprintd:180951): fprintd-WARNING **: 00:00:04.385: Authorization denied to :1.1 to call method 'Claim' for device 'LighTuning Technology Inc. EgisTec EH577': Not Authorized: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.PolicyKit1 was not provided by any .service files
-failed to claim device: GDBus.Error:net.reactivated.Fprint.Error.PermissionDenied: Not Authorized: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.PolicyKit1 was not provided by any .service files

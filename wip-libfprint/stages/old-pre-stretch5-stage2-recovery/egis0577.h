@@ -116,10 +116,21 @@ static const Packet EGIS0577_POST_INIT_PACKETS[] = {
   {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x60, 0x0f, 0x03}, .response_length = 7},
   {.length = 9, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x63, 0x2c, 0x02, 0x00, 0x13}, .response_length = 9},
   {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x60, 0x00, 0x02}, .response_length = 7},
-  {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x64, 0x14, 0xec}, .response_length = 5356},
+  {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x64, 0x14, 0xec}, .response_length = 5356},   /* to EGIS0577_REPEAT_PACKETS */
 };
 
-
+#define EGIS0577_REPEAT_PACKETS_LENGTH 9
+static const Packet EGIS0577_REPEAT_PACKETS[] = {
+  {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x61, 0x2d, 0x20}, .response_length = 7},
+  {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x60, 0x00, 0x20}, .response_length = 7},
+  {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x60, 0x01, 0x20}, .response_length = 7},
+  {.length = 9, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x63, 0x2c, 0x02, 0x00, 0x57}, .response_length = 9},
+  {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x60, 0x2d, 0x02}, .response_length = 7},
+  {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x62, 0x67, 0x03}, .response_length = 10},
+  {.length = 9, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x63, 0x2c, 0x02, 0x00, 0x13}, .response_length = 9},
+  {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x60, 0x00, 0x02}, .response_length = 7},
+  {.length = 7, .sequence = (unsigned char[]){0x45, 0x47, 0x49, 0x53, 0x64, 0x14, 0xec}, .response_length = 5356},
+};
 
 #define EGIS0577_IMGWIDTH 103
 #define EGIS0577_IMGHEIGHT 52
@@ -130,44 +141,8 @@ static const Packet EGIS0577_POST_INIT_PACKETS[] = {
  */
 #define EGIS0577_PADDED_IMGWIDTH (((EGIS0577_IMGWIDTH + 3) / 4) * 4)
 
-#define EGIS0577_BZ3_THRESHOLD 9
+#define EGIS0577_BZ3_THRESHOLD 40
 #define EGIS0577_RESIZE 2
-
-/*
- * Stage-2 processed-image quality gate (runs on the final resized 208x104
- * snapshot geometry, matching the offline capture12 analysis tooling).
- *
- * Current best live-tested operating point (2026-06-12):
- * - stretch5 enhancement before NBIS / submission
- * - reject obvious noise using the pre-stretch p5 floor
- * - grain < 8.000% on enhanced output
- * - 3 <= minutiae <= 12 (too many minutiae usually means noise)
- * - ridge pixels (<180 on enhanced output) >= 600
- */
-#define EGIS0577_ENHANCE_STRETCH_LO_PCT 5
-#define EGIS0577_ENHANCE_STRETCH_HI_PCT 99
-#define EGIS0577_ENHANCE_STRETCH_OUT_LO 20
-#define EGIS0577_ENHANCE_STRETCH_OUT_HI 245
-#define EGIS0577_STAGE2_MIN_STRETCH_P5 100
-#define EGIS0577_STAGE2_GRAIN_DIFF_THRESHOLD 25
-#define EGIS0577_STAGE2_GRAIN_PCT_X1000 8000
-#define EGIS0577_STAGE2_MIN_MINUTIAE 3
-#define EGIS0577_STAGE2_MAX_MINUTIAE 12
-#define EGIS0577_STAGE2_RIDGE_PIXEL_THRESHOLD 180
-#define EGIS0577_STAGE2_MIN_RIDGE_PIXELS 600
-
-/* Noisy-burst recovery. Noise-like Stage-2 rejects indicate that the sensor/AGC
- * state may be contaminated; after a small action-aware streak, clear the warm
- * baseline and force a fresh init/baseline cycle. Verify/identify are bounded
- * more tightly so login never spends too long recovering. */
-#define EGIS0577_NOISE_RECOVERY_STREAK_ENROLL_CAPTURE 3
-#define EGIS0577_NOISE_RECOVERY_STREAK_VERIFY_IDENTIFY 2
-#define EGIS0577_NOISE_RECOVERY_MAX_ENROLL_CAPTURE 2
-#define EGIS0577_NOISE_RECOVERY_MAX_VERIFY_IDENTIFY 1
-#define EGIS0577_NOISE_RECOVERY_DELAY_ENROLL_CAPTURE_MS 2000
-#define EGIS0577_NOISE_RECOVERY_DELAY_VERIFY_IDENTIFY_MS 500
-#define EGIS0577_NOISE_RECOVERY_CLEAN_FRAMES_ENROLL_CAPTURE 2
-#define EGIS0577_NOISE_RECOVERY_CLEAN_FRAMES_VERIFY_IDENTIFY 1
 
 /*
  * Minimum number of nonzero pixels required to classify a frame as finger-present.
@@ -182,7 +157,7 @@ static const Packet EGIS0577_POST_INIT_PACKETS[] = {
  * - likely finger contact
  * - good enough frame to submit upstream
  */
-#define EGIS0577_MIN_ACTIVE_PIXELS_PRESENT 1000
+#define EGIS0577_MIN_ACTIVE_PIXELS_PRESENT 700
 #define EGIS0577_MIN_ACTIVE_PIXELS_STRICT 1000
 /*
  * Successful commands complete well below 1 s. Keep timeout recovery tight so
@@ -200,7 +175,7 @@ static const Packet EGIS0577_POST_INIT_PACKETS[] = {
  * Milliseconds to pause after submitting a good image before restarting
  * polling to observe the real finger-off transition.
  */
-#define EGIS0577_POST_CAPTURE_POLL_DELAY_MS 20
+#define EGIS0577_POST_CAPTURE_POLL_DELAY_MS 200
 
 /*
  * EH577 appears to allow only a small number of 64 14 ec frame reads per

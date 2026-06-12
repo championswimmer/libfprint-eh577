@@ -40,18 +40,35 @@ Other notes:
 - There is also a `eh575-postinit-reset` probe mode that USB-resets after claim
   (EH575 Rust-prototype style); the driver never resets. Untested for saturation.
 
-## Decisive next test (empirical, not more code)
+## RESULT (2026-06-12 probe captures, same finger, via tools/probe-tests/)
 
-Speculating from old dumps is unreliable (different finger/pressure/day). Capture
-fresh frames **now, same finger**, with the probe in several modes and compare
-saturated-pixel counts against the driver's frames:
+Captured one `64 14 ec` finger frame per mode and measured saturated pixels:
 
-1. `eh575-postinit` (post-init only) — does the probe still produce clean frames today?
-2. pre-init then post-init (mimic the driver's order) — does adding pre-init saturate?
-3. `eh575-postinit-reset` — does a USB reset clean it up?
+| frame | nonzero | saturated(>=250) | finger px | max |
+|---|---|---|---|---|
+| probe postinit-only | 665 | 153 | 287 | 255 |
+| probe postinit-**reset** | 665 | 154 | 283 | 255 |
+| probe preinit+postinit | 377 | 160 | 123 | 255 |
+| driver (today) | ~2700 | ~480 | ~1600 | 255 |
 
-If the probe is clean now and the driver saturates with the same finger → it's the
-driver's pre-init or read-cadence. If the probe also saturates now → the 2026-06-03
-clean frame was a lighter press and saturation is purely pressure/contact (then the
-fix is frame-selection/timing, not init). See the
-[probe test skill](../../../tools) workflow.
+**The probe saturates in every mode today** — with/without pre-init, with/without
+USB reset, single-shot. So pre-init order, read cadence, and the missing USB reset
+are all **ruled out** as the cause. The init-diff direction yields no copyable fix:
+probe and driver init are byte-identical AND both saturate.
+
+## IMPORTANT caveat (per user, 2026-06-12)
+
+Ignore all pre-2026-06-06 results — they were captured/reasoned under the wrong
+**swipe**-sensor assumption (EH577 is PRESS). That includes the 2026-06-03
+"clean, unsaturated (max=105, sat=0)" probe frame this entry originally leaned on.
+**There is therefore no validated evidence that the sensor ever produced
+unsaturated frames.** The "saturation is a regression from a previously clean
+state" framing is dropped; saturation may simply be how this sensor/init behaves.
+
+## Where this leaves it
+
+- No "better init" hidden in the probe to copy — both paths saturate identically.
+- Open levers (all still within PRESS): (a) experiment with the gain/exposure
+  registers in the init sequence (`63 09 ...`, `63 26 ...`) to reduce saturation at
+  the source; (b) non-destructive **fresh no-finger baseline subtraction** to remove
+  the fixed hot-pixels; (c) moderate-contact frame selection.

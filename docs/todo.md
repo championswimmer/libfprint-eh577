@@ -18,6 +18,11 @@ Open tasks:
 - [ ] Tune `EGIS0577_BZ3_THRESHOLD`
 - [ ] Test whether resize settings are helping or hurting
 - [ ] Improve press-snapshot ridge area / contrast (NOT swipe assembly — press only)
+  - Current best Stage-2 runtime thresholds so far after stretch5: `pre_stretch_p5>=100`, `grain<8.0%`, `3<=minutiae<=12`, `ridge_pixels>=600`
+  - Still unsolved: acceptable clean captures often have too few reproducible minutiae
+  - Current driver-side image enhancement: `stretch5` (5th..99th percentile mapped to `20..245`) after resize/polarity normalization and before Stage-2/NBIS; use pre-stretch p5 to keep obvious noise separable
+  - Current driver-side noise recovery: after repeated noise-like rejects, clear warm background, force full pre-init/reinit, and require clean baseline frames before re-arming; action-aware limits keep verify/login bounded
+  - Validate by same-finger cross-press Bozorth score, not minutiae count alone
 - [ ] Confirm 3× same-finger `MATCH` and 3× different-finger `NO MATCH`
 
 ### 2. Finalize touch / finger-present / temperature guards

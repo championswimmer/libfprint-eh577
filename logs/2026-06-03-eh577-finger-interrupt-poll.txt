@@ -1,3 +1,0 @@
-### reset
-device reset ok
-### finger interrupt poll

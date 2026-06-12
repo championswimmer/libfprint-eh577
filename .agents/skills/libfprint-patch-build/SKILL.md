@@ -35,25 +35,35 @@ Default assumptions:
 4. Preserve room for later interrupt integration instead of assuming interrupts are unused.
 5. Validate the edited driver against captured logs and dumps before broad refactors.
 
-## Build workflow
+## Build and Testing Workflow
 
 The upstream reference tree is under `refs/libfprint/` and uses Meson.
 
-Typical local build flow:
+### 1. Local Build & CLI Testing (Development)
+For rapid development, avoid installing to the system. Build locally and test using the provided helper script which injects `LD_LIBRARY_PATH`:
 
 ```bash
 meson setup refs/libfprint/build refs/libfprint
-meson compile -C refs/libfprint/build
-meson test -C refs/libfprint/build
+ninja -C refs/libfprint/build
+
+# Sync your WIP files before building!
+cp wip-libfprint/egis0577.c refs/libfprint/libfprint/drivers/egis0577.c
+cp wip-libfprint/egis0577.h refs/libfprint/libfprint/drivers/egis0577.h
+
+# Run the CLI test suite
+./tools/enroll_identify.sh
 ```
 
-If the build directory already exists and options changed:
+### 2. System Installation & GUI E2E Testing (Final Verification)
+When validating the driver for actual system usage (e.g., GNOME Settings integration with `fprintd`), the default `/usr/local` prefix is insufficient. The driver MUST be installed directly into the system OS library paths.
+
+Use the provided system installer script, which automatically configures Meson with `--prefix=/usr --libdir=lib/x86_64-linux-gnu`, builds the driver, installs it with `sudo`, and restarts the `fprintd` system service:
 
 ```bash
-meson setup --reconfigure refs/libfprint/build refs/libfprint
+./tools/install-to-system.sh
 ```
 
-Use the local WIP files as the staging area for EH577-specific edits unless the task explicitly asks for an upstream-style patch.
+After running the install script, the end-user can navigate to their OS Settings (e.g., GNOME Settings -> Users -> Fingerprint Login) to verify E2E enrollment and identification.
 
 ## Validation checklist
 

@@ -133,7 +133,21 @@ while true; do
   STAGE_STATE="init"   # init | ready | finger_down | captured
   LAST_RETRY_MSG=""
 
-  while IFS= read -r line; do
+  # Watchdog: read with a 2s timeout so a wedged helper never blocks the loop
+  # forever. stderr/debug goes straight to $LOG, so this stream is only the clean
+  # EH577_HELPER events — an idle gap here means the driver is actually stalled.
+  LAST_PROGRESS=$SECONDS
+  while true; do
+    IFS= read -r -t 2 line; rc=$?
+    if (( rc > 128 )); then
+      if [[ "$STAGE_STATE" == "finger_down" ]] && (( SECONDS - LAST_PROGRESS >= 12 )); then
+        say "  ⏳  Still capturing — if the sensor seems stuck, lift and press again."
+        LAST_PROGRESS=$SECONDS
+      fi
+      continue
+    fi
+    (( rc != 0 )) && break    # EOF: helper exited
+    LAST_PROGRESS=$SECONDS
     log "$line"
 
     if [[ -z "$NR_STAGES" && "$line" =~ ^EH577_HELPER\ device-opened\ .*total=([0-9]+) ]]; then
@@ -191,8 +205,8 @@ while true; do
     fi
   done < <(sudo sh -c "
     cd '$REPO'
-    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint,libfprint-egis0577,libfprint-print EGIS0577_FRAME_DUMP_DIR='$EVIDENCE_DIR/raw-enroll' '$ENROLL_HELPER_BIN' --finger-index '$CHOICE' --save-image '$REPO/enrolled.pgm'
-  " 2>&1)
+    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint,libfprint-egis0577,libfprint-print EGIS0577_FRAME_DUMP_DIR='$EVIDENCE_DIR/raw-enroll' '$ENROLL_HELPER_BIN' --finger-index '$CHOICE' --save-image '$REPO/enrolled.pgm' 2>>'$LOG'
+  ")
 
   sudo chown -R "$(id -u):$(id -g)" "$REPO/test-storage.variant" "$REPO/enrolled.pgm" "$EVIDENCE_DIR/raw-enroll" 2>/dev/null || true
   if [[ -f "$REPO/enrolled.pgm" ]]; then
@@ -244,7 +258,19 @@ while true; do
   IDENT_RETRY_MSG=""
   RAW_ID_DIR="$EVIDENCE_DIR/raw-identify-$(printf "%02d" $((IDENT_ATTEMPT+1)))"
 
-  while IFS= read -r line; do
+  # Watchdog: 2s read timeout so a wedged helper never blocks forever.
+  LAST_PROGRESS=$SECONDS
+  while true; do
+    IFS= read -r -t 2 line; rc=$?
+    if (( rc > 128 )); then
+      if [[ "$IDENT_STATE" == "finger_down" ]] && (( SECONDS - LAST_PROGRESS >= 12 )); then
+        say "  ⏳  Still capturing — if the sensor seems stuck, lift and press again."
+        LAST_PROGRESS=$SECONDS
+      fi
+      continue
+    fi
+    (( rc != 0 )) && break    # EOF: helper exited
+    LAST_PROGRESS=$SECONDS
     log "$line"
 
     if [[ "$line" == "EH577_IDENTIFY finger-status status=present" && "$IDENT_STATE" == "ready" ]]; then
@@ -287,8 +313,8 @@ while true; do
   done < <(sudo sh -c "
     cd '$REPO'
     rm -f '$REPO/identify.pgm'
-    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint,libfprint-egis0577,libfprint-print EGIS0577_FRAME_DUMP_DIR='$RAW_ID_DIR' '$IDENTIFY_HELPER_BIN' --save-image '$REPO/identify.pgm'
-  " 2>&1)
+    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint,libfprint-egis0577,libfprint-print EGIS0577_FRAME_DUMP_DIR='$RAW_ID_DIR' '$IDENTIFY_HELPER_BIN' --save-image '$REPO/identify.pgm' 2>>'$LOG'
+  ")
 
   sudo chown -R "$(id -u):$(id -g)" "$REPO/identify.pgm" "$RAW_ID_DIR" 2>/dev/null || true
 

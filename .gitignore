@@ -1,6 +1,11 @@
 *.bin
 *.pgm
+*.png
 *.variant
+
+# Generated capture artifacts and local compiled helper binaries
+artifacts/
+tools/eh577_pgm_correlate
 
 # Large generated logs ignored because they are above 2 MB
 /logs/identify-session-*.txt
