@@ -6,3 +6,5 @@
 /logs/identify-session-*.txt
 /logs/enroll-20260610-002523.txt
 /logs/2026-06-04-img-capture-guided-touch-06.txt
+artifacts/pgm-debug/
+tools/__pycache__/

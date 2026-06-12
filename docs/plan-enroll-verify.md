@@ -107,10 +107,11 @@ ninja -C refs/libfprint/build
 Enrollment requires **multiple** finger presentations (libfprint calls this "stages").
 The `enroll` example runs through however many stages the device requires.
 
-The EH577 driver is a **swipe sensor** (`FP_SCAN_TYPE_SWIPE`). Each stage is one
-18-packet post-init cycle. The driver collects `EGIS0577_CONSECUTIVE_CAPTURES` = 8
-strips per stage before declaring a stage complete. Expect 2–5 stages (varies by
-libfprint version and device config).
+The EH577 driver is a **press / snapshot sensor** (`FP_SCAN_TYPE_PRESS`) — one
+captured frame per touch, **not** a swipe sensor. Each stage is a single press
+snapshot (one accepted post-init frame). The number of enroll stages is set by
+`nr_enroll_stages` in the driver. (Swipe / multi-strip assembly was an early
+mistake and has been removed — do not reintroduce it.)
 
 **Timing note**: the driver starts with pre-init (29 packets, ~0.5 s) before the first
 post-init frame. Budget ~1–2 s from `enroll` start before the first TOUCH prompt is
@@ -136,13 +137,14 @@ Opened device. Opening device...
 Enrolling...
 Lift finger...
 Place finger on reader...
-[finger detected, strips collected]
+[finger detected, snapshot captured]
 ...
 Enrollment complete!
 ```
 
-For a swipe sensor, each stage is one swipe. Lift and re-place the finger between
-stages when prompted. Keep the finger in contact for ~2 s per stage.
+For a press sensor, each stage is one touch. Lift and re-place the finger between
+stages when prompted. Press firmly and hold still for ~1–2 s per stage until the
+snapshot is captured.
 
 If the device returns "no finger" for a stage (zero frame), libfprint will retry
 automatically — just try again.

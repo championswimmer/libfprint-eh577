@@ -17,7 +17,7 @@ Open tasks:
 - [ ] Record minutiae counts and bozorth3 scores from debug logs
 - [ ] Tune `EGIS0577_BZ3_THRESHOLD`
 - [ ] Test whether resize settings are helping or hurting
-- [ ] Test whether more strips (`EGIS0577_CONSECUTIVE_CAPTURES`) improve separation
+- [ ] Improve press-snapshot ridge area / contrast (NOT swipe assembly — press only)
 - [ ] Confirm 3× same-finger `MATCH` and 3× different-finger `NO MATCH`
 
 ### 2. Finalize touch / finger-present / temperature guards
@@ -56,6 +56,6 @@ Open tasks:
 - [x] Identified that **pre-init** is required to arm the sensor
 - [x] Captured reproducible non-zero `64 14 ec` frames
 - [x] Integrated `egis0577` into the local `refs/libfprint/` tree and built it successfully
-- [x] Reached assembled fingerprint image output through libfprint
+- [x] Reached press-snapshot fingerprint image output through libfprint
 - [x] Reached end-to-end enroll / verify execution with the patched driver
 - [x] Tightened the finger-present gate to reduce phantom captures

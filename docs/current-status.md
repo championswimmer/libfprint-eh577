@@ -4,13 +4,17 @@
 
 The EH577 bringup is past the protocol-discovery phase.
 
+**Capture model: PRESS (`FP_SCAN_TYPE_PRESS`) — one snapshot frame per touch,
+not swipe.** Swipe / multi-strip assembly was an early mistake, removed in commit
+`a5a4e7f`; do not reintroduce it.
+
 The project now has a real `libfprint` driver port in `refs/libfprint/` that can:
 
 - open the device,
 - run **pre-init** to arm the sensor,
 - enter the **post-init** capture loop,
 - capture **non-zero** `64 14 ec` frames,
-- assemble a fingerprint image,
+- build a single **press snapshot** image,
 - and complete **enroll** / **verify** flows with libfprint example programs.
 
 The main unresolved issue is **biometric correctness**: different fingers can still be accepted as `MATCH`.
@@ -49,8 +53,8 @@ The active EH577 driver work is in:
 Current validated behavior:
 
 - pre-init runs once on open
-- post-init loop captures strips
-- 8 strips are assembled into a fingerprint image
+- post-init loop polls for a finger-present frame
+- a single accepted press snapshot frame becomes the fingerprint image
 - end-to-end enroll/verify runs complete through libfprint example binaries
 
 Important supporting artifacts:
@@ -85,8 +89,8 @@ The active debug track is in:
 
 Likely causes under test:
 - Bozorth3 threshold too permissive
-- assembled image quality still too weak
-- resize / strip-count tuning not yet right
+- snapshot image quality / ridge area still too weak
+- resize / contrast / capture-timing tuning not yet right (within press model)
 
 ### 2. Touch / finger-present / temperature guards
 

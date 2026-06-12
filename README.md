@@ -2,6 +2,12 @@
 
 Reverse-engineering workspace for an open-source Linux fingerprint driver for the EgisTec EH577 USB sensor (`1c7a:0577`).
 
+> **Sensor model: PRESS, not swipe.** The EH577 is a press / snapshot sensor
+> (`FP_SCAN_TYPE_PRESS`) — one frame per touch. It borrows the EH575 *bulk
+> command family* on the wire, but it is **not** a swipe sensor. Early swipe /
+> strip-assembly modeling was a mistake and has been removed; do not reintroduce
+> it.
+
 ## Current status
 
 - Repository initialized as a research/work log and code workspace.

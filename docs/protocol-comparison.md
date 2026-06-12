@@ -2,6 +2,12 @@
 
 ## Target: EH577 (`1c7a:0577`)
 
+**Capture model: PRESS (`FP_SCAN_TYPE_PRESS`) — one frame per touch, not swipe.**
+EH577 reuses the EH575 *bulk command family* on the wire, but unlike the EH575
+reference (which is swipe + strip assembly) the EH577 driver captures a single
+press snapshot. Swipe/strip-assembly modeling was an early mistake, removed in
+commit `a5a4e7f`; do not reintroduce it.
+
 Observed USB descriptor shape:
 
 - bulk OUT `0x01`

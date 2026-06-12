@@ -224,19 +224,49 @@ valid_data (FpiUsbTransfer *transfer)
   return count_nonzero_bytes (transfer) > 0;
 }
 
-static gboolean
-finger_detected (FpiUsbTransfer *transfer)
+static void
+calculate_finger_heuristics (FpDeviceEgis0577 *self, FpiUsbTransfer *transfer, int *out_coverage, int *out_intensity)
 {
-  gsize nonzero = count_nonzero_bytes (transfer);
+  int coverage_pixels = 0;
+  long long intensity_sum = 0;
 
-  fp_dbg ("finger_detected: nonzero=%zu threshold=%d", nonzero, EGIS0577_MIN_ACTIVE_PIXELS_PRESENT);
-  return nonzero >= EGIS0577_MIN_ACTIVE_PIXELS_PRESENT;
+  for (size_t i = 0; i < transfer->actual_length; i++)
+    {
+      guint8 val = transfer->buffer[i];
+      guint8 bg = self->background ? self->background[i] : 0;
+
+      if (val > bg + 2)
+        val -= bg;
+      else
+        val = 0;
+
+      if (val > 15)
+        {
+          coverage_pixels++;
+          intensity_sum += val;
+        }
+    }
+
+  *out_coverage = (coverage_pixels * 100) / transfer->actual_length;
+  *out_intensity = coverage_pixels > 0 ? (intensity_sum / coverage_pixels) : 0;
 }
 
 static gboolean
-capture_usable (gsize nonzero)
+finger_detected (FpDeviceEgis0577 *self, FpiUsbTransfer *transfer)
 {
-  return nonzero >= EGIS0577_MIN_ACTIVE_PIXELS_STRICT;
+  int coverage = 0, intensity = 0;
+  calculate_finger_heuristics (self, transfer, &coverage, &intensity);
+
+  fp_dbg ("finger_detected: coverage=%d%% intensity=%d", coverage, intensity);
+  return coverage >= 18 && intensity >= 10; /* Require at least a faint solid touch to avoid getting stuck on latent prints */
+}
+
+static gboolean
+capture_usable (FpDeviceEgis0577 *self, FpiUsbTransfer *transfer)
+{
+  int coverage = 0, intensity = 0;
+  calculate_finger_heuristics (self, transfer, &coverage, &intensity);
+  return coverage >= 25 && intensity >= 20;
 }
 
 /* Used inside resp_cb to advance to the next packet in the current sequence. */
@@ -365,19 +395,22 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
   FpImageDevice *img_self = FP_IMAGE_DEVICE (dev);
   FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
   FpiImageDeviceState state;
-  gsize nonzero = count_nonzero_bytes (transfer);
   gboolean has_valid_data = valid_data (transfer);
   gboolean detected_finger = FALSE;
+  int coverage = 0, intensity = 0;
 
-  fp_dbg ("Frame received from %s[%d]: len=%zu nonzero=%zu ready=%d stop=%d",
+  calculate_finger_heuristics (self, transfer, &coverage, &intensity);
+
+  fp_dbg ("Frame received from %s[%d]: len=%zu cov=%d%% int=%d ready=%d stop=%d",
           packet_array_name (self->pkt_array),
           self->current_index,
           transfer->actual_length,
-          nonzero,
+          coverage,
+          intensity,
           self->capture_frame != NULL,
           self->stop);
 
-  dump_frame_if_requested (self, transfer, nonzero);
+  dump_frame_if_requested (self, transfer, coverage);
   self->frame_reads_this_claim += 1;
   fp_dbg ("Frame reads in current claim: %u/%u",
           self->frame_reads_this_claim,
@@ -431,7 +464,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
       return;
     }
 
-  detected_finger = finger_detected (transfer);
+  detected_finger = finger_detected (self, transfer);
   fp_dbg ("Finger heuristic for current frame: %s", detected_finger ? "present" : "absent");
 
   if (!detected_finger)
@@ -444,7 +477,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
         }
 
       if (!self->capture_armed)
-        fp_dbg ("Capture armed after clean no-finger frame (nonzero=%zu)", nonzero);
+        fp_dbg ("Capture armed after clean no-finger frame (cov=%d%%)", coverage);
       self->capture_armed = TRUE;
 
       if (!self->background && count_finger_pixels_raw (transfer) < 200)
@@ -463,8 +496,8 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
   if (!self->capture_armed &&
       state == FPI_IMAGE_DEVICE_STATE_AWAIT_FINGER_ON)
     {
-      fp_dbg ("Ignoring finger-like startup/transient frame with nonzero=%zu until a clean no-finger baseline is observed",
-              nonzero);
+      fp_dbg ("Ignoring finger-like startup/transient frame with cov=%d%% until a clean no-finger baseline is observed",
+              coverage);
       report_finger_status (self, img_self, FALSE, "ignoring startup transient before capture is armed");
       restart_for_next_poll (self, transfer->ssm, dev, "startup transient before capture is armed");
       return;
@@ -502,11 +535,10 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
       return;
     }
 
-  if (!capture_usable (nonzero))
+  if (!capture_usable (self, transfer))
     {
-      fp_dbg ("Finger detected but frame nonzero=%zu is below usable threshold=%d, reporting retry",
-              nonzero,
-              EGIS0577_MIN_ACTIVE_PIXELS_STRICT);
+      fp_dbg ("Finger detected but frame cov=%d%% is below usable threshold, reporting retry",
+              coverage);
       self->capture_armed = FALSE;
       fpi_image_device_retry_scan (img_self, FP_DEVICE_RETRY_GENERAL);
       restart_for_next_poll (self, transfer->ssm, dev, "weak snapshot frame");
@@ -516,9 +548,9 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
   self->capture_armed = FALSE;
   clear_capture_frame (self);
   self->capture_frame = g_memdup2 (transfer->buffer, transfer->actual_length);
-  self->capture_nonzero = nonzero;
+  self->capture_nonzero = coverage; // Use coverage for logging later
 
-  fp_dbg ("Accepted snapshot frame with nonzero=%zu, moving to image processing", nonzero);
+  fp_dbg ("Accepted snapshot frame with cov=%d%%, moving to image processing", coverage);
   fpi_ssm_next_state (transfer->ssm);
 }
 

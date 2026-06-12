@@ -88,20 +88,20 @@ and summary data that make the next driver decision obvious.
 
 ## Todo
 
-- [ ] Create a dedicated artifact root such as `artifacts/pgm-debug/` with one timestamped subdirectory per run
-- [ ] Update capture workflow so `enrolled.pgm` and `identify.pgm` are copied immediately after each helper event instead of being overwritten by later attempts
-- [ ] Define a naming scheme: `enroll-left-thumb-stage-01.pgm`, `identify-left-thumb-attempt-01-match.pgm`, `identify-right-thumb-attempt-01-mismatch.pgm`
-- [ ] Store per-run metadata in a simple text or JSON file: timestamp, helper used, finger label, expected outcome, log path, driver commit, parent repo commit
-- [ ] Add a user-run capture script spec under `tools/` for a command like `tools/collect_pgm_debug_run.sh`
-- [ ] The capture script should support both same-finger and different-finger identify cases without editing the script each time
-- [ ] The capture script should print the final evidence directory path clearly for handoff to the next session
-- [ ] Add a PGM stats script spec under `tools/` for a command like `tools/pgm_stats.py <file.pgm>`
-- [ ] `pgm_stats.py` should parse binary PGM (`P5`) safely and print width, height, min, max, mean, non-zero count, occupied bounding box, and a coarse histogram
-- [ ] Add a comparison script spec under `tools/` for a command like `tools/compare_pgm_pair.py <enrolled.pgm> <identify.pgm>`
-- [ ] `compare_pgm_pair.py` should report dimension match, occupancy ratio delta, center-of-mass delta, and whether one image appears inverted relative to the other
-- [ ] Add optional image rendering support so the analysis script can emit enlarged preview PNGs or textual previews for chat-friendly review
-- [ ] Preserve identify helper outputs that mention `identify-result`, `identify-retry`, `image-saved`, and `finger-status`
-- [ ] Preserve enroll helper outputs that mention `image-saved`, stage progress, retry reasons, and `finger-status`
+- [x] Create a dedicated artifact root such as `artifacts/pgm-debug/` with one timestamped subdirectory per run
+- [x] Update capture workflow so `enrolled.pgm` and `identify.pgm` are copied immediately after each helper event instead of being overwritten by later attempts
+- [x] Define a naming scheme: `enroll-left-thumb-stage-01.pgm`, `identify-left-thumb-attempt-01-match.pgm`, `identify-right-thumb-attempt-01-mismatch.pgm`
+- [x] Store per-run metadata in a simple text or JSON file: timestamp, helper used, finger label, expected outcome, log path, driver commit, parent repo commit
+- [x] Add a user-run capture script spec under `tools/` for a command like `tools/collect_pgm_debug_run.sh`
+- [x] The capture script should support both same-finger and different-finger identify cases without editing the script each time
+- [x] The capture script should print the final evidence directory path clearly for handoff to the next session
+- [x] Add a PGM stats script spec under `tools/` for a command like `tools/pgm_stats.py <file.pgm>`
+- [x] `pgm_stats.py` should parse binary PGM (`P5`) safely and print width, height, min, max, mean, non-zero count, occupied bounding box, and a coarse histogram
+- [x] Add a comparison script spec under `tools/` for a command like `tools/compare_pgm_pair.py <enrolled.pgm> <identify.pgm>`
+- [x] `compare_pgm_pair.py` should report dimension match, occupancy ratio delta, center-of-mass delta, and whether one image appears inverted relative to the other
+- [x] Add optional image rendering support so the analysis script can emit enlarged preview PNGs or textual previews for chat-friendly review
+- [x] Preserve identify helper outputs that mention `identify-result`, `identify-retry`, `image-saved`, and `finger-status`
+- [x] Preserve enroll helper outputs that mention `image-saved`, stage progress, retry reasons, and `finger-status`
 - [ ] Capture at least one same-finger evidence set where identify returns `NO MATCH`
 - [ ] Capture at least one retry/failure evidence set where identify says `Minutiae detection failed`
 - [ ] Compare enrolled vs identify images manually for orientation, mirroring, crop, ridge spacing, and placement

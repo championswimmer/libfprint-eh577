@@ -6,13 +6,20 @@ This repository is the bringup workspace for an open-source `libfprint` driver f
 
 ## Current state
 
-- EH577 is now treated as an **EH575-family bulk image/swipe sensor**.
+- **The EH577 is a PRESS (snapshot) sensor — `FP_SCAN_TYPE_PRESS`.** Each touch
+  yields a single captured frame. It is **not** a swipe sensor. Modeling it as an
+  EH575-style swipe device with multi-strip `fpi_assemble_frames` assembly was an
+  early mistake and has been removed (commit `a5a4e7f`). **Do not reintroduce
+  swipe mode, strip assembly, or `RFMGHEIGHT`/`RFMDIS` stripe cropping.** All
+  capture and matching work happens within the press model.
+- It still borrows the **EH575 bulk command family** at the transport/protocol
+  level (that part is wire-compatible); only the *capture model* is press.
 - The active driver port lives in [egis0577.c](refs/libfprint/libfprint/drivers/egis0577.c) and [egis0577.h](refs/libfprint/libfprint/drivers/egis0577.h).
 - The driver already:
   - runs the required **pre-init** sequence,
   - enters the **post-init** capture loop,
   - captures **non-zero** frames,
-  - assembles a fingerprint image,
+  - assembles a single **press snapshot** image,
   - and reaches **enroll/verify** through libfprint example programs.
 - The main remaining correctness bug is **false matches**: different fingers can still verify as `MATCH`.
 - Secondary open questions:

@@ -100,7 +100,10 @@ Practical consequence:
 ## 7. Current mental model
 
 Treat EH577 as:
-- an **EH575-family image/swipe device**,
+- a **press / snapshot sensor** (`FP_SCAN_TYPE_PRESS`) that captures one frame
+  per touch — **not** a swipe device (swipe/strip-assembly was an early mistake,
+  removed in commit `a5a4e7f`; do not reintroduce it),
+- borrowing the **EH575 bulk command family** at the transport level only,
 - driven primarily over bulk endpoints,
 - requiring **pre-init** to arm capture,
 - using a software finger-present heuristic for the current Linux path,

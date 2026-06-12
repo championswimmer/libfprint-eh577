@@ -18,14 +18,13 @@ IDENTIFY_HELPER_BIN="$REPO/refs/libfprint/build/examples/eh577-identify-helper"
 IDENTIFY_BIN="$REPO/refs/libfprint/build/examples/identify"
 CLEAR_BIN="$REPO/refs/libfprint/build/examples/clear-storage"
 SESSION="$(date +%Y%m%d-%H%M%S)"
-LOG="$REPO/logs/identify-session-$SESSION.txt"
-
-mkdir -p "$REPO/logs"
-
-log() { echo "$@" >> "$LOG"; }          # file only
-say() { echo "$@"; }                    # terminal only
+EVIDENCE_DIR="$REPO/artifacts/pgm-debug/$SESSION"
+mkdir -p "$EVIDENCE_DIR"
+LOG="$EVIDENCE_DIR/session.log"
+exec 3>> "$LOG"
+log() { echo -e "$@" >&3; }             # file only, fast append
+say() { echo -e "$@"; }                 # terminal only
 tee_log() { tee -a "$LOG" > /dev/null; } # pipe: file only, swallow terminal
-
 FINGER_NAMES=(
   "left thumb"   "left index"   "left middle"  "left ring"   "left little"
   "right thumb"  "right index"  "right middle" "right ring"  "right little"
@@ -34,6 +33,14 @@ FINGER_NAMES=(
 # ── pre-flight ────────────────────────────────────────────────────────────────
 log "=== EH577 Enroll + Identify [$SESSION] ==="
 log "Log: $LOG"
+say "Evidence directory: $EVIDENCE_DIR"
+
+cat <<EOF > "$EVIDENCE_DIR/metadata.json"
+{
+  "session": "$SESSION",
+  "log": "$LOG"
+}
+EOF
 
 if ! lsusb | grep -q '1c7a:0577'; then
   say "ERROR: EH577 not found. Check USB connection."; exit 1
@@ -184,10 +191,15 @@ while true; do
     fi
   done < <(sudo sh -c "
     cd '$REPO'
-    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint-egis0577 '$ENROLL_HELPER_BIN' --finger-index '$CHOICE' --save-image '$REPO/enrolled.pgm'
+    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint,libfprint-egis0577,libfprint-print EGIS0577_FRAME_DUMP_DIR='$EVIDENCE_DIR/raw-enroll' '$ENROLL_HELPER_BIN' --finger-index '$CHOICE' --save-image '$REPO/enrolled.pgm'
   " 2>&1)
 
-  sudo chown "$(id -u):$(id -g)" "$REPO/test-storage.variant" "$REPO/enrolled.pgm" 2>/dev/null || true
+  sudo chown -R "$(id -u):$(id -g)" "$REPO/test-storage.variant" "$REPO/enrolled.pgm" "$EVIDENCE_DIR/raw-enroll" 2>/dev/null || true
+  if [[ -f "$REPO/enrolled.pgm" ]]; then
+    FNAME_SLUG="${FNAME// /-}"
+    cp "$REPO/enrolled.pgm" "$EVIDENCE_DIR/enroll-${FNAME_SLUG}.pgm"
+    say "  Saved enrolled PGM to $EVIDENCE_DIR/enroll-${FNAME_SLUG}.pgm"
+  fi
 
   say ""
   if [[ -n "$NR_STAGES" && $COMPLETED -eq $NR_STAGES ]]; then
@@ -213,6 +225,8 @@ say "═════════════════════════
 say "Enrolled: ${ENROLLED_NAMES[*]}"
 say "Type 'done' to exit."
 
+IDENT_ATTEMPT=0
+
 while true; do
   say ""
   printf "Press Enter to scan (or 'done' to exit): "
@@ -228,6 +242,7 @@ while true; do
   IDENT_RESULT=""
   IDENT_MATCHED=""
   IDENT_RETRY_MSG=""
+  RAW_ID_DIR="$EVIDENCE_DIR/raw-identify-$(printf "%02d" $((IDENT_ATTEMPT+1)))"
 
   while IFS= read -r line; do
     log "$line"
@@ -245,6 +260,12 @@ while true; do
         too-fast) IDENT_RETRY_MSG="  ✗  Capture too fast — press more steadily" ;;
         *) IDENT_RETRY_MSG="  ✗  Capture not usable — try again" ;;
       esac
+      say "$IDENT_RETRY_MSG"
+      IDENT_STATE="ready"
+    fi
+
+    if [[ "$line" =~ ^EH577_IDENTIFY\ image-saved ]]; then
+      say "  ↑  Image captured — lift your finger to see result"
     fi
 
     if [[ "$line" =~ ^EH577_IDENTIFY\ identify-result\ result=match\ finger=(.*)$ ]]; then
@@ -265,10 +286,19 @@ while true; do
     fi
   done < <(sudo sh -c "
     cd '$REPO'
-    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint-egis0577,libfprint-print '$IDENTIFY_HELPER_BIN' --save-image '$REPO/identify.pgm'
+    rm -f '$REPO/identify.pgm'
+    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint,libfprint-egis0577,libfprint-print EGIS0577_FRAME_DUMP_DIR='$RAW_ID_DIR' '$IDENTIFY_HELPER_BIN' --save-image '$REPO/identify.pgm'
   " 2>&1)
 
-  sudo chown "$(id -u):$(id -g)" "$REPO/identify.pgm" 2>/dev/null || true
+  sudo chown -R "$(id -u):$(id -g)" "$REPO/identify.pgm" "$RAW_ID_DIR" 2>/dev/null || true
+
+  ((IDENT_ATTEMPT++))
+  IDENT_ATTEMPT_PAD=$(printf "%02d" $IDENT_ATTEMPT)
+
+  if [[ -f "$REPO/identify.pgm" ]]; then
+    cp "$REPO/identify.pgm" "$EVIDENCE_DIR/identify-attempt-${IDENT_ATTEMPT_PAD}-${IDENT_RESULT}.pgm"
+    say "  Saved identify PGM to $EVIDENCE_DIR/identify-attempt-${IDENT_ATTEMPT_PAD}-${IDENT_RESULT}.pgm"
+  fi
 
   say "  ▶  Lift your finger"
   say ""
@@ -290,4 +320,5 @@ say "═════════════════════════
 say "  SESSION COMPLETE"
 say "══════════════════════════"
 say "Enrolled: ${ENROLLED_NAMES[*]}"
+say "Evidence dir: $EVIDENCE_DIR"
 say "Log: $LOG"
