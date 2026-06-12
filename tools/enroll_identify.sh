@@ -13,6 +13,8 @@
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 LIBFP="$REPO/refs/libfprint/build/libfprint"
 ENROLL_BIN="$REPO/refs/libfprint/build/examples/enroll"
+ENROLL_HELPER_BIN="$REPO/refs/libfprint/build/examples/eh577-enroll-helper"
+IDENTIFY_HELPER_BIN="$REPO/refs/libfprint/build/examples/eh577-identify-helper"
 IDENTIFY_BIN="$REPO/refs/libfprint/build/examples/identify"
 CLEAR_BIN="$REPO/refs/libfprint/build/examples/clear-storage"
 SESSION="$(date +%Y%m%d-%H%M%S)"
@@ -35,6 +37,12 @@ log "Log: $LOG"
 
 if ! lsusb | grep -q '1c7a:0577'; then
   say "ERROR: EH577 not found. Check USB connection."; exit 1
+fi
+if [[ ! -x "$ENROLL_HELPER_BIN" ]]; then
+  say "ERROR: $ENROLL_HELPER_BIN not built."; exit 1
+fi
+if [[ ! -x "$IDENTIFY_HELPER_BIN" ]]; then
+  say "ERROR: $IDENTIFY_HELPER_BIN not built."; exit 1
 fi
 # Stop fprintd and any socket-activated restarts; wait until USB device is free
 sudo systemctl stop fprintd fprintd.socket 2>/dev/null || true
@@ -96,11 +104,6 @@ while true; do
   FNAME="${FINGER_NAMES[$CHOICE]}"
   log "--- Enrolling: $FNAME (index $CHOICE) ---"
 
-  # Placement hints indexed by stage (0-based).  The 180°-rotated stage is
-  # included because Bozorth3's ±11° beta tolerance cannot cover a full flip;
-  # enrolling one stage upside-down covers that orientation directly.
-  # Extra entries cover drivers with more than 5 stages; the fallback
-  # "vary angle" is used for any stage beyond the last hint defined here.
   STAGE_HINTS=(
     "normal — fingertip toward you, flat"
     "tilt slightly left (~20°)"
@@ -121,34 +124,47 @@ while true; do
   NR_STAGES=""
   COMPLETED=0
   STAGE_STATE="init"   # init | ready | finger_down | captured
+  LAST_RETRY_MSG=""
 
   while IFS= read -r line; do
     log "$line"
 
-    # Stage count from the binary's opening message
-    if [[ -z "$NR_STAGES" && "$line" == *"times to complete the process"* ]]; then
-      NR_STAGES=$(echo "$line" | grep -oP '\d+(?= times to complete)')
+    if [[ -z "$NR_STAGES" && "$line" =~ ^EH577_HELPER\ device-opened\ .*total=([0-9]+) ]]; then
+      NR_STAGES="${BASH_REMATCH[1]}"
       STAGE_STATE="ready"
       say "  ▶  Touch 1/$NR_STAGES — ${STAGE_HINTS[0]:-normal, vary angle}"
     fi
 
-    # Driver: finger just touched the sensor (first transition absent→present)
-    if [[ "$STAGE_STATE" == "ready" && "$line" == *"Reporting finger present"* ]]; then
+    if [[ "$line" == "EH577_HELPER finger-status status=present" && "$STAGE_STATE" == "ready" ]]; then
       STAGE_STATE="finger_down"
       say "  ⬤  Finger detected — hold still..."
     fi
 
-    # Binary: stage officially passed
-    if [[ "$line" == *"passed. Yay!"* ]]; then
-      [[ -z "$NR_STAGES" ]] && NR_STAGES=$(echo "$line" | grep -oP 'of \K\d+(?= passed)')
-      COMPLETED=$((COMPLETED + 1))
-      STAGE_STATE="captured"
-      say "  ✓  Touch $COMPLETED/${NR_STAGES:-?} captured"
+    if [[ "$line" =~ ^EH577_HELPER\ enroll-retry\ completed=([0-9]+)\ total=([0-9]+)\ code=([^[:space:]]+)\ message=(.*)$ ]]; then
+      COMPLETED="${BASH_REMATCH[1]}"
+      NR_STAGES="${BASH_REMATCH[2]}"
+      case "${BASH_REMATCH[3]}" in
+        remove-finger) LAST_RETRY_MSG="  ✗  Remove finger and try again" ;;
+        center-finger) LAST_RETRY_MSG="  ✗  Center finger and try again" ;;
+        too-short) LAST_RETRY_MSG="  ✗  Capture too short — hold longer" ;;
+        too-fast) LAST_RETRY_MSG="  ✗  Capture too fast — press more steadily" ;;
+        *) LAST_RETRY_MSG="  ✗  Capture not usable — lift and retry" ;;
+      esac
+      STAGE_STATE="retry_wait_lift"
+      say "$LAST_RETRY_MSG"
     fi
 
-    # Driver: finger absent after capture — inter-stage reset starting
-    if [[ "$STAGE_STATE" == "captured" && "$line" == *"Reporting finger absent"* && "$line" == *"image submitted"* ]]; then
-      say "  ↑  Lift your finger — sensor resetting"
+    if [[ "$line" =~ ^EH577_HELPER\ enroll-stage\ completed=([0-9]+)\ total=([0-9]+)$ ]]; then
+      COMPLETED="${BASH_REMATCH[1]}"
+      NR_STAGES="${BASH_REMATCH[2]}"
+      STAGE_STATE="captured"
+      say "  ✓  Touch $COMPLETED/${NR_STAGES:-?} captured"
+      if [[ -n "$NR_STAGES" && $COMPLETED -lt $NR_STAGES ]]; then
+        say "  ↑  Lift your finger — sensor resetting"
+      fi
+    fi
+
+    if [[ "$line" == "EH577_HELPER finger-status status=none" && "$STAGE_STATE" == "captured" ]]; then
       if [[ -n "$NR_STAGES" && $COMPLETED -lt $NR_STAGES ]]; then
         STAGE_STATE="ready"
         HINT="${STAGE_HINTS[$COMPLETED]:-normal, vary angle}"
@@ -156,18 +172,19 @@ while true; do
       fi
     fi
 
-    # Driver: finger lifted before image was captured — prompt retry
-    if [[ "$STAGE_STATE" == "finger_down" && "$line" == *"Reporting finger absent"* ]]; then
+    if [[ "$line" == "EH577_HELPER finger-status status=none" && "$STAGE_STATE" == "retry_wait_lift" ]]; then
+      STAGE_STATE="ready"
+      say "  ▶  Touch $((COMPLETED+1))/${NR_STAGES:-?} — ${STAGE_HINTS[$COMPLETED]:-normal, vary angle} (retry)"
+    fi
+
+    if [[ "$line" == "EH577_HELPER finger-status status=none" && "$STAGE_STATE" == "finger_down" ]]; then
       STAGE_STATE="ready"
       say "  ✗  Finger lifted too soon — hold until captured"
       say "  ▶  Touch $((COMPLETED+1))/${NR_STAGES:-?} — ${STAGE_HINTS[$COMPLETED]:-normal, vary angle} (retry)"
     fi
-
-  sudo systemctl stop fprintd fprintd.socket 2>/dev/null || true
-  sudo pkill -f fprintd 2>/dev/null || true
-  done < <(printf "%d\nN\n" "$CHOICE" | sudo sh -c "
+  done < <(sudo sh -c "
     cd '$REPO'
-    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint-egis0577 '$ENROLL_BIN'
+    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint-egis0577 '$ENROLL_HELPER_BIN' --finger-index '$CHOICE' --save-image '$REPO/enrolled.pgm'
   " 2>&1)
 
   sudo chown "$(id -u):$(id -g)" "$REPO/test-storage.variant" "$REPO/enrolled.pgm" 2>/dev/null || true
@@ -207,28 +224,61 @@ while true; do
 
   say "  ▶  Place your finger on the sensor"
 
-  IDTMP=$(mktemp)
-  printf "n\n" | sudo sh -c "
+  IDENT_STATE="ready"
+  IDENT_RESULT=""
+  IDENT_MATCHED=""
+  IDENT_RETRY_MSG=""
+
+  while IFS= read -r line; do
+    log "$line"
+
+    if [[ "$line" == "EH577_IDENTIFY finger-status status=present" && "$IDENT_STATE" == "ready" ]]; then
+      IDENT_STATE="finger_down"
+      say "  ⬤  Finger detected — hold still..."
+    fi
+
+    if [[ "$line" =~ ^EH577_IDENTIFY\ identify-retry\ code=([^[:space:]]+)\ message=(.*)$ ]]; then
+      case "${BASH_REMATCH[1]}" in
+        remove-finger) IDENT_RETRY_MSG="  ✗  Remove finger and try again" ;;
+        center-finger) IDENT_RETRY_MSG="  ✗  Center finger and try again" ;;
+        too-short) IDENT_RETRY_MSG="  ✗  Capture too short — hold longer" ;;
+        too-fast) IDENT_RETRY_MSG="  ✗  Capture too fast — press more steadily" ;;
+        *) IDENT_RETRY_MSG="  ✗  Capture not usable — try again" ;;
+      esac
+    fi
+
+    if [[ "$line" =~ ^EH577_IDENTIFY\ identify-result\ result=match\ finger=(.*)$ ]]; then
+      IDENT_RESULT="match"
+      IDENT_MATCHED="${BASH_REMATCH[1]}"
+    fi
+
+    if [[ "$line" == "EH577_IDENTIFY identify-result result=no-match" ]]; then
+      IDENT_RESULT="no-match"
+    fi
+
+    if [[ "$line" =~ ^EH577_IDENTIFY\ identify-complete\ result=retry ]]; then
+      IDENT_RESULT="retry"
+    fi
+
+    if [[ "$line" =~ ^EH577_IDENTIFY\ identify-complete\ result=failure ]]; then
+      IDENT_RESULT="failure"
+    fi
+  done < <(sudo sh -c "
     cd '$REPO'
-    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=all '$IDENTIFY_BIN'
-  " 2>&1 | tee -a "$LOG" > "$IDTMP"
+    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=libfprint-egis0577,libfprint-print '$IDENTIFY_HELPER_BIN' --save-image '$REPO/identify.pgm'
+  " 2>&1)
 
   sudo chown "$(id -u):$(id -g)" "$REPO/identify.pgm" 2>/dev/null || true
 
-  BZ3=$(grep -oP "score \K[0-9]+(?=/)" "$IDTMP" | sort -n | tail -1)
-  MATCHED=$(grep -oP "matched finger \K.+?(?= successfully)" "$IDTMP" | tail -1)
-  RESULT=$(grep -E "^(NOT )?IDENTIFIED!$" "$IDTMP" | tail -1)
-  rm -f "$IDTMP"
-
   say "  ▶  Lift your finger"
   say ""
-  if [[ "$RESULT" == "IDENTIFIED!" ]]; then
-    [[ -z "$MATCHED" ]] && MATCHED="(see log)"
-    say "  ✓  MATCHED: $MATCHED"
-    [[ -n "$BZ3" ]] && say "     BZ3 score: $BZ3"
-  elif [[ "$RESULT" == "NOT IDENTIFIED!" ]]; then
+  if [[ "$IDENT_RESULT" == "match" ]]; then
+    [[ -z "$IDENT_MATCHED" ]] && IDENT_MATCHED="(unknown)"
+    say "  ✓  MATCHED: $IDENT_MATCHED"
+  elif [[ "$IDENT_RESULT" == "no-match" ]]; then
     say "  ✗  NO MATCH"
-    [[ -n "$BZ3" ]] && say "     Best BZ3: $BZ3"
+  elif [[ "$IDENT_RESULT" == "retry" ]]; then
+    say "${IDENT_RETRY_MSG:-  ✗  Capture not usable — try again}"
   else
     say "  ?  No result — check log: $LOG"
   fi

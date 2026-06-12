@@ -135,6 +135,11 @@ static const Packet EGIS0577_REPEAT_PACKETS[] = {
 #define EGIS0577_IMGWIDTH 103
 #define EGIS0577_IMGHEIGHT 52
 #define EGIS0577_IMGSIZE (EGIS0577_IMGWIDTH * EGIS0577_IMGHEIGHT)
+/*
+ * pixman's A8 helpers used by fpi_image_resize() require rowstride alignment
+ * to 32 bits, so the snapshot image must be padded before resizing.
+ */
+#define EGIS0577_PADDED_IMGWIDTH (((EGIS0577_IMGWIDTH + 3) / 4) * 4)
 
 #define EGIS0577_BZ3_THRESHOLD 40
 #define EGIS0577_RESIZE 2
@@ -148,26 +153,33 @@ static const Packet EGIS0577_REPEAT_PACKETS[] = {
  *                                       persist even after SM_INIT reset in some runs).
  *   Real finger:                    1305–1594 nonzero pixels at value 1–105.
  *
- * For the snapshot path we only need a single threshold: accept the frame as a
- * touch when it is clearly above the warmed-up idle baseline.
+ * For the snapshot path we distinguish:
+ * - likely finger contact
+ * - good enough frame to submit upstream
  */
+#define EGIS0577_MIN_ACTIVE_PIXELS_PRESENT 700
 #define EGIS0577_MIN_ACTIVE_PIXELS_STRICT 1000
-#define EGIS0577_TIMEOUT 10000
+/*
+ * Successful commands complete well below 1 s. Keep timeout recovery tight so
+ * a wedged claim does not stall stage transitions for 10 seconds.
+ */
+#define EGIS0577_TIMEOUT 2000
 
 /*
- * Milliseconds to pause after submitting an enrollment image before allowing
- * the next stage to begin.  During this gap the driver jumps to SM_INIT to
- * run the full PRE_INIT → POST_INIT reset sequence, putting the sensor back in
- * a known-cold state (AGC reset, baseline returns to ~111 nonzero).
- * 1.5 s is enough for the user to lift their finger; the actual touch detection
- * is then done purely on pixel count (≥ EGIS0577_MIN_ACTIVE_PIXELS).
+ * Keep missed-touch retries responsive: poll again immediately within the same
+ * claim until the claim is near its observed large-read limit.
  */
-/*
- * Milliseconds to pause between POST_INIT snapshot attempts. Running POST_INIT
- * immediately back-to-back causes the device to stop responding at packet 5.
- * After a real finger capture the image pipeline needs ~1500 ms to flush; 500 ms
- * was enough for idle frames but timed out at post-init[16] after a real capture.
- */
-#define EGIS0577_INTER_FRAME_DELAY_MS 1500
+#define EGIS0577_NO_FINGER_RETRY_DELAY_MS 0
 
-#define EGIS0577_INTER_STAGE_DELAY_MS 1500
+/*
+ * Milliseconds to pause after submitting a good image before restarting
+ * polling to observe the real finger-off transition.
+ */
+#define EGIS0577_POST_CAPTURE_POLL_DELAY_MS 200
+
+/*
+ * EH577 appears to allow only a small number of 64 14 ec frame reads per
+ * interface claim before transport starts wedging. Stay below that ceiling and
+ * recycle the claim proactively after a handful of missed-touch polls.
+ */
+#define EGIS0577_MAX_FRAMES_PER_CLAIM 6

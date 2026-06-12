@@ -42,6 +42,7 @@ struct _FpDeviceEgis0577
   gboolean      running;
   gboolean      stop;
   gboolean      finger_reported;
+  gboolean      capture_armed;
 
   guint8       *capture_frame;
   gsize         capture_nonzero;
@@ -50,8 +51,12 @@ struct _FpDeviceEgis0577
   int           pkt_array_len;
   int           current_index;
   guint         frame_counter;
+  guint         frame_reads_this_claim;
+  guint         max_frames_per_claim;
   guint         pre_frame_delay_ms;
   guint         poll_loop_delay_ms;
+  guint         no_finger_retry_delay_ms;
+  guint         post_capture_poll_delay_ms;
   gboolean      frame_delay_armed;
 
 };
@@ -194,11 +199,17 @@ valid_data (FpiUsbTransfer *transfer)
 }
 
 static gboolean
-finger_present (FpiUsbTransfer *transfer)
+finger_detected (FpiUsbTransfer *transfer)
 {
   gsize nonzero = count_nonzero_bytes (transfer);
 
-  fp_dbg ("finger_present: nonzero=%zu threshold=%d", nonzero, EGIS0577_MIN_ACTIVE_PIXELS_STRICT);
+  fp_dbg ("finger_detected: nonzero=%zu threshold=%d", nonzero, EGIS0577_MIN_ACTIVE_PIXELS_PRESENT);
+  return nonzero >= EGIS0577_MIN_ACTIVE_PIXELS_PRESENT;
+}
+
+static gboolean
+capture_usable (gsize nonzero)
+{
   return nonzero >= EGIS0577_MIN_ACTIVE_PIXELS_STRICT;
 }
 
@@ -270,12 +281,10 @@ static void
 restart_capture_cycle (FpDeviceEgis0577 *self,
                        FpiSsm           *ssm,
                        FpDevice         *dev,
-                       const char       *reason)
+                       const char       *reason,
+                       guint             delay)
 {
   g_autoptr(GError) error = NULL;
-  guint delay = self->poll_loop_delay_ms > 0
-                  ? self->poll_loop_delay_ms
-                  : EGIS0577_INTER_FRAME_DELAY_MS;
 
   if (!recycle_interface_claim (dev, reason, &error))
     {
@@ -284,9 +293,44 @@ restart_capture_cycle (FpDeviceEgis0577 *self,
       return;
     }
 
+  self->frame_reads_this_claim = 0;
   self->frame_delay_armed = FALSE;
   fp_dbg ("Restarting capture cycle from fresh claim in %u ms (%s)", delay, reason);
   fpi_ssm_jump_to_state_delayed (ssm, SM_INIT, delay);
+}
+
+static gboolean
+claim_needs_recycle (FpDeviceEgis0577 *self)
+{
+  return self->frame_reads_this_claim >= self->max_frames_per_claim;
+}
+
+static void
+restart_for_next_poll (FpDeviceEgis0577 *self,
+                       FpiSsm           *ssm,
+                       FpDevice         *dev,
+                       const char       *reason)
+{
+  if (claim_needs_recycle (self))
+    {
+      fp_dbg ("Frame-read budget reached on this claim (%u/%u), recycling before next poll",
+              self->frame_reads_this_claim,
+              self->max_frames_per_claim);
+      restart_capture_cycle (self, ssm, dev, reason, self->no_finger_retry_delay_ms);
+      return;
+    }
+
+  if (self->no_finger_retry_delay_ms > 0)
+    {
+      fp_dbg ("Retrying next capture in %u ms without recycling claim (%s)",
+              self->no_finger_retry_delay_ms,
+              reason);
+      fpi_ssm_jump_to_state_delayed (ssm, SM_INIT, self->no_finger_retry_delay_ms);
+      return;
+    }
+
+  fp_dbg ("Retrying next capture immediately without recycling claim (%s)", reason);
+  fpi_ssm_jump_to_state (ssm, SM_INIT);
 }
 
 static void
@@ -294,6 +338,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
 {
   FpImageDevice *img_self = FP_IMAGE_DEVICE (dev);
   FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
+  FpiImageDeviceState state;
   gsize nonzero = count_nonzero_bytes (transfer);
   gboolean has_valid_data = valid_data (transfer);
   gboolean detected_finger = FALSE;
@@ -307,6 +352,10 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
           self->stop);
 
   dump_frame_if_requested (self, transfer, nonzero);
+  self->frame_reads_this_claim += 1;
+  fp_dbg ("Frame reads in current claim: %u/%u",
+          self->frame_reads_this_claim,
+          self->max_frames_per_claim);
 
   /*
    * EH577 idle captures are often all-zero, including the first 5356-byte
@@ -325,8 +374,11 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
           return;
         }
 
+      if (!self->capture_armed)
+        fp_dbg ("Capture armed after clean zero frame");
+      self->capture_armed = TRUE;
       report_finger_status (self, img_self, FALSE, "all-zero frame");
-      restart_capture_cycle (self, transfer->ssm, dev, "all-zero frame");
+      restart_for_next_poll (self, transfer->ssm, dev, "all-zero frame");
       return;
     }
 
@@ -338,21 +390,68 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
       return;
     }
 
-  detected_finger = finger_present (transfer);
+  detected_finger = finger_detected (transfer);
   fp_dbg ("Finger heuristic for current frame: %s", detected_finger ? "present" : "absent");
 
   if (!detected_finger)
     {
+      if (!self->capture_armed)
+        fp_dbg ("Capture armed after clean no-finger frame (nonzero=%zu)", nonzero);
+      self->capture_armed = TRUE;
       report_finger_status (self, img_self, FALSE, "non-zero frame below finger heuristic threshold");
-      restart_capture_cycle (self, transfer->ssm, dev, "non-zero frame below finger heuristic threshold");
+      restart_for_next_poll (self, transfer->ssm, dev, "non-zero frame below finger heuristic threshold");
       return;
     }
 
+  g_object_get (dev, "fpi-image-device-state", &state, NULL);
+  if (!self->capture_armed &&
+      state == FPI_IMAGE_DEVICE_STATE_AWAIT_FINGER_ON)
+    {
+      fp_dbg ("Ignoring finger-like startup/transient frame with nonzero=%zu until a clean no-finger baseline is observed",
+              nonzero);
+      report_finger_status (self, img_self, FALSE, "ignoring startup transient before capture is armed");
+      restart_for_next_poll (self, transfer->ssm, dev, "startup transient before capture is armed");
+      return;
+    }
+
+  report_finger_status (self, img_self, TRUE, "snapshot frame exceeded threshold");
+  g_object_get (dev, "fpi-image-device-state", &state, NULL);
+  fp_dbg ("Image-device state after finger-present report=%d", state);
+
+  if (state == FPI_IMAGE_DEVICE_STATE_AWAIT_FINGER_OFF)
+    {
+      fp_dbg ("Finger still down while upstream waits for lift/reset; recycling claim before next finger-off poll");
+      restart_capture_cycle (self,
+                             transfer->ssm,
+                             dev,
+                             "await finger-off with finger still present",
+                             self->post_capture_poll_delay_ms);
+      return;
+    }
+
+  if (state != FPI_IMAGE_DEVICE_STATE_CAPTURE)
+    {
+      fp_dbg ("Finger present outside capture state %d; not attempting a new capture", state);
+      restart_for_next_poll (self, transfer->ssm, dev, "finger still present outside capture state");
+      return;
+    }
+
+  if (!capture_usable (nonzero))
+    {
+      fp_dbg ("Finger detected but frame nonzero=%zu is below usable threshold=%d, reporting retry",
+              nonzero,
+              EGIS0577_MIN_ACTIVE_PIXELS_STRICT);
+      self->capture_armed = FALSE;
+      fpi_image_device_retry_scan (img_self, FP_DEVICE_RETRY_GENERAL);
+      restart_for_next_poll (self, transfer->ssm, dev, "weak snapshot frame");
+      return;
+    }
+
+  self->capture_armed = FALSE;
   clear_capture_frame (self);
   self->capture_frame = g_memdup2 (transfer->buffer, transfer->actual_length);
   self->capture_nonzero = nonzero;
 
-  report_finger_status (self, img_self, TRUE, "snapshot frame exceeded threshold");
   fp_dbg ("Accepted snapshot frame with nonzero=%zu, moving to image processing", nonzero);
   fpi_ssm_next_state (transfer->ssm);
 }
@@ -375,12 +474,17 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
         {
           g_autoptr(FpImage) img = NULL;
           FpImage *resizedImage = NULL;
+          guint row;
 
-          img = fp_image_new (EGIS0577_IMGWIDTH, EGIS0577_IMGHEIGHT);
-          img->width = EGIS0577_IMGWIDTH;
+          img = fp_image_new (EGIS0577_PADDED_IMGWIDTH, EGIS0577_IMGHEIGHT);
+          img->width = EGIS0577_PADDED_IMGWIDTH;
           img->height = EGIS0577_IMGHEIGHT;
           img->flags = FPI_IMAGE_COLORS_INVERTED;
-          memcpy (img->data, self->capture_frame, EGIS0577_IMGSIZE);
+
+          for (row = 0; row < EGIS0577_IMGHEIGHT; row++)
+            memcpy (img->data + (row * EGIS0577_PADDED_IMGWIDTH),
+                    self->capture_frame + (row * EGIS0577_IMGWIDTH),
+                    EGIS0577_IMGWIDTH);
 
           resizedImage = fpi_image_resize (img, EGIS0577_RESIZE, EGIS0577_RESIZE);
 
@@ -390,12 +494,11 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
 
       clear_capture_frame (self);
 
-      /* Report finger-off, then restart from a fresh claim.
-       * EH577 wedges after ~8 large reads on one claim, so do not spend the
-       * next stage on another in-claim 64 14 ec read. */
-      report_finger_status (self, img_self, FALSE, "image submitted — inter-stage gap");
-      fp_dbg ("Image submitted; recycling claim before next stage");
-      restart_capture_cycle (self, ssm, dev, "inter-stage reset");
+      /* Keep libfprint in AWAIT_FINGER_OFF until we observe a real lift on a
+       * later poll. Recycle the claim now so those polls happen on a fresh
+       * transport session. */
+      fp_dbg ("Image submitted; keep waiting for real finger-off and recycle claim");
+      restart_capture_cycle (self, ssm, dev, "post-capture await finger-off", self->post_capture_poll_delay_ms);
     }
   else
     {
@@ -416,6 +519,18 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
 
   if (error)
     {
+      if (!self->stop &&
+          g_error_matches (error, G_USB_DEVICE_ERROR, G_USB_DEVICE_ERROR_TIMED_OUT))
+        {
+          fp_dbg ("Timeout at %s[%d], recycling claim and restarting capture",
+                  packet_array_name (self->pkt_array),
+                  self->current_index);
+          clear_capture_frame (self);
+          restart_capture_cycle (self, transfer->ssm, dev, "timeout recovery", self->no_finger_retry_delay_ms);
+          g_error_free (error);
+          return;
+        }
+
       fp_dbg ("Error occurred at index %d of %s array",
               self->current_index,
               packet_array_name (self->pkt_array));
@@ -557,13 +672,23 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
       self->current_index = 0;
       self->pre_frame_delay_ms = get_env_ms_or_default ("EGIS0577_PRE_FRAME_DELAY_MS", 0);
       self->poll_loop_delay_ms = get_env_ms_or_default ("EGIS0577_POLL_LOOP_DELAY_MS", 0);
+      self->no_finger_retry_delay_ms = get_env_ms_or_default ("EGIS0577_NO_FINGER_RETRY_DELAY_MS",
+                                                              EGIS0577_NO_FINGER_RETRY_DELAY_MS);
+      self->post_capture_poll_delay_ms = get_env_ms_or_default ("EGIS0577_POST_CAPTURE_POLL_DELAY_MS",
+                                                                EGIS0577_POST_CAPTURE_POLL_DELAY_MS);
+      self->max_frames_per_claim = get_env_ms_or_default ("EGIS0577_MAX_FRAMES_PER_CLAIM",
+                                                          EGIS0577_MAX_FRAMES_PER_CLAIM);
       self->frame_delay_armed = FALSE;
 
       clear_capture_frame (self);
       fp_dbg ("Initial packet array: %s", packet_array_name (self->pkt_array));
-      fp_dbg ("EH577 pacing config: pre_frame_delay_ms=%u poll_loop_delay_ms=%u",
+      fp_dbg ("EH577 pacing config: pre_frame_delay_ms=%u poll_loop_delay_ms=%u no_finger_retry_delay_ms=%u post_capture_poll_delay_ms=%u max_frames_per_claim=%u current_claim_frames=%u",
               self->pre_frame_delay_ms,
-              self->poll_loop_delay_ms);
+              self->poll_loop_delay_ms,
+              self->no_finger_retry_delay_ms,
+              self->post_capture_poll_delay_ms,
+              self->max_frames_per_claim,
+              self->frame_reads_this_claim);
       fpi_ssm_next_state (ssm);
       break;
 
@@ -702,7 +827,9 @@ dev_start (FpImageDevice *dev)
   fp_dbg ("Activate requested");
   self->stop = FALSE;
   self->finger_reported = FALSE;
+  self->capture_armed = FALSE;
   self->frame_counter = 0;
+  self->frame_reads_this_claim = 0;
 
   fpi_ssm_start (ssm, loop_complete);
 
@@ -740,7 +867,7 @@ fpi_device_egis0577_class_init (FpDeviceEgis0577Class *klass)
   img_class->activate = dev_start;
   img_class->deactivate = dev_stop;
 
-  img_class->img_width = EGIS0577_IMGWIDTH * EGIS0577_RESIZE;
+  img_class->img_width = EGIS0577_PADDED_IMGWIDTH * EGIS0577_RESIZE;
   img_class->img_height = EGIS0577_IMGHEIGHT * EGIS0577_RESIZE;
 
   img_class->bz3_threshold = EGIS0577_BZ3_THRESHOLD;
