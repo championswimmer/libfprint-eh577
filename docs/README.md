@@ -19,6 +19,8 @@ Use this directory for the human-readable project state.
   - EH577 compared with EH575, `egis0570`, and `egismoc`
 - [plan-enroll-verify.md](plan-enroll-verify.md)
   - how the patched `libfprint` tree is exercised end-to-end
+- [ubuntu-install-guide.md](ubuntu-install-guide.md)
+  - how to build and install the patched driver system-wide on Ubuntu
 
 ## Code / artifact map
 
