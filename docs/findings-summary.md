@@ -32,7 +32,7 @@ Practical consequence:
 - the driver must always arm the sensor before entering the normal capture loop
 
 Best reference:
-- `docs/research-log.md` entry for `2026-06-09`
+- [01-pre-init-required-to-arm-sensor.md](research-log/2026-06-09/01-pre-init-required-to-arm-sensor.md)
 
 ## 3. EH577 really returns image-like data
 
@@ -108,6 +108,6 @@ Treat EH577 as:
 
 ## Read next
 
-- current snapshot: `docs/current-status.md`
-- chronological detail: `docs/research-log.md`
-- open tasks: `docs/todo.md`
+- current snapshot: [current-status.md](current-status.md)
+- chronological detail: [research-log.md](research-log.md)
+- open tasks: [todo.md](todo.md)

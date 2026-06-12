@@ -48,12 +48,12 @@
  * - on real EH577 hardware, `EGIS 60 01 fc` has returned `SIGE 01 01 01`,
  *   `SIGE 01 05 01`, and `SIGE 01 00 01`
  * - the strongest successful capture evidence so far came from the post-init-led
- *   path during finger hold
+ *   snapshot capture path
  * - EH577 also accepts the EH575 PRE_INIT family, but its PRE_INIT payload
  *   command `73 14 ec` has so far returned only a short status reply rather
  *   than the meaningful 5356-byte frame seen on post-init `64 14 ec`
  * - because of that, this EH577 draft currently prefers staying on the
- *   post-init/repeat capture path even when `60 01 fc` returns `01 01 01`
+ *   post-init capture path even when `60 01 fc` returns `01 01 01`
  */
 
 typedef struct Packet
@@ -137,8 +137,6 @@ static const Packet EGIS0577_REPEAT_PACKETS[] = {
 #define EGIS0577_IMGSIZE (EGIS0577_IMGWIDTH * EGIS0577_IMGHEIGHT)
 
 #define EGIS0577_BZ3_THRESHOLD 40
-#define EGIS0577_RFMGHEIGHT 24
-#define EGIS0577_RFMDIS (EGIS0577_IMGHEIGHT - EGIS0577_RFMGHEIGHT) / 2
 #define EGIS0577_RESIZE 2
 
 /*
@@ -150,14 +148,10 @@ static const Packet EGIS0577_REPEAT_PACKETS[] = {
  *                                       persist even after SM_INIT reset in some runs).
  *   Real finger:                    1305–1594 nonzero pixels at value 1–105.
  *
- * We implement hysteresis using STRICT and LOOSE thresholds matching the Windows driver
- * conceptually (FingerOnThreshold vs FingerOnThresholdLoose).
- * 1000 sits safely above the worst-case no-finger baseline (~755).
- * 700 allows a capture already in progress to continue even if the finger lifts slightly,
- * but is low enough to reject a completely empty frame.
+ * For the snapshot path we only need a single threshold: accept the frame as a
+ * touch when it is clearly above the warmed-up idle baseline.
  */
 #define EGIS0577_MIN_ACTIVE_PIXELS_STRICT 1000
-#define EGIS0577_MIN_ACTIVE_PIXELS_LOOSE  700
 #define EGIS0577_TIMEOUT 10000
 
 /*
@@ -169,23 +163,11 @@ static const Packet EGIS0577_REPEAT_PACKETS[] = {
  * is then done purely on pixel count (≥ EGIS0577_MIN_ACTIVE_PIXELS).
  */
 /*
- * Milliseconds to pause between within-stage POST_INIT re-runs (no-finger
- * polling and consecutive strip collection).  Running POST_INIT immediately
- * back-to-back causes the device to stop responding at packet 5.  After a
- * real finger capture the image pipeline needs ~1500 ms to flush; 500 ms was
- * enough for idle frames but timed out at post-init[16] after a real capture.
+ * Milliseconds to pause between POST_INIT snapshot attempts. Running POST_INIT
+ * immediately back-to-back causes the device to stop responding at packet 5.
+ * After a real finger capture the image pipeline needs ~1500 ms to flush; 500 ms
+ * was enough for idle frames but timed out at post-init[16] after a real capture.
  */
 #define EGIS0577_INTER_FRAME_DELAY_MS 1500
 
 #define EGIS0577_INTER_STAGE_DELAY_MS 1500
-
-#define EGIS0577_CONSECUTIVE_CAPTURES 3
-
-/*
- * Minimum number of strips that must be collected before submitting an image
- * for matching. A real finger press delivers up to CONSECUTIVE_CAPTURES strips;
- * requiring at least this many prevents a single spurious high-variance frame
- * (followed by one sub-threshold frame) from triggering a match attempt.
- * Set to roughly CONSECUTIVE_CAPTURES/2 so brief but real touches still work.
- */
-#define EGIS0577_MIN_STRIPS_FOR_MATCH 3

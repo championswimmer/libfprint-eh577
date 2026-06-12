@@ -43,8 +43,8 @@ struct _FpDeviceEgis0577
   gboolean      stop;
   gboolean      finger_reported;
 
-  GSList       *strips;
-  gsize         strips_len;
+  guint8       *capture_frame;
+  gsize         capture_nonzero;
 
   const Packet *pkt_array;
   int           pkt_array_len;
@@ -68,19 +68,6 @@ enum sm_states {
 
 G_DECLARE_FINAL_TYPE (FpDeviceEgis0577, fpi_device_egis0577, FPI, DEVICE_EGIS0577, FpImageDevice);
 G_DEFINE_TYPE (FpDeviceEgis0577, fpi_device_egis0577, FP_TYPE_IMAGE_DEVICE);
-
-static unsigned char
-egis_get_pixel (struct fpi_frame_asmbl_ctx *ctx, struct fpi_frame *frame, unsigned int x, unsigned int y)
-{
-  return frame->data[x + y * ctx->frame_width];
-}
-
-static struct fpi_frame_asmbl_ctx assembling_ctx = {
-  .frame_width = EGIS0577_IMGWIDTH,
-  .frame_height = EGIS0577_RFMGHEIGHT,
-  .image_width = (EGIS0577_IMGWIDTH / 3) * 4,   /* PIXMAN expects width/stride to be multiple of 4 */
-  .get_pixel = egis_get_pixel,
-};
 
 static const char *
 packet_array_name (const Packet *pkt_array)
@@ -108,6 +95,13 @@ report_finger_status (FpDeviceEgis0577 *self,
 
   self->finger_reported = present;
   fpi_image_device_report_finger_status (img_self, present);
+}
+
+static void
+clear_capture_frame (FpDeviceEgis0577 *self)
+{
+  g_clear_pointer (&self->capture_frame, g_free);
+  self->capture_nonzero = 0;
 }
 
 static gsize
@@ -193,8 +187,6 @@ dump_frame_if_requested (FpDeviceEgis0577 *self,
  * ==================== Data processing ====================
  */
 
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-
 static gboolean
 valid_data (FpiUsbTransfer *transfer)
 {
@@ -202,13 +194,12 @@ valid_data (FpiUsbTransfer *transfer)
 }
 
 static gboolean
-finger_present (FpDeviceEgis0577 *self, FpiUsbTransfer *transfer)
+finger_present (FpiUsbTransfer *transfer)
 {
   gsize nonzero = count_nonzero_bytes (transfer);
-  int threshold = self->strips_len > 0 ? EGIS0577_MIN_ACTIVE_PIXELS_LOOSE : EGIS0577_MIN_ACTIVE_PIXELS_STRICT;
 
-  fp_dbg ("finger_present: nonzero=%zu threshold=%d", nonzero, threshold);
-  return nonzero >= threshold;
+  fp_dbg ("finger_present: nonzero=%zu threshold=%d", nonzero, EGIS0577_MIN_ACTIVE_PIXELS_STRICT);
+  return nonzero >= EGIS0577_MIN_ACTIVE_PIXELS_STRICT;
 }
 
 /* Used inside resp_cb to advance to the next packet in the current sequence. */
@@ -247,28 +238,55 @@ jump_to_init_with_optional_delay (FpDeviceEgis0577 *self,
     }
 }
 
-/* Restart the POST_INIT sequence (without running PRE_INIT) after a frame.
- * Used for within-stage polling: no-finger waits and consecutive strip
- * collection.  A short delay prevents device command saturation — running
- * POST_INIT back-to-back with no pause causes a timeout at packet 5. */
-static void
-restart_post_init (FpDeviceEgis0577 *self, FpiSsm *ssm, const char *reason)
+static gboolean
+recycle_interface_claim (FpDevice *dev,
+                         const char *reason,
+                         GError **error)
 {
+  GUsbDevice *usb_dev = fpi_device_get_usb_device (dev);
+
+  fp_dbg ("Releasing interface %d before fresh claim (%s)", EGIS0577_INTERFACE, reason);
+  if (!g_usb_device_release_interface (usb_dev,
+                                       EGIS0577_INTERFACE,
+                                       0,
+                                       error))
+    return FALSE;
+
+  fp_dbg ("Re-claiming interface %d (%s)", EGIS0577_INTERFACE, reason);
+  if (!g_usb_device_claim_interface (usb_dev,
+                                     EGIS0577_INTERFACE,
+                                     0,
+                                     error))
+    return FALSE;
+
+  return TRUE;
+}
+
+/* EH577 appears to budget only ~8 large 64 14 ec reads per interface claim.
+ * Re-running REPEAT as a "flush" spends the same budget and wedges the next
+ * stage. Instead, recycle the claim and restart from PRE_INIT so every snapshot
+ * is captured from a fresh transport session, like the standalone probe does. */
+static void
+restart_capture_cycle (FpDeviceEgis0577 *self,
+                       FpiSsm           *ssm,
+                       FpDevice         *dev,
+                       const char       *reason)
+{
+  g_autoptr(GError) error = NULL;
   guint delay = self->poll_loop_delay_ms > 0
                   ? self->poll_loop_delay_ms
                   : EGIS0577_INTER_FRAME_DELAY_MS;
 
-  /* Run the REPEAT sequence as a pipeline flush/ack before restarting POST_INIT.
-   * Without it, the device's DMA/FIFO saturates after ~8 real captures and
-   * stops responding at post-init[15] (the DMA setup command).  resp_cb handles
-   * the REPEAT completion by switching back to POST_INIT automatically. */
-  self->pkt_array = EGIS0577_REPEAT_PACKETS;
-  self->pkt_array_len = EGIS0577_REPEAT_PACKETS_LENGTH;
-  self->current_index = 0;
-  self->frame_delay_armed = FALSE;
+  if (!recycle_interface_claim (dev, reason, &error))
+    {
+      fp_dbg ("Failed to recycle EH577 claim: %s", error->message);
+      fpi_ssm_mark_failed (ssm, g_steal_pointer (&error));
+      return;
+    }
 
-  fp_dbg ("Running repeat flush in %u ms before next post-init (%s)", delay, reason);
-  fpi_ssm_jump_to_state_delayed (ssm, SM_REQ, delay);
+  self->frame_delay_armed = FALSE;
+  fp_dbg ("Restarting capture cycle from fresh claim in %u ms (%s)", delay, reason);
+  fpi_ssm_jump_to_state_delayed (ssm, SM_INIT, delay);
 }
 
 static void
@@ -280,12 +298,12 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
   gboolean has_valid_data = valid_data (transfer);
   gboolean detected_finger = FALSE;
 
-  fp_dbg ("Frame received from %s[%d]: len=%zu nonzero=%zu strips=%zu stop=%d",
+  fp_dbg ("Frame received from %s[%d]: len=%zu nonzero=%zu ready=%d stop=%d",
           packet_array_name (self->pkt_array),
           self->current_index,
           transfer->actual_length,
           nonzero,
-          self->strips_len,
+          self->capture_frame != NULL,
           self->stop);
 
   dump_frame_if_requested (self, transfer, nonzero);
@@ -297,24 +315,18 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
    */
   if (!has_valid_data)
     {
-      fp_dbg ("Zero frame seen; %s",
-              self->strips_len > 0 ? "processing previously collected strips" : "continuing polling loop");
+      fp_dbg ("Zero frame seen; continuing polling loop");
 
       if (self->stop)
         {
           fp_dbg ("Stop requested while handling zero frame");
           fpi_ssm_jump_to_state (transfer->ssm, SM_DONE);
-          g_slist_free_full (self->strips, g_free);
-          self->strips_len = 0;
-          self->strips = NULL;
+          clear_capture_frame (self);
           return;
         }
 
-      if (self->strips_len > 0)
-        goto START_PROCESSING;
-
       report_finger_status (self, img_self, FALSE, "all-zero frame");
-      restart_post_init (self, transfer->ssm, "all-zero frame");
+      restart_capture_cycle (self, transfer->ssm, dev, "all-zero frame");
       return;
     }
 
@@ -322,60 +334,27 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
     {
       fp_dbg ("Stop requested while handling non-zero frame");
       fpi_ssm_jump_to_state (transfer->ssm, SM_DONE);
-      g_slist_free_full (self->strips, g_free);
-      self->strips_len = 0;
-      self->strips = NULL;
+      clear_capture_frame (self);
       return;
     }
 
-  detected_finger = finger_present (self, transfer);
+  detected_finger = finger_present (transfer);
   fp_dbg ("Finger heuristic for current frame: %s", detected_finger ? "present" : "absent");
 
   if (!detected_finger)
     {
-      if (self->strips_len >= EGIS0577_MIN_STRIPS_FOR_MATCH)
-        {
-          fp_dbg ("Finger no longer detected after %zu strips, processing image", self->strips_len);
-          goto START_PROCESSING;
-        }
-      else if (self->strips_len > 0)
-        {
-          fp_dbg ("Only %zu strip(s) collected (need %d), discarding spurious capture",
-                  self->strips_len, EGIS0577_MIN_STRIPS_FOR_MATCH);
-          g_slist_free_full (self->strips, g_free);
-          self->strips = NULL;
-          self->strips_len = 0;
-          report_finger_status (self, img_self, FALSE, "too few strips — spurious frame discarded");
-        }
-      else
-        {
-          report_finger_status (self, img_self, FALSE, "non-zero frame below finger heuristic threshold");
-        }
-    }
-  else
-    {
-      struct fpi_frame *stripe = g_malloc (EGIS0577_IMGWIDTH * EGIS0577_RFMGHEIGHT + sizeof (struct fpi_frame));
-      stripe->delta_x = 0;
-      stripe->delta_y = 0;
-      memcpy (stripe->data, (transfer->buffer) + (EGIS0577_IMGWIDTH * EGIS0577_RFMDIS), EGIS0577_IMGWIDTH * EGIS0577_RFMGHEIGHT);
-      self->strips = g_slist_prepend (self->strips, stripe);
-      self->strips_len += 1;
-
-      report_finger_status (self, img_self, TRUE, "active pixel count exceeded threshold");
-      fp_dbg ("Appended strip %zu/%d", self->strips_len, EGIS0577_CONSECUTIVE_CAPTURES);
+      report_finger_status (self, img_self, FALSE, "non-zero frame below finger heuristic threshold");
+      restart_capture_cycle (self, transfer->ssm, dev, "non-zero frame below finger heuristic threshold");
+      return;
     }
 
-  if (self->strips_len < EGIS0577_CONSECUTIVE_CAPTURES)
-    {
-      fp_dbg ("Continuing polling loop with %zu strips buffered", self->strips_len);
-      restart_post_init (self, transfer->ssm, "collecting more strips");
-    }
-  else
-START_PROCESSING:
-    {
-      fp_dbg ("Enough data collected, moving to image processing with %zu strips", self->strips_len);
-      fpi_ssm_next_state (transfer->ssm);
-    }
+  clear_capture_frame (self);
+  self->capture_frame = g_memdup2 (transfer->buffer, transfer->actual_length);
+  self->capture_nonzero = nonzero;
+
+  report_finger_status (self, img_self, TRUE, "snapshot frame exceeded threshold");
+  fp_dbg ("Accepted snapshot frame with nonzero=%zu, moving to image processing", nonzero);
+  fpi_ssm_next_state (transfer->ssm);
 }
 
 static void
@@ -386,41 +365,41 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
 
   FpiImageDeviceState state;
 
-  report_finger_status (self, img_self, TRUE, "processing buffered strips");
+  report_finger_status (self, img_self, TRUE, "processing snapshot frame");
 
   g_object_get (dev, "fpi-image-device-state", &state, NULL);
-  fp_dbg ("Processing %zu strips while image-device state=%d", self->strips_len, state);
+  fp_dbg ("Processing snapshot frame while image-device state=%d", state);
   if (state == FPI_IMAGE_DEVICE_STATE_CAPTURE)
     {
-      if (!self->stop)
+      if (!self->stop && self->capture_frame)
         {
           g_autoptr(FpImage) img = NULL;
+          FpImage *resizedImage = NULL;
 
-          self->strips = g_slist_reverse (self->strips);
-          fpi_do_movement_estimation (&assembling_ctx, self->strips);
+          img = fp_image_new (EGIS0577_IMGWIDTH, EGIS0577_IMGHEIGHT);
+          img->width = EGIS0577_IMGWIDTH;
+          img->height = EGIS0577_IMGHEIGHT;
+          img->flags = FPI_IMAGE_COLORS_INVERTED;
+          memcpy (img->data, self->capture_frame, EGIS0577_IMGSIZE);
 
-          img = fpi_assemble_frames (&assembling_ctx, self->strips);
-          img->flags |= (FPI_IMAGE_COLORS_INVERTED | FPI_IMAGE_PARTIAL);
+          resizedImage = fpi_image_resize (img, EGIS0577_RESIZE, EGIS0577_RESIZE);
 
-          FpImage *resizedImage = fpi_image_resize (img, EGIS0577_RESIZE, EGIS0577_RESIZE);
-
-          fp_dbg ("Submitting assembled image from %zu strips", self->strips_len);
+          fp_dbg ("Submitting snapshot image from frame with nonzero=%zu", self->capture_nonzero);
           fpi_image_device_image_captured (img_self, resizedImage);
         }
 
-      g_slist_free_full (self->strips, g_free);
-      self->strips = NULL;
-      self->strips_len = 0;
+      clear_capture_frame (self);
 
-      /* Report finger-off, then flush via REPEAT and restart POST_INIT.
-       * restart_post_init runs REPEAT[0..8] as a pipeline flush before POST_INIT,
-       * preventing DMA/FIFO saturation after many consecutive real captures. */
+      /* Report finger-off, then restart from a fresh claim.
+       * EH577 wedges after ~8 large reads on one claim, so do not spend the
+       * next stage on another in-claim 64 14 ec read. */
       report_finger_status (self, img_self, FALSE, "image submitted — inter-stage gap");
-      fp_dbg ("Image submitted; running repeat flush then post-init for next stage");
-      restart_post_init (self, ssm, "inter-stage reset");
+      fp_dbg ("Image submitted; recycling claim before next stage");
+      restart_capture_cycle (self, ssm, dev, "inter-stage reset");
     }
   else
     {
+      clear_capture_frame (self);
       fp_dbg ("Image-device state is not CAPTURE yet, returning to polling loop");
       jump_to_init_with_optional_delay (self, ssm, "image-device state not CAPTURE yet");
     }
@@ -442,9 +421,7 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
               packet_array_name (self->pkt_array));
       fpi_ssm_mark_failed (transfer->ssm, error);
 
-      g_slist_free_full (self->strips, g_free);
-      self->strips_len = 0;
-      self->strips = NULL;
+      clear_capture_frame (self);
       return;
     }
 
@@ -464,9 +441,9 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
     {
       if (self->pkt_array == EGIS0577_POST_INIT_PACKETS)
         {
-          /* Post-init complete: frame (5356 bytes) is in transfer->buffer.
-           * save_img decides whether to restart via REPEAT flush or to move
-           * to SM_PROCESS_IMG when enough strips are assembled. */
+          /* Post-init complete: a full 5356-byte snapshot frame is in
+           * transfer->buffer. save_img decides whether to recycle the claim
+           * for another attempt or move to SM_PROCESS_IMG. */
           fp_dbg ("Completed post-init sequence, passing frame to save_img");
           self->current_index = 0;
           save_img (transfer, dev);
@@ -474,9 +451,9 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
         }
       else if (self->pkt_array == EGIS0577_REPEAT_PACKETS)
         {
-          /* REPEAT used as pipeline flush after a real capture.  The 5356-byte
-           * response here is all zeros; discard it and restart POST_INIT.
-           * Collected strips in self->strips are preserved. */
+          /* Legacy REPEAT path kept for debugging/reference.  The current EH577
+           * runtime should not enter it because REPEAT burns the same large-read
+           * budget as a real frame capture. */
           fp_dbg ("Completed repeat flush, restarting post-init");
           self->pkt_array = EGIS0577_POST_INIT_PACKETS;
           self->pkt_array_len = EGIS0577_POST_INIT_PACKETS_LENGTH;
@@ -578,16 +555,11 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
       self->pkt_array = EGIS0577_PRE_INIT_PACKETS;
       self->pkt_array_len = EGIS0577_PRE_INIT_PACKETS_LENGTH;
       self->current_index = 0;
-      self->finger_reported = FALSE;
-      self->frame_counter = 0;
       self->pre_frame_delay_ms = get_env_ms_or_default ("EGIS0577_PRE_FRAME_DELAY_MS", 0);
       self->poll_loop_delay_ms = get_env_ms_or_default ("EGIS0577_POLL_LOOP_DELAY_MS", 0);
       self->frame_delay_armed = FALSE;
 
-      /* Do NOT clear strips here — they must survive across reinit cycles when
-       * we are mid-collection (collecting CONSECUTIVE_CAPTURES strips, each
-       * requiring a full PRE_INIT → POST_INIT reset to get a fresh frame).
-       * Strips are freed by: save_img stop paths, and process_imgs after submit. */
+      clear_capture_frame (self);
       fp_dbg ("Initial packet array: %s", packet_array_name (self->pkt_array));
       fp_dbg ("EH577 pacing config: pre_frame_delay_ms=%u poll_loop_delay_ms=%u",
               self->pre_frame_delay_ms,
@@ -699,6 +671,7 @@ dev_deinit (FpImageDevice *dev)
 {
   GError *error = NULL;
 
+  clear_capture_frame (FPI_DEVICE_EGIS0577 (dev));
   fp_dbg ("Releasing interface %d", EGIS0577_INTERFACE);
   g_usb_device_release_interface (fpi_device_get_usb_device (FP_DEVICE (dev)),
                                   EGIS0577_INTERFACE,
@@ -728,6 +701,8 @@ dev_start (FpImageDevice *dev)
 
   fp_dbg ("Activate requested");
   self->stop = FALSE;
+  self->finger_reported = FALSE;
+  self->frame_counter = 0;
 
   fpi_ssm_start (ssm, loop_complete);
 
@@ -756,8 +731,8 @@ fpi_device_egis0577_class_init (FpDeviceEgis0577Class *klass)
   dev_class->full_name = "LighTuning Technology Inc. EgisTec EH577";
   dev_class->type = FP_DEVICE_TYPE_USB;
   dev_class->id_table = id_table;
-  dev_class->scan_type = FP_SCAN_TYPE_SWIPE;
-  dev_class->nr_enroll_stages = 10;
+  dev_class->scan_type = FP_SCAN_TYPE_PRESS;
+  dev_class->nr_enroll_stages = 5;
   dev_class->temp_hot_seconds = -1;
 
   img_class->img_open = dev_init;
@@ -765,8 +740,8 @@ fpi_device_egis0577_class_init (FpDeviceEgis0577Class *klass)
   img_class->activate = dev_start;
   img_class->deactivate = dev_stop;
 
-  img_class->img_width = EGIS0577_IMGWIDTH;
-  img_class->img_height = -1;
+  img_class->img_width = EGIS0577_IMGWIDTH * EGIS0577_RESIZE;
+  img_class->img_height = EGIS0577_IMGHEIGHT * EGIS0577_RESIZE;
 
   img_class->bz3_threshold = EGIS0577_BZ3_THRESHOLD;
 }
