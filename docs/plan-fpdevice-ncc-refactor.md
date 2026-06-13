@@ -102,7 +102,7 @@ G_DEFINE_TYPE (FpDeviceEgis0577, fpi_device_egis0577, FP_TYPE_DEVICE);
 ### 2.4 Constants — add near the top of the file with other `#define`s
 
 ```c
-#define NCC_ENROLL_FRAMES   5      /* distinct presses required for enrollment */
+#define NCC_ENROLL_FRAMES   7      /* distinct presses required for enrollment */
 #define NCC_THRESHOLD       0.50f  /* per-frame NCC score to count as a hit    */
 #define NCC_MIN_MATCHES     2      /* minimum gallery hits to declare a match   */
 #define NCC_SEARCH_WINDOW   30     /* ±N pixel search window; ≥30 to avoid     */
@@ -792,7 +792,7 @@ After implementing:
 1. **Build**: `ninja -C builddir` must succeed with no new warnings.
 
 2. **Enroll**: Run `refs/libfprint/examples/eh577-enroll-helper`. You should see
-   `NCC_ENROLL_FRAMES` (5) progress messages, each requiring a distinct lift-and-repress cycle.
+   `NCC_ENROLL_FRAMES` (7) progress messages, each requiring a distinct lift-and-repress cycle.
    A print file should appear in the storage directory.
 
 3. **Verify (match)**: Run `refs/libfprint/examples/verify`. Present the same finger that was

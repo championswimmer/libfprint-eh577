@@ -82,6 +82,25 @@ Numbered work plans and investigation checklists.
 - Direct USB access usually needs `sudo`.
 - Artifacts created under `sudo` may be owned by `root`.
 - Keep `AGENTS.md` lean; put detailed status/history/todo material under `docs/`.
+- **Back up driver edits.** After editing the authoritative driver in
+  `refs/libfprint/libfprint/drivers/egis0577.{c,h}`, mirror the files to
+  [wip-libfprint/](wip-libfprint/) (`cp refs/.../egis0577.c wip-libfprint/`).
+  `refs/libfprint/` is a clone whose working tree can get reverted by git
+  operations and silently lose uncommitted work; `wip-libfprint/` is the stash
+  that survives it.
+
+### Sudo policy (agents)
+
+- **Never run `sudo` directly.** The agent does not have the password, and
+  repeated non-interactive `sudo` attempts will lock the account out.
+- When a task needs root, **write a single self-contained shell script** under
+  [tools/](tools/) that does everything requiring root (and only that), make it
+  executable, and **ask the user to run it** (e.g. `sudo ./tools/<script>.sh`,
+  or via the `! ` prompt prefix). Put the exact command in the message.
+- Scripts that already wrap their own privileged steps (e.g.
+  [tools/capture12.sh](tools/capture12.sh), [tools/enroll_identify.sh](tools/enroll_identify.sh))
+  call `sudo` internally and are run by the user — that is fine; the rule is the
+  agent must not invoke `sudo` from its own shell.
 
 ## Documenting research
 

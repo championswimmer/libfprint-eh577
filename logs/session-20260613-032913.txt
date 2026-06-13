@@ -1,0 +1,48 @@
+
+════════════════════════════════════════
+  EH577 Enroll + Verify  [20260613-032913]
+════════════════════════════════════════
+
+Repo:  /home/championswimmer/Development/Cpp/libfprint-eh577
+Log:   /home/championswimmer/Development/Cpp/libfprint-eh577/logs/session-20260613-032913.txt
+
+Finger: 0
+
+════════════════════════════════════════
+  PHASE 1: ENROLL
+════════════════════════════════════════
+
+The sensor captures one frame per stage. Keep your finger flat and still.
+You will be told exactly when to TOUCH and when to REMOVE.
+
+Get ready — TOUCH finger on sensor in:
+
+>>> TOUCH NOW <<<
+
+This program will enroll the selected finger overwriting any print for the same finger that was enrolled previously. Fingerprint updates without erasing old data are possible on devices supporting that. Ctrl+C interrupts program execution.
+Choose the finger to enroll:
+  [0] left thumb
+  [1] left index
+  [2] left middle
+  [3] left ring
+  [4] left little
+  [5] right thumb
+  [6] right index
+  [7] right middle
+  [8] right ring
+  [9] right little
+> Selected device 0 (LighTuning Technology Inc. EgisTec EH577) claimed by egis0577 driver
+
+(process:846824): libfprint-WARNING **: 03:29:25.752: Enroll failed with error transfer timed out
+Opened device.
+The device doesn't support fingerprint updates. Old prints will be erased.
+It's now time to enroll your finger.
+
+You will need to successfully scan your left thumb finger 7 times to complete the process.
+
+Scan your finger now.
+
+>>> REMOVE finger now <<<
+
+Enroll data saved.
+Lift finger completely. Verify starts in:

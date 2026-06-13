@@ -1,0 +1,149 @@
+﻿;
+; EgisTouchFP0577.inf
+;
+
+[Version]
+Signature="$Windows NT$"
+Class=Biometric
+ClassGuid={53D29EF7-377C-4D14-864B-EB3A85769359}
+Provider=%EGIS%
+DriverVer=06/15/2020,3.6.2.1
+CatalogFile=EgisTouchFP0577.cat
+PnpLockDown=1
+
+[Manufacturer]
+%EGIS%=EgisTec,NTamd64
+
+[EgisTec.NTamd64]
+%EGISUsbDeviceName%=Biometric_Install, USB\VID_1C7A&PID_0577
+
+[SourceDisksFiles]
+EgisTouchFP0577.dll=1
+EgisTouchFPEngine0577.dll=1
+EgisTouchFPSensor0577.dll=1
+
+[SourceDisksNames]
+1 = %MediaDescription%
+
+
+[Biometric_Install.NT]
+CopyFiles=UMDriverCopy, WinBioAdapterCopy
+AddProperty=Device_Properties
+Include=WINUSB.INF                      ; Import sections from WINUSB.INF
+Needs=WINUSB.NT                         ; Run the CopyFiles & AddReg directives for WinUsb.INF
+FeatureScore=0xFE                       ;
+
+[Biometric_Install.NT.hw]
+AddReg=Biometric_Device_AddReg
+AddReg=DriverPlugInAddReg, DatabaseAddReg, ContactSensor_AddReg
+
+[Device_Properties]
+DeviceIcon,,,,"%12%\UMDF\EgisTouchFP0577.dll,101" ; This is where a device specific icon can be specified.
+
+[Biometric_Install.NT.Services]
+AddService=WUDFRd,0x000001fa,WUDFRD_ServiceInstall  ; flag 0x2 sets this as the service for the device
+AddService=WinUsb,0x000001f8,WinUsb_ServiceInstall  ; this service is installed because its a filter.
+
+[Biometric_Install.NT.Wdf]
+UmdfDispatcher=WinUsb
+UmdfService=EgisTouchFP0577, EgisFP_Install
+UmdfServiceOrder=EgisTouchFP0577
+
+[Biometric_Install.NT.CoInstallers]
+AddReg=CoInstallers_AddReg
+
+
+[EgisFP_Install]
+UmdfLibraryVersion=2.0.0
+DriverCLSID = "{9864FE59-0577-42FC-B845-689F5A0794C6}"
+ServiceBinary = "%12%\UMDF\EgisTouchFP0577.dll"
+
+[Biometric_Device_AddReg]
+HKR,,"DeviceCharacteristics",0x10001,0x0100     ; Use same security checks on relative opens
+HKR,,"Security",,"D:P(A;;GA;;;BA)(A;;GA;;;SY)"  ; Allow generic-all access to Built-in administrators and Local system
+HKR,,"LowerFilters",0x00010008,"WinUsb" ; FLG_ADDREG_TYPE_MULTI_SZ | FLG_ADDREG_APPEND
+HKR,,"Exclusive",0x10001,1
+HKR,,"DeviceIdleEnabled",0x00010001,1
+HKR,,"DefaultIdleTimeout",0x00010001,10000
+HKR,,"WinUsbPowerPolicyOwnershipDisabled",0x00010001,1
+HKR,WudfPowerPolicySettings,"WdfDefaultIdleInWorkingState",0x00010001,1
+HKR,WudfPowerPolicySettings,"WdfDefaultWakeFromSleepState",0x00010001,0
+HKR,"WDF","WdfDirectedPowerTransitionEnable",0x00010001,1
+
+[DriverPlugInAddReg]
+HKR,WinBio\Configurations,DefaultConfiguration,,"0"
+HKR,WinBio\Configurations\0,SensorMode,0x10001,1                                ; Basic - 1, Advanced - 2
+HKR,WinBio\Configurations\0,SystemSensor,0x10001,1                              ; UAC/Winlogon - 1
+HKR,WinBio\Configurations\0,SensorAdapterBinary,,"EgisTouchFPSensor0577.DLL"	; EgisTec sensor adapter
+HKR,WinBio\Configurations\0,EngineAdapterBinary,,"EgisTouchFPEngine0577.DLL"	; EgisTec engine adapter
+HKR,WinBio\Configurations\0,StorageAdapterBinary,,"WinBioStorageAdapter.DLL"    ; Windows built-in storage adapter
+HKR,WinBio\Configurations\0,DatabaseId,,"01BE2559-0577-4CDA-ABD5-C9992404DA3A"  ; Unique database GUID
+HKLM,System\CurrentControlSet\Control\usbflags,IgnoreHWSerNum1C7A0570,0x10001,1 ; Ignore serial number
+
+[DatabaseAddReg]
+HKLM,System\CurrentControlSet\Services\WbioSrvc\Databases\{01BE2559-0577-4CDA-ABD5-C9992404DA3A},BiometricType,0x00010001,0x00000008
+HKLM,System\CurrentControlSet\Services\WbioSrvc\Databases\{01BE2559-0577-4CDA-ABD5-C9992404DA3A},Attributes,0x00010001,0x00000001
+HKLM,System\CurrentControlSet\Services\WbioSrvc\Databases\{01BE2559-0577-4CDA-ABD5-C9992404DA3A},Format,,"00000000-0000-0000-0000-000000000000"
+HKLM,System\CurrentControlSet\Services\WbioSrvc\Databases\{01BE2559-0577-4CDA-ABD5-C9992404DA3A},InitialSize,0x00010001,0x00000020
+HKLM,System\CurrentControlSet\Services\WbioSrvc\Databases\{01BE2559-0577-4CDA-ABD5-C9992404DA3A},AutoCreate,0x00010001,0x00000001
+HKLM,System\CurrentControlSet\Services\WbioSrvc\Databases\{01BE2559-0577-4CDA-ABD5-C9992404DA3A},AutoName,0x00010001,0x00000001
+HKLM,System\CurrentControlSet\Services\WbioSrvc\Databases\{01BE2559-0577-4CDA-ABD5-C9992404DA3A},FilePath,,""
+HKLM,System\CurrentControlSet\Services\WbioSrvc\Databases\{01BE2559-0577-4CDA-ABD5-C9992404DA3A},ConnectionString,,""
+
+[ContactSensor_AddReg]
+HKR,EgisTouchFP0577\ ,"RemoteWakeupEnable",0x00010001,0x0000001
+HKR,EgisTouchFP0577\ ,"FetchImageMode",0x00010001,0x80000003
+HKR,EgisTouchFP0577\ ,"FingerOnMode",0x00010001,0x00000000
+HKR,EgisTouchFP0577\ ,"ResumingDetectModeParameterTuningEnabled",0x00010001,0
+HKR,EgisTouchFP0577\ ,"FingerOnThresholdLoose",0x00010001,2
+HKR,EgisTouchFP0577\ ,"FingerOnThreshold",0x00010001,6
+
+[ContactSensor_AddReg.security]
+"D:P(A;;GA;;;BA)(A;;GA;;;SY)(A;;GAKA;;;WD)"
+
+
+[WUDFRD_ServiceInstall]
+DisplayName = %WudfRdDisplayName%
+ServiceType = 1
+StartType = 3
+ErrorControl = 1
+ServiceBinary = %12%\WUDFRd.sys
+LoadOrderGroup = Base
+
+[WinUsb_ServiceInstall]
+DisplayName     = %WinUsb_SvcDesc%
+ServiceType     = 1
+StartType       = 3
+ErrorControl    = 1
+ServiceBinary   = %12%\WinUSB.sys
+
+[CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"WUDFCoinstaller.dll"
+
+[DestinationDirs]
+UMDriverCopy=12,UMDF ; copy to \Windows\System32\drivers\UMDF
+WinBioAdapterCopy=11,WinBioPlugins ; copy to \Windows\System32\WinBioPlugins
+
+[UMDriverCopy]
+EgisTouchFP0577.dll
+
+[WinBioAdapterCopy]
+EgisTouchFPEngine0577.dll
+EgisTouchFPSensor0577.dll
+
+[SignatureAttributes] 
+EgisTouchFPEngine0577.dll = SignatureAttributes.WindowsHello
+EgisTouchFPSensor0577.dll = SignatureAttributes.WindowsHello
+ 
+[SignatureAttributes.WindowsHello] 
+WindowsHello = true 
+
+; =================== Generic ==================================
+
+[Strings]
+EGIS="Egis Technology Inc."
+MediaDescription="Egis Technology Inc. Biometric Driver Installation Media"
+ClassName="Biometric Devices"
+WudfRdDisplayName="Windows Driver Foundation - User-mode Driver Framework Reflector"
+EGISUsbDeviceName="EgisTec Touch Fingerprint Sensor"
+WinUsb_SvcDesc="WinUSB Driver"

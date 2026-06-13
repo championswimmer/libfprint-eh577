@@ -164,7 +164,7 @@ static const Packet EGIS0577_POST_INIT_PACKETS[] = {
 #define EGIS0577_STAGE2_MIN_STRETCH_P5 100
 #define EGIS0577_STAGE2_GRAIN_DIFF_THRESHOLD 25
 #define EGIS0577_STAGE2_GRAIN_PCT_X1000 6000
-#define EGIS0577_STAGE2_MIN_MINUTIAE 4
+#define EGIS0577_STAGE2_MIN_MINUTIAE 2
 #define EGIS0577_STAGE2_MAX_MINUTIAE 16
 #define EGIS0577_STAGE2_RIDGE_PIXEL_THRESHOLD 180
 #define EGIS0577_STAGE2_MIN_RIDGE_PIXELS 600
@@ -200,6 +200,18 @@ static const Packet EGIS0577_POST_INIT_PACKETS[] = {
 /*
  * Successful commands complete well below 1 s. Keep timeout recovery tight so
  * a wedged claim does not stall stage transitions for 10 seconds.
+ *
+ * Startup timeout recovery policy:
+ * - the default recovery path is conservative: recycle the claimed interface
+ *   and restart from PRE_INIT
+ * - a more aggressive last-resort recovery path exists behind the optional
+ *   environment flag `EGIS0577_ENABLE_USB_RESET_RECOVERY=1`
+ * - when enabled, repeated first-pre-init timeouts may trigger a full
+ *   `g_usb_device_reset()` before reclaiming the interface
+ *
+ * Leave the flag unset for normal use. Enable it only for targeted debugging
+ * if claim-recycle recovery is insufficient and you accept the risk that some
+ * hosts/sensors may wedge badly enough to require unplug/replug or reboot.
  */
 #define EGIS0577_TIMEOUT 2000
 

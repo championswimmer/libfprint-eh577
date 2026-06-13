@@ -63,17 +63,52 @@ if [[ -n "$USBDEV" ]]; then
 fi
 sudo bash -c 'echo "on" > /sys/bus/usb/devices/3-3/power/control' 2>/dev/null || true
 
+# Clean shutdown. On Ctrl-C (or any exit) ask whichever privileged helper is
+# running to close the device first — both helpers trap SIGINT and run
+# fp_device_close(), releasing the USB interface — then escalate to SIGKILL only
+# if it ignores us. Afterwards keep fprintd (and its socket activation) off the
+# just-freed device and hand session artifacts back to the invoking user.
+# Idempotent so the INT and EXIT traps can both fire harmlessly.
+CLEANED=""
+cleanup() {
+  [[ -n "$CLEANED" ]] && return
+  CLEANED=1
+  for BIN in "$ENROLL_HELPER_BIN" "$IDENTIFY_HELPER_BIN"; do
+    sudo pkill -INT -f "$BIN" 2>/dev/null || true
+  done
+  for _ in $(seq 1 20); do
+    sudo pgrep -f "$ENROLL_HELPER_BIN"   >/dev/null 2>&1 ||
+    sudo pgrep -f "$IDENTIFY_HELPER_BIN" >/dev/null 2>&1 || break
+    sleep 0.25
+  done
+  for BIN in "$ENROLL_HELPER_BIN" "$IDENTIFY_HELPER_BIN"; do
+    sudo pkill -KILL -f "$BIN" 2>/dev/null || true
+  done
+  sudo systemctl stop fprintd fprintd.socket 2>/dev/null || true
+  sudo pkill -f fprintd 2>/dev/null || true
+  sudo chown -R "$(id -u):$(id -g)" "$EVIDENCE_DIR" \
+       "$REPO/test-storage.variant" "$REPO/enrolled.pgm" "$REPO/identify.pgm" 2>/dev/null || true
+}
+on_interrupt() {
+  say ""
+  say "Interrupted — shutting down device cleanly..."
+  cleanup
+  exit 130
+}
+trap on_interrupt INT TERM
+trap cleanup EXIT
+
 # ── optional storage clear ────────────────────────────────────────────────────
 say ""
 printf "Clear all previously enrolled prints before starting? [y/N] "
 read -r CLEAR_CHOICE
 if [[ "$CLEAR_CHOICE" =~ ^[yY]$ ]]; then
-  say "Clearing storage..."
-  printf "Y\n" | sudo sh -c "
-    cd '$REPO'
-    exec env LD_LIBRARY_PATH='$LIBFP' G_MESSAGES_DEBUG=all '$CLEAR_BIN'
-  " 2>&1 | tee_log || true
-  sudo chown "$(id -u):$(id -g)" "$REPO/test-storage.variant" 2>/dev/null || true
+  say "Clearing local example storage..."
+  # EH577 currently uses host-side example storage (test-storage.variant), not
+  # on-device storage. The generic clear-storage example talks to device
+  # storage and can hang or fail on drivers that do not advertise STORAGE.
+  rm -f "$REPO/test-storage.variant"
+  rm -f "$REPO/enrolled.pgm" "$REPO/identify.pgm" 2>/dev/null || true
   say "Done."
 fi
 

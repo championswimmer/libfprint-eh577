@@ -38,6 +38,35 @@ sudo systemctl stop fprintd fprintd.socket 2>/dev/null || true
 sudo pkill -f fprintd 2>/dev/null || true
 sudo pkill -f "$HELPER" 2>/dev/null || true
 
+# Clean shutdown. On Ctrl-C (or any exit) ask the privileged helper to close the
+# device first — it traps SIGINT and runs fp_device_close(), which releases the
+# USB interface — then escalate to SIGKILL only if it ignores us. Afterwards keep
+# fprintd (and its socket activation) off the just-freed device and hand any
+# artifacts back to the invoking user. Idempotent so the INT and EXIT traps can
+# both fire harmlessly.
+CLEANED=""
+cleanup() {
+  [[ -n "$CLEANED" ]] && return
+  CLEANED=1
+  sudo pkill -INT -f "$HELPER" 2>/dev/null || true
+  for _ in $(seq 1 20); do
+    sudo pgrep -f "$HELPER" >/dev/null 2>&1 || break
+    sleep 0.25
+  done
+  sudo pkill -KILL -f "$HELPER" 2>/dev/null || true
+  sudo systemctl stop fprintd fprintd.socket 2>/dev/null || true
+  sudo pkill -f fprintd 2>/dev/null || true
+  sudo chown -R "$(id -u):$(id -g)" "$OUT" 2>/dev/null || true
+}
+on_interrupt() {
+  echo ""
+  echo "Interrupted — shutting down device cleanly..."
+  cleanup
+  exit 130
+}
+trap on_interrupt INT TERM
+trap cleanup EXIT
+
 echo ""
 echo "══════════════════════════"
 echo "  CAPTURE $COUNT IMAGES"

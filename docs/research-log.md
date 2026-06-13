@@ -2,6 +2,11 @@
 
 This repository contains the detailed chronological logs of investigations, experiments, and findings for the EgisTec EH577 fingerprint sensor. To keep logs manageable, the individual details are split into daily folders.
 
+## [2026-06-13](research-log/2026-06-13)
+* [01-offline-minutiae-bozorth-vs-ncc-on-capture12-folders.md](research-log/2026-06-13/01-offline-minutiae-bozorth-vs-ncc-on-capture12-folders.md): Compared two `capture12` folders offline; confirmed libfprint/NBIS minutiae counts exactly match the driver logs, stock/relaxed Bozorth remain unusable on these tiny templates, and NCC cleanly separates same-folder pairs from cross-folder pairs strongly enough to justify the planned NCC refactor prototype.
+* [02-capture-vfunc-and-unarmed-reinit-rearm.md](research-log/2026-06-13/02-capture-vfunc-and-unarmed-reinit-rearm.md): Fixed `tools/capture12.sh` after the `FpImageDevice`→`FpDevice` migration: re-added the `capture` vfunc (the migration dropped `FP_DEVICE_FEATURE_CAPTURE`), then broke the resulting unarmed poll-loop hang — a Stage-2 noise reject clears the background so raw frames always read finger-like and never re-arm. Added bounded fresh init+rearm escalation (claim recycle + PRE_INIT, no USB reset) that falls back to an `FP_DEVICE_RETRY_REMOVE_FINGER` lift-and-retry prompt.
+* [03-windows-driver-alternate-read-modes.md](research-log/2026-06-13/03-windows-driver-alternate-read-modes.md): Rechecked the EH577 Windows stack for larger capture paths; found `FetchImageMode = 0x80000003`, a `0x4000` internal image buffer, and EH575-family `0x80`/`0x81` candidate read helpers worth probing, while still finding no evidence for swipe/strip assembly.
+
 ## [2026-06-12](research-log/2026-06-12)
 * [01-enroll-wedge-root-cause.md](research-log/2026-06-12/01-enroll-wedge-root-cause.md): Traced the enroll wedge to an 8-large-read DMA ceiling per claim, identifying interface reset as the solution.
 * [02-windows-inf-and-dll-guard-clues.md](research-log/2026-06-12/02-windows-inf-and-dll-guard-clues.md): Extracted registry INF keys and DLL function/variable strings pointing to detect/sensor splits.
