@@ -21,6 +21,8 @@ Use this directory for the human-readable project state.
   - how the patched `libfprint` tree is exercised end-to-end
 - [ubuntu-install-guide.md](ubuntu-install-guide.md)
   - how to build and install the patched driver system-wide on Ubuntu
+- [plan-fpdevice-ncc-refactor.md](plan-fpdevice-ncc-refactor.md)
+  - step-by-step plan to switch the driver from FpImageDevice to FpDevice with embedded NCC matching
 
 ## Code / artifact map
 

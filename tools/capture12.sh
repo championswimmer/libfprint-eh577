@@ -62,6 +62,7 @@ sudo env \
   EGIS0577_STAGE2_MAX_MINUTIAE="${EGIS0577_STAGE2_MAX_MINUTIAE-}" \
   EGIS0577_STAGE2_MIN_RIDGE_PIXELS="${EGIS0577_STAGE2_MIN_RIDGE_PIXELS-}" \
   EGIS0577_STAGE2_MIN_STRETCH_P5="${EGIS0577_STAGE2_MIN_STRETCH_P5-}" \
+  EGIS0577_DISABLE_STRETCH="${EGIS0577_DISABLE_STRETCH-}" \
   EH577_CAPTURE_VERBOSE_STATUS="${EH577_CAPTURE_VERBOSE_STATUS-}" \
   bash -c '
     set -o pipefail
@@ -100,9 +101,10 @@ for pgm in "$OUT"/capture-*.pgm; do
   (( have_convert )) && convert "$pgm" -filter point -resize 300% "${pgm%.pgm}.png"
 done
 
-python3 - "$OUT" <<'PY'
-import sys, glob, os
+python3 - "$OUT" "$LOG" <<'PY'
+import sys, glob, os, re
 out = sys.argv[1]
+log = sys.argv[2]
 def load(p):
     d = open(p,'rb').read(); i = 2; v = []
     while len(v) < 3:
@@ -111,8 +113,22 @@ def load(p):
         while d[i] not in b' \t\n\r': i += 1
         v.append(int(d[s:i]))
     i += 1; w,h,_ = v; return w,h,d[i:i+w*h]
-print("\n  file                 dark<60  speckle  mean   (speckle high = noisy)")
-for f in sorted(glob.glob(os.path.join(out,"capture-*.pgm"))):
+
+minutiae_list = []
+ridges_list = []
+if os.path.exists(log):
+    with open(log, 'r', encoding='utf-8', errors='ignore') as f:
+        for line in f:
+            if '=> accept' in line:
+                m1 = re.search(r'minutiae=(\d+)', line)
+                m2 = re.search(r'ridge_pixels=(\d+)', line)
+                if m1 and m2:
+                    minutiae_list.append(int(m1.group(1)))
+                    ridges_list.append(int(m2.group(1)))
+
+print("\n  file                 dark<60  speckle  mean  minutiae  ridges   (speckle high = noisy)")
+files = sorted(glob.glob(os.path.join(out,"capture-*.pgm")))
+for idx, f in enumerate(files):
     w,h,px = load(f)
     dark = sum(1 for x in px if x < 60)
     spk = 0
@@ -121,7 +137,9 @@ for f in sorted(glob.glob(os.path.join(out,"capture-*.pgm"))):
             if px[y*w+x] < 60:
                 lit = sum(1 for dy in(-1,0,1) for dx in(-1,0,1) if px[(y+dy)*w+(x+dx)] >= 120)
                 if lit >= 6: spk += 1
-    print(f"  {os.path.basename(f):20s} {dark:7d}  {spk:7d}  {sum(px)/len(px):4.0f}")
+    mi = str(minutiae_list[idx]) if idx < len(minutiae_list) else "?"
+    ri = str(ridges_list[idx]) if idx < len(ridges_list) else "?"
+    print(f"  {os.path.basename(f):20s} {dark:7d}  {spk:7d}  {sum(px)/len(px):4.0f}  {mi:>8}  {ri:>6}")
 PY
 
 echo ""
