@@ -61,4 +61,5 @@ if [[ -n "${SUDO_UID:-}" ]]; then
 fi
 
 echo "Raw frames dumped: $(ls "$OUT/raw" 2>/dev/null | wc -l)"
+echo "PGMs accepted:    $(ls "$OUT"/*.pgm 2>/dev/null | wc -l) / $COUNT"
 echo "Share this log:  $LOG"

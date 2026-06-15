@@ -313,14 +313,14 @@ and results.
 - [x] B5: Mirrored `egis0577.{c,h}` to `wip-libfprint/`; clean build (zero warnings)
 
 ### Phase C — PGM capture workflow
-- [ ] C1: Audit `eh577-capture-helper.c` — confirm loop + PGM output; fix if not
-- [ ] C2: Audit `eh577_capture_debug.sh` — confirm it covers stage-2 gate; fix if not
-- [ ] C3: Write `tools/eh577_pgm_loop.sh` (lean N-capture loop with summary)
+- [x] C1: Audit `eh577-capture-helper.c` — loop + PGM output confirmed (saves capture-NN.pgm, loops N times)
+- [x] C2: Audit `eh577_capture_debug.sh` — added PGM accept count to final summary
+- [x] C3: Write `tools/eh577_pgm_loop.sh` (lean N-capture loop with summary)
 
 ### Phase D — Offline enroll+identify
-- [ ] D1: Audit `eh577-enroll-helper.c` — confirm storage path arg + 7-stage enroll
-- [ ] D2: Audit `eh577-identify-helper.c` — confirm variant load + NCC score output
-- [ ] D3: Write `tools/eh577_offline_session.sh` (enroll + identify loop + session log)
+- [x] D1: Audit `eh577-enroll-helper.c` — `--finger-index N`, saves to `test-storage.variant` in CWD
+- [x] D2: Audit `eh577-identify-helper.c` — loads gallery from CWD, prints match/no-match per identify-complete line (NCC score not exposed through public API)
+- [x] D3: Write `tools/eh577_offline_session.sh` (enroll + identify loop + session log under `artifacts/sessions/SESS/`)
 
 ### Final
 - [ ] Run enroll+identify validation (same-finger × 3 MATCH)
