@@ -57,12 +57,6 @@ struct _FpDeviceEgis0577
   int           current_index;
   guint         frame_counter;
   guint         frame_reads_this_claim;
-  guint         max_frames_per_claim;
-  guint         pre_frame_delay_ms;
-  guint         poll_loop_delay_ms;
-  guint         no_finger_retry_delay_ms;
-  guint         post_capture_poll_delay_ms;
-  gboolean      frame_delay_armed;
   gboolean      has_pre_init_run;
 
   gint64        finger_first_detected_time;
@@ -73,28 +67,12 @@ struct _FpDeviceEgis0577
   int           best_sat;      /* saturated-pixel count of best_frame (lower=cleaner) */
   int           best_coverage; /* coverage% of best_frame */
 
-  guint         stage2_grain_pct_x1000;
-  guint         stage2_min_minutiae;
-  guint         stage2_max_minutiae;
-  guint         stage2_min_ridge_pixels;
-  guint         stage2_min_stretch_p5;
-
-  guint         noise_reject_streak;
-  guint         noise_recovery_attempts;
-  guint         noise_recovery_clean_frames;
-  gboolean      noise_recovery_active;
-
-  gint64        unarmed_finger_first_time;
-  guint         unarmed_reinit_attempts; /* fresh init+rearm escalations while stuck unarmed */
-
   GPtrArray    *enroll_gallery;
   guint         enroll_stage;
-  gsize         enroll_frame_size;
   guint         enroll_frame_width;
   guint         enroll_frame_height;
 
   guint         startup_timeout_retries;
-  guint         startup_reset_attempts;
 
   gint64        rearm_not_before_time;
 };
@@ -117,23 +95,12 @@ G_DEFINE_TYPE (FpDeviceEgis0577, fpi_device_egis0577, FP_TYPE_DEVICE);
 #define NCC_MIN_MATCHES 2
 #define NCC_SEARCH_WINDOW 30
 
+/* Startup: recycle the interface claim up to this many times if the first
+ * pre-init packet times out. If still stuck after that, fail cleanly. */
 #define EGIS0577_STARTUP_TIMEOUT_RECOVERY_MAX        2
 #define EGIS0577_STARTUP_TIMEOUT_RECOVERY_DELAY_MS 250
-#define EGIS0577_STARTUP_RESET_RECOVERY_MAX          1
-#define EGIS0577_STARTUP_RESET_DELAY_MS            500
 #define EGIS0577_STARTUP_SETTLE_DELAY_MS           150
 #define EGIS0577_ENROLL_REARM_SETTLE_MS            800
-
-/* When the poll loop is stuck unarmed (persistent finger-like frames, no clean
- * no-finger baseline to arm from), escalate by forcing a fresh init+rearm this
- * many times before giving up and asking the caller to lift and retry. Each
- * escalation recycles the interface claim and re-runs PRE_INIT (fresh transport
- * session, like the standalone probe) — it never performs a USB-level reset,
- * which is known to wedge this hardware until a cold reboot. A single PRE_INIT
- * recycle already runs on the Stage-2 reject that precedes this state, so keep
- * the extra escalations low — the actionable outcome when the sensor stays
- * noisy is the lift+retry prompt, and the user should reach it quickly. */
-#define EGIS0577_UNARMED_REINIT_MAX                  2
 
 /* Per-touch timing. After a finger is first detected we skip frames for a short
  * settle window so the press stabilizes before it is evaluated. A touch "turn"
@@ -425,65 +392,6 @@ clear_best_frame (FpDeviceEgis0577 *self)
   g_clear_pointer (&self->best_frame, g_free);
   self->best_sat = -1;
   self->best_coverage = 0;
-}
-
-static guint
-get_env_uint_or_default (const char *name,
-                         guint       default_value)
-{
-  const gchar *value = g_getenv (name);
-  gchar *endptr = NULL;
-  guint64 parsed = 0;
-
-  if (!value || value[0] == '\0')
-    return default_value;
-
-  parsed = g_ascii_strtoull (value, &endptr, 10);
-  if (!endptr || endptr[0] != '\0')
-    {
-      fp_warn ("Ignoring invalid %s value: %s", name, value);
-      return default_value;
-    }
-
-  if (parsed > G_MAXUINT)
-    {
-      fp_warn ("Ignoring too-large %s value: %s", name, value);
-      return default_value;
-    }
-
-  return (guint) parsed;
-}
-
-static guint
-get_env_ms_or_default (const char *name,
-                       guint       default_value)
-{
-  return get_env_uint_or_default (name, default_value);
-}
-
-static gboolean
-get_env_bool_or_default (const char *name,
-                         gboolean    default_value)
-{
-  const gchar *value = g_getenv (name);
-
-  if (!value || value[0] == '\0')
-    return default_value;
-
-  if (g_ascii_strcasecmp (value, "1") == 0 ||
-      g_ascii_strcasecmp (value, "true") == 0 ||
-      g_ascii_strcasecmp (value, "yes") == 0 ||
-      g_ascii_strcasecmp (value, "on") == 0)
-    return TRUE;
-
-  if (g_ascii_strcasecmp (value, "0") == 0 ||
-      g_ascii_strcasecmp (value, "false") == 0 ||
-      g_ascii_strcasecmp (value, "no") == 0 ||
-      g_ascii_strcasecmp (value, "off") == 0)
-    return FALSE;
-
-  fp_warn ("Ignoring invalid %s value: %s", name, value);
-  return default_value;
 }
 
 static void
@@ -861,104 +769,14 @@ stage2_snapshot_quality_ok (FpDeviceEgis0577 *self,
   if (out_stretch_p99)
     *out_stretch_p99 = stretch_p99;
 
-  return stretch_p5 >= self->stage2_min_stretch_p5 &&
-         grain_pct_x1000 < self->stage2_grain_pct_x1000 &&
-         minutiae >= self->stage2_min_minutiae &&
+  return stretch_p5 >= EGIS0577_STAGE2_MIN_STRETCH_P5 &&
+         grain_pct_x1000 < EGIS0577_STAGE2_GRAIN_PCT_X1000 &&
+         minutiae >= EGIS0577_STAGE2_MIN_MINUTIAE &&
          /* Too many minutiae on this tiny sensor usually means noise, not a
           * better fingerprint. Cap the count so noisy stretch5 frames do not
           * pass just because they manufacture many false minutiae. */
-         minutiae <= self->stage2_max_minutiae &&
-         ridge_pixels >= self->stage2_min_ridge_pixels;
-}
-
-static gboolean
-stage2_reject_is_noise_like (FpDeviceEgis0577 *self,
-                             guint             grain_pct_x1000,
-                             guint             minutiae,
-                             guint             stretch_p5)
-{
-  return stretch_p5 < self->stage2_min_stretch_p5 ||
-         grain_pct_x1000 >= self->stage2_grain_pct_x1000 ||
-         minutiae > self->stage2_max_minutiae;
-}
-
-static gboolean
-action_is_verify_or_identify (FpDevice *dev)
-{
-  FpiDeviceAction action = fpi_device_get_current_action (dev);
-
-  return action == FPI_DEVICE_ACTION_VERIFY || action == FPI_DEVICE_ACTION_IDENTIFY;
-}
-
-static guint
-noise_recovery_delay_ms (FpDevice *dev)
-{
-  return action_is_verify_or_identify (dev) ?
-         EGIS0577_NOISE_RECOVERY_DELAY_VERIFY_IDENTIFY_MS :
-         EGIS0577_NOISE_RECOVERY_DELAY_ENROLL_CAPTURE_MS;
-}
-
-static guint
-noise_recovery_required_clean_frames (FpDevice *dev)
-{
-  return action_is_verify_or_identify (dev) ?
-         EGIS0577_NOISE_RECOVERY_CLEAN_FRAMES_VERIFY_IDENTIFY :
-         EGIS0577_NOISE_RECOVERY_CLEAN_FRAMES_ENROLL_CAPTURE;
-}
-
-static void
-reset_noise_recovery_state (FpDeviceEgis0577 *self)
-{
-  self->noise_reject_streak = 0;
-  self->noise_recovery_attempts = 0;
-  self->noise_recovery_clean_frames = 0;
-  self->noise_recovery_active = FALSE;
-}
-
-static gboolean
-noise_recovery_note_clean_baseline (FpDeviceEgis0577 *self,
-                                    FpDevice         *dev,
-                                    const char       *source)
-{
-  guint required;
-
-  if (!self->noise_recovery_active)
-    return TRUE;
-
-  self->noise_recovery_clean_frames++;
-  required = noise_recovery_required_clean_frames (dev);
-
-  fp_dbg ("Noise recovery clean baseline %u/%u from %s",
-          self->noise_recovery_clean_frames,
-          required,
-          source);
-
-  if (self->noise_recovery_clean_frames < required)
-    return FALSE;
-
-  fp_warn ("Noise recovery completed after %u clean baseline frames; capture can arm again",
-           self->noise_recovery_clean_frames);
-  self->noise_reject_streak = 0;
-  self->noise_recovery_clean_frames = 0;
-  self->noise_recovery_active = FALSE;
-  return TRUE;
-}
-
-/* Used inside resp_cb to advance to the next packet in the current sequence. */
-static void
-jump_to_req_with_optional_delay (FpDeviceEgis0577 *self,
-                                  FpiSsm           *ssm,
-                                  const char       *reason)
-{
-  if (self->poll_loop_delay_ms > 0)
-    {
-      fp_dbg ("Delaying next packet by %u ms (%s)", self->poll_loop_delay_ms, reason);
-      fpi_ssm_jump_to_state_delayed (ssm, SM_REQ, self->poll_loop_delay_ms);
-    }
-  else
-    {
-      fpi_ssm_jump_to_state (ssm, SM_REQ);
-    }
+         minutiae <= EGIS0577_STAGE2_MAX_MINUTIAE &&
+         ridge_pixels >= EGIS0577_STAGE2_MIN_RIDGE_PIXELS;
 }
 
 static gboolean
@@ -976,35 +794,6 @@ recycle_interface_claim (FpDevice *dev,
     return FALSE;
 
   fp_dbg ("Re-claiming interface %d (%s)", EGIS0577_INTERFACE, reason);
-  if (!g_usb_device_claim_interface (usb_dev,
-                                     EGIS0577_INTERFACE,
-                                     0,
-                                     error))
-    return FALSE;
-
-  return TRUE;
-}
-
-static gboolean
-reset_device_and_reclaim (FpDevice *dev,
-                          const char *reason,
-                          GError **error)
-{
-  GUsbDevice *usb_dev = fpi_device_get_usb_device (dev);
-  g_autoptr(GError) release_error = NULL;
-
-  fp_dbg ("Releasing interface %d before USB reset (%s)", EGIS0577_INTERFACE, reason);
-  if (!g_usb_device_release_interface (usb_dev,
-                                       EGIS0577_INTERFACE,
-                                       0,
-                                       &release_error))
-    fp_dbg ("Ignoring release failure before USB reset: %s", release_error->message);
-
-  fp_dbg ("Resetting USB device (%s)", reason);
-  if (!g_usb_device_reset (usb_dev, error))
-    return FALSE;
-
-  fp_dbg ("Re-claiming interface %d after USB reset (%s)", EGIS0577_INTERFACE, reason);
   if (!g_usb_device_claim_interface (usb_dev,
                                      EGIS0577_INTERFACE,
                                      0,
@@ -1035,38 +824,15 @@ restart_capture_cycle (FpDeviceEgis0577 *self,
     }
 
   self->frame_reads_this_claim = 0;
-  self->frame_delay_armed = FALSE;
-  fp_dbg ("Restarting capture cycle from fresh claim in %u ms (%s)", delay, reason);
-  fpi_ssm_jump_to_state_delayed (ssm, SM_INIT, delay);
-}
-
-static void
-restart_capture_cycle_with_usb_reset (FpDeviceEgis0577 *self,
-                                      FpiSsm           *ssm,
-                                      FpDevice         *dev,
-                                      const char       *reason,
-                                      guint             delay)
-{
-  g_autoptr(GError) error = NULL;
-
-  if (!reset_device_and_reclaim (dev, reason, &error))
-    {
-      fp_dbg ("Failed to USB-reset EH577 device: %s", error->message);
-      fpi_ssm_mark_failed (ssm, g_steal_pointer (&error));
-      return;
-    }
-
-  self->frame_reads_this_claim = 0;
-  self->frame_delay_armed = FALSE;
   self->has_pre_init_run = FALSE;
-  fp_dbg ("Restarting capture cycle after USB reset in %u ms (%s)", delay, reason);
+  fp_dbg ("Restarting capture cycle from fresh claim in %u ms (%s)", delay, reason);
   fpi_ssm_jump_to_state_delayed (ssm, SM_INIT, delay);
 }
 
 static gboolean
 claim_needs_recycle (FpDeviceEgis0577 *self)
 {
-  return self->frame_reads_this_claim >= self->max_frames_per_claim;
+  return self->frame_reads_this_claim >= EGIS0577_MAX_FRAMES_PER_CLAIM;
 }
 
 static void
@@ -1079,17 +845,8 @@ restart_for_next_poll (FpDeviceEgis0577 *self,
     {
       fp_dbg ("Frame-read budget reached on this claim (%u/%u), recycling before next poll",
               self->frame_reads_this_claim,
-              self->max_frames_per_claim);
-      restart_capture_cycle (self, ssm, dev, reason, self->no_finger_retry_delay_ms);
-      return;
-    }
-
-  if (self->no_finger_retry_delay_ms > 0)
-    {
-      fp_dbg ("Retrying next capture in %u ms without recycling claim (%s)",
-              self->no_finger_retry_delay_ms,
-              reason);
-      fpi_ssm_jump_to_state_delayed (ssm, SM_INIT, self->no_finger_retry_delay_ms);
+              EGIS0577_MAX_FRAMES_PER_CLAIM);
+      restart_capture_cycle (self, ssm, dev, reason, 0);
       return;
     }
 
@@ -1110,19 +867,8 @@ on_frame_accepted_enroll (FpDevice *dev,
 
   if (self->enroll_stage == 0)
     {
-      self->enroll_frame_size = frame_size;
       self->enroll_frame_width = img->width;
       self->enroll_frame_height = img->height;
-    }
-  else if (self->enroll_frame_size != frame_size)
-    {
-      g_free (pixels);
-      g_object_unref (img);
-      self->stop = TRUE;
-      fpi_device_action_error (dev,
-                               fpi_device_error_new_msg (FP_DEVICE_ERROR_DATA_INVALID,
-                                                         "inconsistent enrollment frame size"));
-      return;
     }
 
   g_object_unref (img);
@@ -1231,77 +977,6 @@ on_frame_accepted_verify (FpDevice *dev,
   fpi_device_verify_complete (dev, NULL);
 }
 
-static void
-on_frame_accepted_identify (FpDevice *dev,
-                            FpImage  *img)
-{
-  FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
-  GPtrArray *prints = NULL;
-  g_autoptr(FpPrint) probe_print = NULL;
-  guint probe_w = img->width;
-  guint probe_h = img->height;
-  gsize probe_size = (gsize) probe_w * probe_h;
-  guint8 *probe = g_memdup2 (img->data, probe_size);
-  FpPrint *best_print = NULL;
-  double best_score = -1.0;
-
-  fpi_device_get_identify_data (dev, &prints);
-  probe_print = create_raw_frame_print (dev, img);
-  g_object_unref (img);
-
-  for (guint pi = 0; pi < prints->len; pi++)
-    {
-      FpPrint *candidate = g_ptr_array_index (prints, pi);
-      g_autoptr(GVariant) stored = NULL;
-      guint8 **gallery = NULL;
-      guint gallery_count = 0, gw = 0, gh = 0;
-      guint hits = 0;
-      double top = -1.0;
-
-      g_object_get (candidate, "fpi-data", &stored, NULL);
-      if (!stored)
-        continue;
-
-      if (!unpack_gallery (stored, &gallery, &gallery_count, &gw, &gh) ||
-          gw != probe_w || gh != probe_h)
-        {
-          if (gallery)
-            {
-              for (guint i = 0; i < gallery_count; i++)
-                g_free (gallery[i]);
-              g_free (gallery);
-            }
-          continue;
-        }
-
-      for (guint i = 0; i < gallery_count; i++)
-        {
-          double s = peak_ncc (probe, gallery[i], probe_w, probe_h, NCC_SEARCH_WINDOW);
-          if (s > top)
-            top = s;
-          if (s >= NCC_THRESHOLD)
-            hits++;
-          g_free (gallery[i]);
-        }
-      g_free (gallery);
-
-      if (top >= NCC_THRESHOLD && hits >= NCC_MIN_MATCHES && top > best_score)
-        {
-          best_score = top;
-          best_print = candidate;
-        }
-    }
-
-  g_free (probe);
-
-  fp_info ("Identify: best_ncc=%.3f => %s",
-           best_score, best_print ? "MATCH" : "NO-MATCH");
-
-  self->stop = TRUE;
-  fpi_device_identify_report (dev, best_print, g_steal_pointer (&probe_print), NULL);
-  fpi_device_identify_complete (dev, NULL);
-}
-
 /* Single-shot like verify: hand the stage-2-qualifying image straight back to
  * fp_device_capture_finish(). This is the exact resized snapshot the NCC matcher
  * sees, so the capture12 tooling stores the same pixels the matcher would.
@@ -1331,14 +1006,11 @@ on_frame_accepted (FpDevice *dev,
       on_frame_accepted_verify (dev, img);
       break;
 
-    case FPI_DEVICE_ACTION_IDENTIFY:
-      on_frame_accepted_identify (dev, img);
-      break;
-
     case FPI_DEVICE_ACTION_CAPTURE:
       on_frame_accepted_capture (dev, img);
       break;
 
+    case FPI_DEVICE_ACTION_IDENTIFY:
     case FPI_DEVICE_ACTION_NONE:
     case FPI_DEVICE_ACTION_PROBE:
     case FPI_DEVICE_ACTION_OPEN:
@@ -1348,53 +1020,6 @@ on_frame_accepted (FpDevice *dev,
     case FPI_DEVICE_ACTION_CLEAR_STORAGE:
     default:
       g_object_unref (img);
-      break;
-    }
-}
-
-/* Last-resort exit when the device stays stuck unarmed after exhausting the
- * fresh init+rearm escalations: the sensor keeps returning finger-like frames
- * and we never observe a clean no-finger baseline. Rather than spin forever,
- * surface a retryable "remove finger" condition so the caller can prompt the
- * user to lift and try again. Dispatched by action so we complete the right
- * one (capture is single-shot; enroll just nudges the current stage and keeps
- * polling so a clean baseline can still complete it). */
-static void
-report_unarmed_stuck (FpDeviceEgis0577 *self, FpiSsm *ssm, FpDevice *dev)
-{
-  switch (fpi_device_get_current_action (dev))
-    {
-    case FPI_DEVICE_ACTION_CAPTURE:
-      self->stop = TRUE;
-      fpi_device_capture_complete (dev, NULL,
-                                   fpi_device_retry_new (FP_DEVICE_RETRY_REMOVE_FINGER));
-      fpi_ssm_jump_to_state (ssm, SM_DONE);
-      break;
-
-    case FPI_DEVICE_ACTION_ENROLL:
-      /* Retry convention: report the retry with no partial print. */
-      fpi_device_enroll_progress (dev, self->enroll_stage, NULL,
-                                  fpi_device_retry_new (FP_DEVICE_RETRY_REMOVE_FINGER));
-      /* Keep enrollment alive: allow another fresh init+rearm cycle. */
-      self->unarmed_reinit_attempts = 0;
-      self->unarmed_finger_first_time = 0;
-      restart_capture_cycle (self, ssm, dev,
-                             "enroll stuck unarmed: fresh init+rearm after lift prompt",
-                             self->no_finger_retry_delay_ms);
-      break;
-
-    case FPI_DEVICE_ACTION_VERIFY:
-    case FPI_DEVICE_ACTION_IDENTIFY:
-    case FPI_DEVICE_ACTION_NONE:
-    case FPI_DEVICE_ACTION_PROBE:
-    case FPI_DEVICE_ACTION_OPEN:
-    case FPI_DEVICE_ACTION_CLOSE:
-    case FPI_DEVICE_ACTION_LIST:
-    case FPI_DEVICE_ACTION_DELETE:
-    case FPI_DEVICE_ACTION_CLEAR_STORAGE:
-    default:
-      /* verify/identify force-arm before reaching here; just keep polling. */
-      restart_for_next_poll (self, ssm, dev, "stuck unarmed (non-enroll/capture)");
       break;
     }
 }
@@ -1448,7 +1073,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
   self->frame_reads_this_claim += 1;
   fp_dbg ("Frame reads in current claim: %u/%u",
           self->frame_reads_this_claim,
-          self->max_frames_per_claim);
+          EGIS0577_MAX_FRAMES_PER_CLAIM);
 
   if (self->turn_open && !self->stop &&
       g_get_monotonic_time () - self->finger_first_detected_time > EGIS0577_TURN_TIMEOUT_MS * 1000)
@@ -1477,27 +1102,17 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
           return;
         }
 
-      if (!noise_recovery_note_clean_baseline (self, dev, "all-zero frame"))
-        {
-          report_finger_status (self, FALSE, "noise recovery waiting for additional clean zero frame");
-          restart_for_next_poll (self, transfer->ssm, dev, "noise recovery clean zero frame");
-          return;
-        }
-
-      if (!action_is_verify_or_identify (dev) &&
-          self->rearm_not_before_time > 0 &&
+      if (self->rearm_not_before_time > 0 &&
           g_get_monotonic_time () < self->rearm_not_before_time)
         {
-          report_finger_status (self, FALSE, "enroll re-arm settle after all-zero baseline");
-          restart_for_next_poll (self, transfer->ssm, dev, "enroll re-arm settle after all-zero baseline");
+          report_finger_status (self, FALSE, "re-arm settle");
+          restart_for_next_poll (self, transfer->ssm, dev, "re-arm settle");
           return;
         }
 
       if (!self->capture_armed)
         fp_dbg ("Capture armed after clean zero frame");
       self->capture_armed = TRUE;
-      self->unarmed_finger_first_time = 0;
-      self->unarmed_reinit_attempts = 0;
       self->rearm_not_before_time = 0;
 
       report_finger_status (self, FALSE, "all-zero frame");
@@ -1532,27 +1147,17 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
           update_warm_background (self, transfer);
         }
 
-      if (!noise_recovery_note_clean_baseline (self, dev, "warm no-finger frame"))
-        {
-          report_finger_status (self, FALSE, "noise recovery waiting for additional clean no-finger frame");
-          restart_for_next_poll (self, transfer->ssm, dev, "noise recovery clean no-finger frame");
-          return;
-        }
-
-      if (!action_is_verify_or_identify (dev) &&
-          self->rearm_not_before_time > 0 &&
+      if (self->rearm_not_before_time > 0 &&
           g_get_monotonic_time () < self->rearm_not_before_time)
         {
-          report_finger_status (self, FALSE, "enroll re-arm settle after warm baseline");
-          restart_for_next_poll (self, transfer->ssm, dev, "enroll re-arm settle after warm baseline");
+          report_finger_status (self, FALSE, "re-arm settle");
+          restart_for_next_poll (self, transfer->ssm, dev, "re-arm settle");
           return;
         }
 
       if (!self->capture_armed)
         fp_dbg ("Capture armed after clean no-finger frame (cov=%d%%)", coverage);
       self->capture_armed = TRUE;
-      self->unarmed_finger_first_time = 0;
-      self->unarmed_reinit_attempts = 0;
       self->rearm_not_before_time = 0;
 
       report_finger_status (self, FALSE, "non-zero frame below finger heuristic threshold");
@@ -1562,65 +1167,16 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
 
   if (!self->capture_armed)
     {
-      gint64 now = g_get_monotonic_time ();
-
-      if (self->unarmed_finger_first_time == 0)
-        self->unarmed_finger_first_time = now;
-
-      if (now - self->unarmed_finger_first_time < 750 * 1000)
-        {
-          fp_dbg ("Ignoring finger-like startup/transient frame with cov=%d%% until a clean no-finger baseline is observed",
-                  coverage);
-          report_finger_status (self, FALSE, "ignoring startup transient before capture is armed");
-          restart_for_next_poll (self, transfer->ssm, dev, "startup transient before capture is armed");
-          return;
-        }
-
-      if (action_is_verify_or_identify (dev))
-        {
-          fp_warn ("Persistent finger-like startup frames for >750ms during verify/identify; arming capture to avoid login wedge");
-          self->capture_armed = TRUE;
-          self->unarmed_finger_first_time = 0;
-        }
-      else if (self->unarmed_reinit_attempts < EGIS0577_UNARMED_REINIT_MAX)
-        {
-          /* Stuck unarmed during enroll/capture: a Stage-2 noise reject cleared
-           * the warm background and left the sensor in a noisy state, so every
-           * frame reads finger-like and we can never observe the clean no-finger
-           * baseline needed to (re)arm. Force a fresh transport session — claim
-           * recycle + PRE_INIT re-run — so the sensor settles and a clean
-           * baseline can rebuild. This is the "reset the init and rearm" path; it
-           * deliberately does NOT USB-reset the device (that wedges this hardware
-           * until a cold reboot). Bounded by EGIS0577_UNARMED_REINIT_MAX. */
-          self->unarmed_reinit_attempts++;
-          fp_warn ("Persistent finger-like frames for >750ms during enroll/capture; forcing fresh init+rearm (attempt %u/%u, no USB reset)",
-                   self->unarmed_reinit_attempts, EGIS0577_UNARMED_REINIT_MAX);
-          self->capture_armed = FALSE;
-          self->turn_open = FALSE;
-          self->unarmed_finger_first_time = 0;
-          self->has_pre_init_run = FALSE;       /* force PRE_INIT on next SM_INIT */
-          reset_noise_recovery_state (self);
-          clear_background (self);               /* drop the noisy baseline; rebuild fresh */
-          report_finger_status (self, FALSE, "forcing fresh init+rearm while stuck unarmed");
-          restart_capture_cycle (self, transfer->ssm, dev,
-                                 "stuck unarmed: fresh init+rearm",
-                                 self->no_finger_retry_delay_ms);
-          return;
-        }
-      else
-        {
-          fp_warn ("Still finger-like after %u init+rearm attempts; asking caller to remove finger and retry",
-                   self->unarmed_reinit_attempts);
-          report_finger_status (self, FALSE, "remove finger and retry");
-          report_unarmed_stuck (self, transfer->ssm, dev);
-          return;
-        }
+      fp_dbg ("Got finger-like frame but not yet armed (cov=%d%%); waiting for clean no-finger baseline",
+              coverage);
+      report_finger_status (self, FALSE, "not armed, waiting for no-finger baseline");
+      restart_for_next_poll (self, transfer->ssm, dev, "finger-like while not armed");
+      return;
     }
 
   if (!self->turn_open)
     {
       self->finger_first_detected_time = g_get_monotonic_time ();
-      self->unarmed_finger_first_time = 0;
       self->turn_open = TRUE;
       clear_best_frame (self);
     }
@@ -1697,9 +1253,6 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
 {
   FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
   gboolean submitted = FALSE;
-  gboolean recovery_triggered = FALSE;
-  guint restart_delay = self->post_capture_poll_delay_ms;
-  const char *restart_reason = "stage2 quality retry await finger-off";
 
   report_finger_status (self, TRUE, "processing snapshot frame");
 
@@ -1744,121 +1297,36 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
 
       fp_warn ("Stage-2 snapshot gate: stretch_p5=%u/%u stretch_p99=%u grain=%u.%03u%%/%u.%03u%% ridge_pixels=%u/%u minutiae=%u/%u..%u => %s",
                stretch_p5,
-               self->stage2_min_stretch_p5,
+               EGIS0577_STAGE2_MIN_STRETCH_P5,
                stretch_p99,
                grain_pct_x1000 / 1000,
                grain_pct_x1000 % 1000,
-               self->stage2_grain_pct_x1000 / 1000,
-               self->stage2_grain_pct_x1000 % 1000,
+               EGIS0577_STAGE2_GRAIN_PCT_X1000 / 1000,
+               EGIS0577_STAGE2_GRAIN_PCT_X1000 % 1000,
                ridge_pixels,
-               self->stage2_min_ridge_pixels,
+               EGIS0577_STAGE2_MIN_RIDGE_PIXELS,
                minutiae,
-               self->stage2_min_minutiae,
-               self->stage2_max_minutiae,
+               EGIS0577_STAGE2_MIN_MINUTIAE,
+               EGIS0577_STAGE2_MAX_MINUTIAE,
                quality_ok ? "accept" : "retry");
 
       if (quality_ok)
         {
-          reset_noise_recovery_state (self);
           fp_dbg ("Submitting snapshot image from frame with nonzero=%zu", self->capture_nonzero);
           on_frame_accepted (dev, g_steal_pointer (&resized_image));
           submitted = TRUE;
         }
       else
         {
-          g_autoptr(GString) reject_reason = g_string_new (NULL);
-          gboolean noise_like = stage2_reject_is_noise_like (self,
-                                                             grain_pct_x1000,
-                                                             minutiae,
-                                                             stretch_p5);
-
-          /* Only noisy rejects (high grain, too many minutiae, or a washed-out
-           * stretch) mean the warm baseline itself is suspect and worth wiping
-           * for a fresh transport session. A clean-but-insufficient frame — e.g.
-           * low minutiae from a light or partial press — leaves the baseline
-           * perfectly good; forcing a baseline wipe + PRE_INIT reinit there just
-           * costs time and risks the noisy-rearm loop. Keep the baseline and
-           * simply wait for a better press. */
-          if (noise_like)
-            {
-              self->noise_reject_streak = 0;
-              recovery_triggered = TRUE;
-              restart_delay = noise_recovery_delay_ms (dev);
-              restart_reason = "noise recovery fresh baseline";
-              self->noise_recovery_attempts++;
-              self->noise_recovery_clean_frames = 0;
-              self->noise_recovery_active = TRUE;
-              self->capture_armed = FALSE;
-              self->turn_open = FALSE;
-              self->unarmed_finger_first_time = 0;
-              self->has_pre_init_run = FALSE;
-              if (!action_is_verify_or_identify (dev))
-                self->rearm_not_before_time = g_get_monotonic_time () + EGIS0577_ENROLL_REARM_SETTLE_MS * 1000;
-              clear_background (self);
-              clear_best_frame (self);
-              fp_warn ("Stage-2 noise-like reject -> fresh baseline recovery (delay=%ums)",
-                       restart_delay);
-            }
-          else
-            {
-              restart_delay = self->no_finger_retry_delay_ms;
-              restart_reason = "stage2 non-noise retry (keep baseline)";
-              self->capture_armed = FALSE;
-              self->turn_open = FALSE;
-              self->unarmed_finger_first_time = 0;
-              if (!action_is_verify_or_identify (dev))
-                self->rearm_not_before_time = g_get_monotonic_time () + EGIS0577_ENROLL_REARM_SETTLE_MS * 1000;
-              clear_best_frame (self);
-              fp_warn ("Stage-2 non-noise reject (e.g. low minutiae) -> retry without fresh baseline (delay=%ums)",
-                       restart_delay);
-            }
-
-          if (stretch_p5 < self->stage2_min_stretch_p5)
-            g_string_append_printf (reject_reason,
-                                    "%sstretch_p5=%u < %u",
-                                    reject_reason->len ? "; " : "",
-                                    stretch_p5,
-                                    self->stage2_min_stretch_p5);
-
-          if (grain_pct_x1000 >= self->stage2_grain_pct_x1000)
-            g_string_append_printf (reject_reason,
-                                    "%sgrain=%u.%03u%% >= %u.%03u%%",
-                                    reject_reason->len ? "; " : "",
-                                    grain_pct_x1000 / 1000,
-                                    grain_pct_x1000 % 1000,
-                                    self->stage2_grain_pct_x1000 / 1000,
-                                    self->stage2_grain_pct_x1000 % 1000);
-
-          if (ridge_pixels < self->stage2_min_ridge_pixels)
-            g_string_append_printf (reject_reason,
-                                    "%sridge_pixels=%u < %u",
-                                    reject_reason->len ? "; " : "",
-                                    ridge_pixels,
-                                    self->stage2_min_ridge_pixels);
-
-          if (minutiae < self->stage2_min_minutiae)
-            g_string_append_printf (reject_reason,
-                                    "%sminutiae=%u < %u",
-                                    reject_reason->len ? "; " : "",
-                                    minutiae,
-                                    self->stage2_min_minutiae);
-
-          if (minutiae > self->stage2_max_minutiae)
-            g_string_append_printf (reject_reason,
-                                    "%sminutiae=%u > %u (likely noise)",
-                                    reject_reason->len ? "; " : "",
-                                    minutiae,
-                                    self->stage2_max_minutiae);
-
-          if (reject_reason->len == 0)
-            g_string_assign (reject_reason, "unknown Stage-2 failure");
-
-          if (recovery_triggered)
-            g_string_append_printf (reject_reason,
-                                    "%snoise recovery: fresh baseline/reinit requested",
-                                    reject_reason->len ? "; " : "");
-
-          fp_warn ("Stage-2 reject: %s", reject_reason->str);
+          self->capture_armed = FALSE;
+          self->turn_open = FALSE;
+          if (fpi_device_get_current_action (dev) == FPI_DEVICE_ACTION_ENROLL)
+            self->rearm_not_before_time = g_get_monotonic_time () + EGIS0577_ENROLL_REARM_SETTLE_MS * 1000;
+          clear_best_frame (self);
+          fp_warn ("Stage-2 reject: stretch_p5=%u grain=%u.%03u%% ridge=%u minutiae=%u",
+                   stretch_p5,
+                   grain_pct_x1000 / 1000, grain_pct_x1000 % 1000,
+                   ridge_pixels, minutiae);
         }
     }
 
@@ -1873,10 +1341,10 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
 
   fp_dbg (submitted ?
           "Image submitted; waiting for real finger-off and restarting polling" :
-          "Stage-2 rejected image; waiting for real finger-off and restarting polling");
+          "Stage-2 rejected image; restarting capture cycle");
   restart_capture_cycle (self, ssm, dev,
-                         submitted ? "post-capture await finger-off" : restart_reason,
-                         submitted ? self->post_capture_poll_delay_ms : restart_delay);
+                         submitted ? "post-capture await finger-off" : "stage2 reject",
+                         EGIS0577_POST_CAPTURE_POLL_DELAY_MS);
 }
 
 /*
@@ -1897,7 +1365,7 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
                   packet_array_name (self->pkt_array),
                   self->current_index);
           clear_capture_frame (self);
-          restart_capture_cycle (self, transfer->ssm, dev, "timeout recovery", self->no_finger_retry_delay_ms);
+          restart_capture_cycle (self, transfer->ssm, dev, "timeout recovery", 0);
           g_error_free (error);
           return;
         }
@@ -1967,7 +1435,7 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
       self->current_index += 1;
     }
 
-  jump_to_req_with_optional_delay (self, transfer->ssm, "advance packet sequence");
+  fpi_ssm_jump_to_state (transfer->ssm, SM_REQ);
 }
 
 static void
@@ -2020,31 +1488,8 @@ req_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *err
                   return;
                 }
 
-              if (get_env_bool_or_default ("EGIS0577_ENABLE_USB_RESET_RECOVERY", FALSE) &&
-                  self->startup_reset_attempts < EGIS0577_STARTUP_RESET_RECOVERY_MAX)
-                {
-                  self->startup_reset_attempts++;
-                  self->startup_timeout_retries = 0;
-                  fp_warn ("Timeout sending first pre-init packet after claim recycle; USB-resetting device and retrying startup (%u/%u)",
-                           self->startup_reset_attempts,
-                           EGIS0577_STARTUP_RESET_RECOVERY_MAX);
-                  clear_capture_frame (self);
-                  restart_capture_cycle_with_usb_reset (self,
-                                                       transfer->ssm,
-                                                       dev,
-                                                       "startup USB reset recovery",
-                                                       EGIS0577_STARTUP_RESET_DELAY_MS);
-                  g_error_free (error);
-                  return;
-                }
-
-              /* Claim-recycle retries are exhausted and USB-reset recovery is
-               * off by default (it wedges this hardware until a cold reboot).
-               * The device is present but not accepting the first pre-init bulk
-               * write — it is transport-wedged. Fail cleanly with an actionable
-               * message instead of silently re-recycling forever (which makes
-               * the capture/enroll scripts hang with no further output). The
-               * reliable recovery is a physical unplug/replug of the sensor. */
+              /* Claim-recycle retries exhausted; the device is transport-wedged.
+               * Fail cleanly — the reliable recovery is unplug/replug. */
               fp_warn ("EH577 not responding to init after %u claim recycles; sensor is transport-wedged — unplug and replug it, then retry",
                        EGIS0577_STARTUP_TIMEOUT_RECOVERY_MAX);
               clear_capture_frame (self);
@@ -2059,7 +1504,7 @@ req_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *err
                   packet_array_name (self->pkt_array),
                   self->current_index);
           clear_capture_frame (self);
-          restart_capture_cycle (self, transfer->ssm, dev, "timeout recovery", self->no_finger_retry_delay_ms);
+          restart_capture_cycle (self, transfer->ssm, dev, "timeout recovery", 0);
           g_error_free (error);
           return;
         }
@@ -2072,15 +1517,12 @@ req_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *err
       return;
     }
 
-  if (first_preinit && (self->startup_timeout_retries > 0 || self->startup_reset_attempts > 0))
+  if (first_preinit && self->startup_timeout_retries > 0)
     {
-      fp_dbg ("Recovered startup after %u claim retr%s and %u USB reset attempt%s",
+      fp_dbg ("Recovered startup after %u claim retr%s",
               self->startup_timeout_retries,
-              self->startup_timeout_retries == 1 ? "y" : "ies",
-              self->startup_reset_attempts,
-              self->startup_reset_attempts == 1 ? "" : "s");
+              self->startup_timeout_retries == 1 ? "y" : "ies");
       self->startup_timeout_retries = 0;
-      self->startup_reset_attempts = 0;
     }
 
   fpi_ssm_next_state (transfer->ssm);
@@ -2134,41 +1576,18 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
           self->pkt_array_len = EGIS0577_PRE_INIT_PACKETS_LENGTH;
         }
       self->current_index = 0;
-      self->pre_frame_delay_ms = get_env_ms_or_default ("EGIS0577_PRE_FRAME_DELAY_MS", 0);
-      self->poll_loop_delay_ms = get_env_ms_or_default ("EGIS0577_POLL_LOOP_DELAY_MS", 0);
-      self->no_finger_retry_delay_ms = get_env_ms_or_default ("EGIS0577_NO_FINGER_RETRY_DELAY_MS",
-                                                              EGIS0577_NO_FINGER_RETRY_DELAY_MS);
-      self->post_capture_poll_delay_ms = get_env_ms_or_default ("EGIS0577_POST_CAPTURE_POLL_DELAY_MS",
-                                                                EGIS0577_POST_CAPTURE_POLL_DELAY_MS);
-      self->max_frames_per_claim = get_env_ms_or_default ("EGIS0577_MAX_FRAMES_PER_CLAIM",
-                                                          EGIS0577_MAX_FRAMES_PER_CLAIM);
-      self->stage2_grain_pct_x1000 = get_env_uint_or_default ("EGIS0577_STAGE2_GRAIN_PCT_X1000",
-                                                              EGIS0577_STAGE2_GRAIN_PCT_X1000);
-      self->stage2_min_minutiae = get_env_uint_or_default ("EGIS0577_STAGE2_MIN_MINUTIAE",
-                                                           EGIS0577_STAGE2_MIN_MINUTIAE);
-      self->stage2_max_minutiae = get_env_uint_or_default ("EGIS0577_STAGE2_MAX_MINUTIAE",
-                                                           EGIS0577_STAGE2_MAX_MINUTIAE);
-      self->stage2_min_ridge_pixels = get_env_uint_or_default ("EGIS0577_STAGE2_MIN_RIDGE_PIXELS",
-                                                               EGIS0577_STAGE2_MIN_RIDGE_PIXELS);
-      self->stage2_min_stretch_p5 = get_env_uint_or_default ("EGIS0577_STAGE2_MIN_STRETCH_P5",
-                                                             EGIS0577_STAGE2_MIN_STRETCH_P5);
-      self->frame_delay_armed = FALSE;
 
       clear_capture_frame (self);
-      fp_dbg ("Initial packet array: %s", packet_array_name (self->pkt_array));
-      fp_dbg ("EH577 pacing config: pre_frame_delay_ms=%u poll_loop_delay_ms=%u no_finger_retry_delay_ms=%u post_capture_poll_delay_ms=%u max_frames_per_claim=%u current_claim_frames=%u stage2_stretch_p5>=%u stage2_grain<%u.%03u%% stage2_minutiae=%u..%u stage2_ridge_pixels>=%u",
-              self->pre_frame_delay_ms,
-              self->poll_loop_delay_ms,
-              self->no_finger_retry_delay_ms,
-              self->post_capture_poll_delay_ms,
-              self->max_frames_per_claim,
+      fp_dbg ("Initial packet array: %s (claim_frames=%u/%u, stage2: p5>=%u grain<%u.%03u%% min=%u max=%u ridge>=%u)",
+              packet_array_name (self->pkt_array),
               self->frame_reads_this_claim,
-              self->stage2_min_stretch_p5,
-              self->stage2_grain_pct_x1000 / 1000,
-              self->stage2_grain_pct_x1000 % 1000,
-              self->stage2_min_minutiae,
-              self->stage2_max_minutiae,
-              self->stage2_min_ridge_pixels);
+              EGIS0577_MAX_FRAMES_PER_CLAIM,
+              EGIS0577_STAGE2_MIN_STRETCH_P5,
+              EGIS0577_STAGE2_GRAIN_PCT_X1000 / 1000,
+              EGIS0577_STAGE2_GRAIN_PCT_X1000 % 1000,
+              EGIS0577_STAGE2_MIN_MINUTIAE,
+              EGIS0577_STAGE2_MAX_MINUTIAE,
+              EGIS0577_STAGE2_MIN_RIDGE_PIXELS);
       if (!self->has_pre_init_run && self->pkt_array == EGIS0577_PRE_INIT_PACKETS && self->current_index == 0)
         {
           fp_dbg ("Applying %u ms startup settle delay before first pre-init packet",
@@ -2199,20 +1618,6 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
               self->current_index,
               self->pkt_array_len);
 
-      if (self->pkt_array[self->current_index].response_length == EGIS0577_IMGSIZE &&
-          self->pre_frame_delay_ms > 0 &&
-          !self->frame_delay_armed)
-        {
-          self->frame_delay_armed = TRUE;
-          fp_dbg ("Delaying frame request %s[%d] by %u ms before sending 64 14 ec",
-                  packet_array_name (self->pkt_array),
-                  self->current_index,
-                  self->pre_frame_delay_ms);
-          fpi_ssm_jump_to_state_delayed (ssm, SM_REQ, self->pre_frame_delay_ms);
-          break;
-        }
-
-      self->frame_delay_armed = FALSE;
       send_req (ssm, dev, &self->pkt_array[self->current_index]);
       break;
 
@@ -2265,15 +1670,11 @@ reset_action_state (FpDeviceEgis0577 *self)
   self->stop = FALSE;
   self->finger_reported = FALSE;
   self->capture_armed = FALSE;
-  self->unarmed_finger_first_time = 0;
-  self->unarmed_reinit_attempts = 0;
-  reset_noise_recovery_state (self);
   self->frame_counter = 0;
   self->frame_reads_this_claim = 0;
   self->turn_open = FALSE;
   self->has_pre_init_run = FALSE;
   self->startup_timeout_retries = 0;
-  self->startup_reset_attempts = 0;
   self->rearm_not_before_time = 0;
   clear_capture_frame (self);
   clear_background (self);
@@ -2308,10 +1709,8 @@ dev_open (FpDevice *dev)
       return;
     }
 
-  /* The unconditional reset-on-open path proved too aggressive and could make
-   * the device disappear from lsusb on this hardware. Keep open lightweight;
-   * startup hardening now happens via a short settle delay before the first
-   * pre-init packet plus timeout-triggered claim recycle / USB-reset recovery. */
+  /* Keep open lightweight; startup hardening happens via a short settle delay
+   * before the first pre-init packet and claim-recycle on timeout. */
   fp_dbg ("Settling %u ms after claim before first action", EGIS0577_STARTUP_SETTLE_DELAY_MS);
   g_usleep (EGIS0577_STARTUP_SETTLE_DELAY_MS * 1000);
 
@@ -2346,7 +1745,6 @@ dev_enroll (FpDevice *dev)
   g_clear_pointer (&self->enroll_gallery, g_ptr_array_unref);
   self->enroll_gallery = g_ptr_array_new_with_free_func (g_free);
   self->enroll_stage = 0;
-  self->enroll_frame_size = 0;
   self->enroll_frame_width = 0;
   self->enroll_frame_height = 0;
 
@@ -2357,13 +1755,6 @@ static void
 dev_verify (FpDevice *dev)
 {
   fp_dbg ("Verify requested");
-  start_capture_action (dev);
-}
-
-static void
-dev_identify (FpDevice *dev)
-{
-  fp_dbg ("Identify requested");
   start_capture_action (dev);
 }
 
@@ -2401,15 +1792,8 @@ fpi_device_egis0577_class_init (FpDeviceEgis0577Class *klass)
   dev_class->close = dev_close;
   dev_class->enroll = dev_enroll;
   dev_class->verify = dev_verify;
-  dev_class->identify = dev_identify;
   dev_class->capture = dev_capture;
 
   fpi_device_class_auto_initialize_features (dev_class);
-
-  /* For desktop login flows (fprintd/pam_fprintd/GDM), verify is the critical
-   * path.  Our live tests show verify works, but identify is still less stable
-   * (one enrolled finger failed to identify from a 2-print gallery). Keep the
-   * private identify implementation available for targeted testing, but do not
-   * advertise IDENTIFY support to user space until it is proven reliable. */
   dev_class->features &= ~FP_DEVICE_FEATURE_IDENTIFY;
 }

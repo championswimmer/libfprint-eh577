@@ -169,19 +169,6 @@ static const Packet EGIS0577_POST_INIT_PACKETS[] = {
 #define EGIS0577_STAGE2_RIDGE_PIXEL_THRESHOLD 180
 #define EGIS0577_STAGE2_MIN_RIDGE_PIXELS 600
 
-/* Noisy-burst recovery. Noise-like Stage-2 rejects indicate that the sensor/AGC
- * state may be contaminated; after a small action-aware streak, clear the warm
- * baseline and force a fresh init/baseline cycle. Verify/identify are bounded
- * more tightly so login never spends too long recovering. */
-#define EGIS0577_NOISE_RECOVERY_STREAK_ENROLL_CAPTURE 2
-#define EGIS0577_NOISE_RECOVERY_STREAK_VERIFY_IDENTIFY 2
-#define EGIS0577_NOISE_RECOVERY_MAX_ENROLL_CAPTURE 2
-#define EGIS0577_NOISE_RECOVERY_MAX_VERIFY_IDENTIFY 1
-#define EGIS0577_NOISE_RECOVERY_DELAY_ENROLL_CAPTURE_MS 2000
-#define EGIS0577_NOISE_RECOVERY_DELAY_VERIFY_IDENTIFY_MS 500
-#define EGIS0577_NOISE_RECOVERY_CLEAN_FRAMES_ENROLL_CAPTURE 2
-#define EGIS0577_NOISE_RECOVERY_CLEAN_FRAMES_VERIFY_IDENTIFY 1
-
 /*
  * Minimum number of nonzero pixels required to classify a frame as finger-present.
  *
@@ -197,29 +184,8 @@ static const Packet EGIS0577_POST_INIT_PACKETS[] = {
  */
 #define EGIS0577_MIN_ACTIVE_PIXELS_PRESENT 1000
 #define EGIS0577_MIN_ACTIVE_PIXELS_STRICT 1000
-/*
- * Successful commands complete well below 1 s. Keep timeout recovery tight so
- * a wedged claim does not stall stage transitions for 10 seconds.
- *
- * Startup timeout recovery policy:
- * - the default recovery path is conservative: recycle the claimed interface
- *   and restart from PRE_INIT
- * - a more aggressive last-resort recovery path exists behind the optional
- *   environment flag `EGIS0577_ENABLE_USB_RESET_RECOVERY=1`
- * - when enabled, repeated first-pre-init timeouts may trigger a full
- *   `g_usb_device_reset()` before reclaiming the interface
- *
- * Leave the flag unset for normal use. Enable it only for targeted debugging
- * if claim-recycle recovery is insufficient and you accept the risk that some
- * hosts/sensors may wedge badly enough to require unplug/replug or reboot.
- */
+/* USB commands time out after this many ms. */
 #define EGIS0577_TIMEOUT 2000
-
-/*
- * Keep missed-touch retries responsive: poll again immediately within the same
- * claim until the claim is near its observed large-read limit.
- */
-#define EGIS0577_NO_FINGER_RETRY_DELAY_MS 0
 
 /*
  * Milliseconds to pause after submitting a good image before restarting
