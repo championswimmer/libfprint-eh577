@@ -36,8 +36,29 @@ fi
 
 mkdir -p "$SESS_DIR"
 
-systemctl stop fprintd fprintd.socket 2>/dev/null || true
-pkill -f fprintd 2>/dev/null || true
+free_device() {
+  systemctl stop fprintd fprintd.socket 2>/dev/null || true
+  pkill -f fprintd 2>/dev/null || true
+  pkill -f "eh577-enroll-helper" 2>/dev/null || true
+  pkill -f "eh577-identify-helper" 2>/dev/null || true
+
+  local devnode
+  devnode=$(lsusb -d 1c7a:0577 2>/dev/null \
+    | awk '{printf "/dev/bus/usb/%s/%s\n", $2, $4}' | tr -d ':')
+  [[ -z "$devnode" || ! -e "$devnode" ]] && return
+
+  local waited=0
+  while fuser "$devnode" >/dev/null 2>&1; do
+    if (( waited >= 5 )); then
+      echo "Warning: device still busy after 5 s — holder PIDs: $(fuser "$devnode" 2>/dev/null || true)"
+      return
+    fi
+    echo "Waiting for USB device to be released (${waited}s)..."
+    sleep 1
+    (( waited++ )) || true
+  done
+}
+free_device
 
 echo "Session: $SESSION"
 echo "Log:     $LOG"

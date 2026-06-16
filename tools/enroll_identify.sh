@@ -54,14 +54,17 @@ fi
 # Stop fprintd and any socket-activated restarts; wait until USB device is free
 sudo systemctl stop fprintd fprintd.socket 2>/dev/null || true
 sudo pkill -f fprintd 2>/dev/null || true
-USBDEV=$(ls /dev/bus/usb/003/00[0-9] 2>/dev/null | while read -r d; do lsusb -D "$d" 2>/dev/null | grep -q '1c7a:0577' && echo "$d"; done | head -1)
-if [[ -n "$USBDEV" ]]; then
+sudo pkill -f "eh577-enroll-helper" 2>/dev/null || true
+sudo pkill -f "eh577-identify-helper" 2>/dev/null || true
+USBDEV=$(lsusb -d 1c7a:0577 2>/dev/null \
+  | awk '{printf "/dev/bus/usb/%s/%s\n", $2, $4}' | tr -d ':')
+if [[ -n "$USBDEV" && -e "$USBDEV" ]]; then
   for i in 1 2 3 4 5; do
     sudo fuser "$USBDEV" &>/dev/null || break
+    echo "Waiting for USB device to be released (${i}s)..."
     sleep 1
   done
 fi
-sudo bash -c 'echo "on" > /sys/bus/usb/devices/3-3/power/control' 2>/dev/null || true
 
 # Clean shutdown. On Ctrl-C (or any exit) ask whichever privileged helper is
 # running to close the device first — both helpers trap SIGINT and run

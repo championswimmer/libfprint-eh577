@@ -31,10 +31,17 @@ log ""
 if ! lsusb | grep -q '1c7a:0577'; then
   log "ERROR: EH577 not found. Check USB connection."; exit 1
 fi
-if systemctl is-active --quiet fprintd; then
-  log "Stopping fprintd..."; sudo systemctl stop fprintd
+sudo systemctl stop fprintd fprintd.socket 2>/dev/null || true
+sudo pkill -f fprintd 2>/dev/null || true
+USBDEV=$(lsusb -d 1c7a:0577 2>/dev/null \
+  | awk '{printf "/dev/bus/usb/%s/%s\n", $2, $4}' | tr -d ':')
+if [[ -n "$USBDEV" && -e "$USBDEV" ]]; then
+  for i in 1 2 3 4 5; do
+    sudo fuser "$USBDEV" &>/dev/null || break
+    echo "Waiting for USB device to be released (${i}s)..."
+    sleep 1
+  done
 fi
-sudo bash -c 'echo "on" > /sys/bus/usb/devices/3-3/power/control' 2>/dev/null || true
 
 # ── finger selection ──────────────────────────────────────────────────────────
 echo "Choose the finger to enroll and verify:"

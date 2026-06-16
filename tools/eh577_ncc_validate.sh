@@ -34,6 +34,18 @@ chown_artifacts() {
 stop_fprintd() {
   sudo systemctl stop fprintd fprintd.socket 2>/dev/null || true
   sudo pkill -f fprintd 2>/dev/null || true
+  sudo pkill -f "eh577-enroll-helper" 2>/dev/null || true
+  sudo pkill -f "eh577-verify-helper" 2>/dev/null || true
+  sudo pkill -f "eh577-identify-helper" 2>/dev/null || true
+  local devnode
+  devnode=$(lsusb -d 1c7a:0577 2>/dev/null \
+    | awk '{printf "/dev/bus/usb/%s/%s\n", $2, $4}' | tr -d ':')
+  [[ -z "$devnode" || ! -e "$devnode" ]] && return
+  for i in 1 2 3 4 5; do
+    sudo fuser "$devnode" &>/dev/null || break
+    echo "Waiting for USB device to be released (${i}s)..."
+    sleep 1
+  done
 }
 
 run_clear_storage() {

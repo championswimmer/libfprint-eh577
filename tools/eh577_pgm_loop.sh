@@ -4,7 +4,8 @@
 #
 # Usage: ./tools/eh577_pgm_loop.sh [N]    # default N=5
 #
-# Accepted PGMs land in artifacts/pgm/YYYYMMDD-HHMMSS-NNN.pgm.
+# Captures land in artifacts/pgm-runs/YYYYMMDD-HHMMSS/ (log, raw dumps,
+# helper PGMs), and accepted PGMs are also copied to artifacts/pgm/.
 # Exit 0 if at least one frame was accepted; exit 1 if all were rejected.
 
 set -uo pipefail
@@ -19,11 +20,20 @@ LIBFP="$REPO/refs/libfprint/build/libfprint"
 HELPER="$REPO/refs/libfprint/build/examples/eh577-capture-helper"
 COUNT="${1:-5}"
 SESSION="$(date +%Y%m%d-%H%M%S)"
-TMP_DIR="$(mktemp -d)"
+OUT_DIR="$REPO/artifacts/pgm-runs/$SESSION"
 PGM_DIR="$REPO/artifacts/pgm"
-LOG="$TMP_DIR/pgm-loop.log"
+RAW_DIR="$OUT_DIR/raw"
+LOG="$OUT_DIR/pgm-loop.log"
 
-trap 'rm -rf "$TMP_DIR"' EXIT
+cleanup() {
+  if [[ -n "${HELPER_PID:-}" ]] && kill -0 "$HELPER_PID" 2>/dev/null; then
+    echo "Interrupted; stopping capture helper (pid $HELPER_PID)..." >&2
+    kill -TERM "$HELPER_PID" 2>/dev/null || true
+    wait "$HELPER_PID" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
+trap 'cleanup; exit 130' INT TERM
 
 if [[ ! -x "$HELPER" ]]; then
   echo "Helper not built: $HELPER"; exit 1
@@ -32,19 +42,47 @@ if ! lsusb | grep -q '1c7a:0577'; then
   echo "EH577 (1c7a:0577) not on USB — replug it."; exit 1
 fi
 
-systemctl stop fprintd fprintd.socket 2>/dev/null || true
-pkill -f fprintd 2>/dev/null || true
+free_device() {
+  systemctl stop fprintd fprintd.socket 2>/dev/null || true
+  pkill -f fprintd 2>/dev/null || true
+  pkill -f "eh577-capture-helper" 2>/dev/null || true
 
-mkdir -p "$PGM_DIR"
+  local devnode
+  devnode=$(lsusb -d 1c7a:0577 2>/dev/null \
+    | awk '{printf "/dev/bus/usb/%s/%s\n", $2, $4}' | tr -d ':')
+  [[ -z "$devnode" || ! -e "$devnode" ]] && return
+
+  local waited=0
+  while fuser "$devnode" >/dev/null 2>&1; do
+    if (( waited >= 5 )); then
+      echo "Warning: device still busy after 5 s — holder PIDs: $(fuser "$devnode" 2>/dev/null || true)"
+      return
+    fi
+    echo "Waiting for USB device to be released (${waited}s)..."
+    sleep 1
+    (( waited++ )) || true
+  done
+}
+free_device
+
+mkdir -p "$OUT_DIR" "$RAW_DIR" "$PGM_DIR"
 
 echo "Capturing $COUNT frame(s) — touch the sensor when prompted."
+echo "Debug log: $LOG"
+# Open fd 3 on the terminal so the helper can print prompts there while
+# stdout/stderr (driver debug logs) go to the log file.
+exec 3>/dev/tty
 LD_LIBRARY_PATH="$LIBFP" \
 G_MESSAGES_DEBUG=libfprint-egis0577 \
-  "$HELPER" "$TMP_DIR" "$COUNT" 2>"$LOG"
+EGIS0577_FRAME_DUMP_DIR="$RAW_DIR" \
+  stdbuf -oL -eL "$HELPER" "$OUT_DIR" "$COUNT" >"$LOG" 2>&1 &
+HELPER_PID=$!
+wait "$HELPER_PID"
+exec 3>&-
 
 # Rename and move accepted PGMs with session-scoped sequence numbers.
 accepted=0
-for pgm in "$TMP_DIR"/capture-*.pgm; do
+for pgm in "$OUT_DIR"/capture-*.pgm; do
   [[ -e "$pgm" ]] || continue
   seq=$(printf "%03d" $((accepted + 1)))
   dest="$PGM_DIR/${SESSION}-${seq}.pgm"
@@ -65,7 +103,7 @@ echo "Accepted:         $accepted"
 echo "Rejected:         $rejected"
 
 if [[ -n "${SUDO_UID:-}" ]]; then
-  chown -R "$SUDO_UID:${SUDO_GID:-$SUDO_UID}" "$PGM_DIR" 2>/dev/null || true
+  chown -R "$SUDO_UID:${SUDO_GID:-$SUDO_UID}" "$OUT_DIR" "$PGM_DIR" 2>/dev/null || true
 fi
 
 [[ $accepted -ge 1 ]]
