@@ -2,7 +2,7 @@
 # Lean PGM capture loop — no cue timers, no finger-selection UI.
 # Each accepted press is saved as a numbered PGM and counted.
 #
-# Usage: sudo ./tools/eh577_pgm_loop.sh [N]    # default N=5
+# Usage: ./tools/eh577_pgm_loop.sh [N]    # default N=5
 #
 # Accepted PGMs land in artifacts/pgm/YYYYMMDD-HHMMSS-NNN.pgm.
 # Exit 0 if at least one frame was accepted; exit 1 if all were rejected.
@@ -10,8 +10,7 @@
 set -uo pipefail
 
 if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
-  echo "Must run as root:  sudo $0 [count]"
-  exit 1
+  exec sudo "$0" "$@"
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

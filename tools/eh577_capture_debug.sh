@@ -5,16 +5,15 @@
 # reads, etc. Use this when capture12.sh "does nothing" (no touch prompt / no
 # frames), which usually means open never completed.
 #
-# Run as root:
-#   sudo ./tools/eh577_capture_debug.sh [count]      (default 2)
+# Run as:
+#   ./tools/eh577_capture_debug.sh [count]      (default 2)
 #
 # It prints the log path at the end — share that file.
 
 set -uo pipefail
 
 if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
-  echo "Must run as root:  sudo $0 [count]"
-  exit 1
+  exec sudo "$0" "$@"
 fi
 
 # Resolve repo paths relative to this script (works regardless of CWD).

@@ -4,7 +4,7 @@
 # Runs entirely against our own built driver — no system fprintd.
 # One finger enrolled, then repeated identify until user types 'q'.
 #
-# Usage: sudo ./tools/eh577_offline_session.sh
+# Usage: ./tools/eh577_offline_session.sh
 #
 # Session artifacts land in artifacts/sessions/SESS/ and driver debug
 # goes to artifacts/sessions/SESS/session.log via G_MESSAGES_DEBUG.
@@ -12,8 +12,7 @@
 set -uo pipefail
 
 if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
-  echo "Must run as root:  sudo $0"
-  exit 1
+  exec sudo "$0" "$@"
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
