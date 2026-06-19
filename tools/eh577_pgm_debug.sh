@@ -40,16 +40,12 @@ echo '0' >"$CONTROL"
 
 cleanup() {
   echo '0' >"$CONTROL" 2>/dev/null || true
-  if [[ -n "${DEBUG_PID:-}" ]] && kill -0 "$DEBUG_PID" 2>/dev/null; then
-    kill -TERM "$DEBUG_PID" 2>/dev/null || true
-    wait "$DEBUG_PID" 2>/dev/null || true
-  fi
   if [[ -n "${SUDO_UID:-}" ]]; then
     chown -R "$SUDO_UID:${SUDO_GID:-$SUDO_UID}" "$OUT" 2>/dev/null || true
   fi
 }
 trap cleanup EXIT
-trap 'cleanup; exit 130' INT TERM
+trap 'cleanup; exit 130' TERM
 
 free_device() {
   systemctl stop fprintd fprintd.socket 2>/dev/null || true
@@ -92,8 +88,12 @@ Interval: ${INTERVAL_MS} ms
 Keys: f=start captures, s=stop captures, x=exit
 EOF
 
-# fd 3 stays connected to the terminal; stdout/stderr are the verbose log.
+# fd 3 stays connected to the terminal for concise status messages while
+# stdout/stderr go to the verbose log.  Keep the debug binary in the foreground:
+# it reads raw keys from stdin, and a background process is not allowed to read
+# from the controlling terminal reliably (the original version missed f/s/x).
 exec 3>/dev/tty
+set +e
 (
   cd "$REPO"
   LD_LIBRARY_PATH="$LIBFP" \
@@ -104,11 +104,9 @@ exec 3>/dev/tty
   EGIS0577_PGM_DEBUG_CONTROL="$CONTROL" \
   EGIS0577_PGM_DEBUG_INTERVAL_MS="$INTERVAL_MS" \
     "$DEBUG_BIN"
-) >>"$LOG" 2>&1 &
-DEBUG_PID=$!
-
-wait "$DEBUG_PID"
+) >>"$LOG" 2>&1
 status=$?
+set -e
 exec 3>&-
 
 pgm_count=$(find "$PGM_DIR" -maxdepth 1 -type f -name 'frame-*.pgm' 2>/dev/null | wc -l)
