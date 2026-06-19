@@ -46,9 +46,9 @@ struct _FpDeviceEgis0577
   gboolean      stop;
   gboolean      finger_reported;
   gboolean      capture_armed;
+  gboolean      waiting_for_lift; /* set on turn timeout or accepted frame; cleared on lift */
 
   guint8       *capture_frame;
-  gsize         capture_nonzero;
 
   guint8       *background;
 
@@ -60,12 +60,7 @@ struct _FpDeviceEgis0577
   gboolean      has_pre_init_run;
 
   gint64        finger_first_detected_time;
-
-  /* Per-touch "turn" best-frame selection (see save_img). */
-  gboolean      turn_open;     /* a touch is being captured right now */
-  guint8       *best_frame;    /* cleanest usable frame seen this turn */
-  int           best_sat;      /* saturated-pixel count of best_frame (lower=cleaner) */
-  int           best_coverage; /* coverage% of best_frame */
+  gboolean      turn_open;
 
   GPtrArray    *enroll_gallery;
   guint         enroll_stage;
@@ -73,8 +68,6 @@ struct _FpDeviceEgis0577
   guint         enroll_frame_height;
 
   guint         startup_timeout_retries;
-
-  gint64        rearm_not_before_time;
 };
 
 enum sm_states {
@@ -82,7 +75,6 @@ enum sm_states {
   SM_START,
   SM_REQ,
   SM_RESP,
-  SM_PROCESS_IMG,
   SM_DONE,
   SM_STATES_NUM
 };
@@ -100,12 +92,11 @@ G_DEFINE_TYPE (FpDeviceEgis0577, fpi_device_egis0577, FP_TYPE_DEVICE);
 #define EGIS0577_STARTUP_TIMEOUT_RECOVERY_MAX        2
 #define EGIS0577_STARTUP_TIMEOUT_RECOVERY_DELAY_MS 250
 #define EGIS0577_STARTUP_SETTLE_DELAY_MS           150
-#define EGIS0577_ENROLL_REARM_SETTLE_MS            800
 
-/* Per-touch timing. After a finger is first detected we skip frames for a short
- * settle window so the press stabilizes before it is evaluated. A touch "turn"
- * is force-finalized once the turn timeout elapses, so a single press can never
- * poll indefinitely. */
+/* Per-touch timing. After a finger first lands we ignore frames for SETTLE_MS
+ * so the press stabilises before evaluation. If no valid frame is captured
+ * within TURN_TIMEOUT_MS the turn fails and the driver waits for a real lift
+ * before arming a new attempt. */
 #define EGIS0577_FINGER_SETTLE_MS                  400
 #define EGIS0577_TURN_TIMEOUT_MS                  1400
 
@@ -312,7 +303,6 @@ static void
 clear_capture_frame (FpDeviceEgis0577 *self)
 {
   g_clear_pointer (&self->capture_frame, g_free);
-  self->capture_nonzero = 0;
 }
 
 static void
@@ -325,7 +315,7 @@ clear_background (FpDeviceEgis0577 *self)
  * Keep a rolling copy of the most recent *warm* no-finger frame as the background.
  *
  * The sensor's fixed hot/saturated pixels (and fixed-pattern offset) are present in
- * the no-finger frames too, so subtracting the latest one in process_imgs cancels
+ * the no-finger frames too, so subtracting the latest one in save_img cancels
  * that fixed-pattern noise without eroding ridge detail. The baseline must be a warm
  * frame that actually carries the hot pixels: a cold all-zero frame has bg=0 at those
  * locations and would fail to subtract them, so only frames that reach this helper
@@ -371,28 +361,6 @@ count_nonzero_bytes (FpiUsbTransfer *transfer)
   return nonzero;
 }
 
-/* Saturated/hot pixels (~255). Fewer = cleaner frame; used to pick the best frame
- * within a touch. Saturation is the cheap, validated proxy for the perceived noise
- * ("grain"); the precise grain<0.1 / minutiae gate is enforced separately. */
-static gsize
-count_saturated_pixels (FpiUsbTransfer *transfer)
-{
-  gsize n = 0;
-
-  for (size_t i = 0; i < transfer->actual_length; i++)
-    if (transfer->buffer[i] >= 250)
-      n++;
-
-  return n;
-}
-
-static void
-clear_best_frame (FpDeviceEgis0577 *self)
-{
-  g_clear_pointer (&self->best_frame, g_free);
-  self->best_sat = -1;
-  self->best_coverage = 0;
-}
 
 static void
 maybe_write_live_frame_pgm (FpImage *img)
@@ -502,14 +470,6 @@ finger_detected (FpDeviceEgis0577 *self, FpiUsbTransfer *transfer)
 
   fp_dbg ("finger_detected: coverage=%d%% intensity=%d", coverage, intensity);
   return coverage >= 18 && intensity >= 10; /* Require at least a faint solid touch to avoid getting stuck on latent prints */
-}
-
-static gboolean
-capture_usable (FpDeviceEgis0577 *self, FpiUsbTransfer *transfer)
-{
-  int coverage = 0, intensity = 0;
-  calculate_finger_heuristics (self, transfer, &coverage, &intensity);
-  return coverage >= 25 && intensity >= 20;
 }
 
 /* Normalize the processed image into the same polarity used by the offline
@@ -792,14 +752,10 @@ stage2_snapshot_quality_ok (FpDeviceEgis0577 *self,
   if (out_stretch_p99)
     *out_stretch_p99 = stretch_p99;
 
-  return stretch_p5 >= EGIS0577_STAGE2_MIN_STRETCH_P5 &&
-         grain_pct_x1000 < EGIS0577_STAGE2_GRAIN_PCT_X1000 &&
-         minutiae >= EGIS0577_STAGE2_MIN_MINUTIAE &&
-         /* Too many minutiae on this tiny sensor usually means noise, not a
-          * better fingerprint. Cap the count so noisy stretch5 frames do not
-          * pass just because they manufacture many false minutiae. */
-         minutiae <= EGIS0577_STAGE2_MAX_MINUTIAE &&
-         ridge_pixels >= EGIS0577_STAGE2_MIN_RIDGE_PIXELS;
+  return grain_pct_x1000 < EGIS0577_STAGE2_GRAIN_PCT_X1000 &&
+         minutiae > EGIS0577_STAGE2_MIN_MINUTIAE &&
+         minutiae < EGIS0577_STAGE2_MAX_MINUTIAE &&
+         ridge_pixels > EGIS0577_STAGE2_MIN_RIDGE_PIXELS;
 }
 
 static gboolean
@@ -907,10 +863,10 @@ on_frame_accepted_enroll (FpDevice *dev,
 
   self->capture_armed = FALSE;
   self->turn_open = FALSE;
-  self->rearm_not_before_time = g_get_monotonic_time () + EGIS0577_ENROLL_REARM_SETTLE_MS * 1000;
+  self->waiting_for_lift = TRUE;
 
-  fp_info ("Enroll stage %u/%u captured; re-arm blocked for %u ms to require a real lift/reset",
-           self->enroll_stage, NCC_ENROLL_FRAMES, EGIS0577_ENROLL_REARM_SETTLE_MS);
+  fp_info ("Enroll stage %u/%u captured; waiting for lift before next turn",
+           self->enroll_stage, NCC_ENROLL_FRAMES);
 
   if (self->enroll_stage < NCC_ENROLL_FRAMES)
     return;
@@ -1047,241 +1003,107 @@ on_frame_accepted (FpDevice *dev,
     }
 }
 
-/* End a touch "turn": submit the cleanest frame collected during the window, or
- * restart polling if none qualified. Called when the 1s window has elapsed (from any
- * frame, finger present or not), guaranteeing a turn never runs longer than ~1s. */
-static void
-finalize_turn (FpDeviceEgis0577 *self, FpiSsm *ssm, FpDevice *dev)
-{
-  self->turn_open = FALSE;
-  self->capture_armed = FALSE;
-
-  if (self->best_frame)
-    {
-      clear_capture_frame (self);
-      self->capture_frame = g_steal_pointer (&self->best_frame);
-      self->capture_nonzero = self->best_coverage;
-      fp_dbg ("Turn complete: submitting best frame (cov=%d%% sat=%d)",
-              self->best_coverage, self->best_sat);
-      clear_best_frame (self);
-      fpi_ssm_next_state (ssm); /* -> SM_PROCESS_IMG */
-      return;
-    }
-
-  fp_dbg ("Turn complete with no usable frame; restarting poll loop");
-  clear_best_frame (self);
-  restart_for_next_poll (self, ssm, dev, "turn window expired without usable frame");
-}
-
+/*
+ * save_img: called once per completed post-init sequence with the raw 5356-byte
+ * frame in transfer->buffer.  Implements the per-touch turn flow:
+ *
+ *  1. No finger / zero frame → clear waiting_for_lift if set; arm for next touch.
+ *  2. Finger present, waiting_for_lift or not armed → ignore.
+ *  3. Finger present, armed → open turn; skip frames until FINGER_SETTLE_MS.
+ *  4. Past settle, still within TURN_TIMEOUT_MS → run quality gate once per frame.
+ *     First frame that passes: enhance, submit to on_frame_accepted, done.
+ *  5. TURN_TIMEOUT_MS elapsed without a valid frame → report absent, set
+ *     waiting_for_lift so no new turn starts until the finger is actually lifted.
+ */
 static void
 save_img (FpiUsbTransfer *transfer, FpDevice *dev)
 {
   FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
+  FpiSsm *ssm = transfer->ssm;
   gboolean has_valid_data = valid_data (transfer);
-  gboolean detected_finger = FALSE;
-  int coverage = 0, intensity = 0;
 
-  calculate_finger_heuristics (self, transfer, &coverage, &intensity);
-
-  fp_dbg ("Frame received from %s[%d]: len=%zu cov=%d%% int=%d ready=%d stop=%d",
-          packet_array_name (self->pkt_array),
-          self->current_index,
-          transfer->actual_length,
-          coverage,
-          intensity,
-          self->capture_frame != NULL,
-          self->stop);
-
-  dump_frame_if_requested (self, transfer, coverage);
+  dump_frame_if_requested (self, transfer, count_nonzero_bytes (transfer));
   self->frame_reads_this_claim += 1;
   fp_dbg ("Frame reads in current claim: %u/%u",
           self->frame_reads_this_claim,
           EGIS0577_MAX_FRAMES_PER_CLAIM);
 
-  if (self->turn_open && !self->stop &&
-      g_get_monotonic_time () - self->finger_first_detected_time > EGIS0577_TURN_TIMEOUT_MS * 1000)
-    {
-      finalize_turn (self, transfer->ssm, dev);
-      return;
-    }
-
-  if (!has_valid_data)
-    {
-      fp_dbg ("Zero frame seen; continuing polling loop");
-
-      if (self->stop)
-        {
-          fp_dbg ("Stop requested while handling zero frame");
-          fpi_ssm_jump_to_state (transfer->ssm, SM_DONE);
-          clear_capture_frame (self);
-          return;
-        }
-
-      if (self->finger_reported &&
-          g_get_monotonic_time () - self->finger_first_detected_time < EGIS0577_FINGER_SETTLE_MS * 1000)
-        {
-          fp_dbg ("Ignoring zero frame during %ums settle time", EGIS0577_FINGER_SETTLE_MS);
-          restart_for_next_poll (self, transfer->ssm, dev, "zero frame during settle");
-          return;
-        }
-
-      if (self->rearm_not_before_time > 0 &&
-          g_get_monotonic_time () < self->rearm_not_before_time)
-        {
-          report_finger_status (self, FALSE, "re-arm settle");
-          restart_for_next_poll (self, transfer->ssm, dev, "re-arm settle");
-          return;
-        }
-
-      if (!self->capture_armed)
-        fp_dbg ("Capture armed after clean zero frame");
-      self->capture_armed = TRUE;
-      self->rearm_not_before_time = 0;
-
-      report_finger_status (self, FALSE, "all-zero frame");
-      restart_for_next_poll (self, transfer->ssm, dev, "all-zero frame");
-      return;
-    }
-
   if (self->stop)
     {
-      fp_dbg ("Stop requested while handling non-zero frame");
-      fpi_ssm_jump_to_state (transfer->ssm, SM_DONE);
-      clear_capture_frame (self);
+      fpi_ssm_jump_to_state (ssm, SM_DONE);
       return;
     }
 
-  detected_finger = finger_detected (self, transfer);
-  fp_dbg ("Finger heuristic for current frame: %s", detected_finger ? "present" : "absent");
-
-  if (!detected_finger)
+  /* ---- No-finger path (zero frame or below detection threshold) ---- */
+  if (!has_valid_data || !finger_detected (self, transfer))
     {
-      if (self->finger_reported &&
-          g_get_monotonic_time () - self->finger_first_detected_time < EGIS0577_FINGER_SETTLE_MS * 1000)
+      if (has_valid_data && count_finger_pixels_raw (transfer) < 200)
+        update_warm_background (self, transfer);
+
+      /* Any lift clears the "wait for lift" block and arms a fresh turn. */
+      if (self->waiting_for_lift)
         {
-          fp_dbg ("Ignoring no-finger frame during %ums settle time", EGIS0577_FINGER_SETTLE_MS);
-          restart_for_next_poll (self, transfer->ssm, dev, "no-finger frame during settle");
-          return;
+          self->waiting_for_lift = FALSE;
+          self->turn_open = FALSE;
+          fp_dbg ("Lift detected; re-arming for next touch");
         }
 
-      if (count_finger_pixels_raw (transfer) < 200)
-        {
-          fp_dbg ("Updating rolling warm background");
-          update_warm_background (self, transfer);
-        }
-
-      if (self->rearm_not_before_time > 0 &&
-          g_get_monotonic_time () < self->rearm_not_before_time)
-        {
-          report_finger_status (self, FALSE, "re-arm settle");
-          restart_for_next_poll (self, transfer->ssm, dev, "re-arm settle");
-          return;
-        }
-
-      if (!self->capture_armed)
-        fp_dbg ("Capture armed after clean no-finger frame (cov=%d%%)", coverage);
       self->capture_armed = TRUE;
-      self->rearm_not_before_time = 0;
+      report_finger_status (self, FALSE, has_valid_data ? "below threshold" : "zero frame");
+      restart_for_next_poll (self, ssm, dev, "no finger");
+      return;
+    }
 
-      report_finger_status (self, FALSE, "non-zero frame below finger heuristic threshold");
-      restart_for_next_poll (self, transfer->ssm, dev, "non-zero frame below finger heuristic threshold");
+  /* ---- Finger present ---- */
+  if (self->waiting_for_lift)
+    {
+      fp_dbg ("Finger still on sensor; waiting for lift before next turn");
+      restart_for_next_poll (self, ssm, dev, "waiting for lift");
       return;
     }
 
   if (!self->capture_armed)
     {
-      fp_dbg ("Arming on first finger-like frame (cov=%d%%)", coverage);
-      self->capture_armed = TRUE;
-      self->rearm_not_before_time = 0;
+      fp_dbg ("Capture not armed; ignoring finger frame");
+      restart_for_next_poll (self, ssm, dev, "not armed");
+      return;
     }
 
   if (!self->turn_open)
     {
       self->finger_first_detected_time = g_get_monotonic_time ();
       self->turn_open = TRUE;
-      clear_best_frame (self);
+      report_finger_status (self, TRUE, "finger detected");
     }
-
-  report_finger_status (self, TRUE, "snapshot frame exceeded threshold");
 
   {
     gint64 elapsed = g_get_monotonic_time () - self->finger_first_detected_time;
 
-    if (elapsed < EGIS0577_FINGER_SETTLE_MS * 1000)
+    /* Turn timeout: fail, require lift before next attempt. */
+    if (elapsed > EGIS0577_TURN_TIMEOUT_MS * 1000)
       {
-        fp_dbg ("Finger settling (%lld ms), skipping frame", (long long) (elapsed / 1000));
-        restart_for_next_poll (self, transfer->ssm, dev, "finger settling");
+        fp_warn ("Turn timed out after %lld ms; waiting for lift before retry",
+                 (long long) (elapsed / 1000));
+        self->turn_open = FALSE;
+        self->capture_armed = FALSE;
+        self->waiting_for_lift = TRUE;
+        report_finger_status (self, FALSE, "turn timeout");
+        restart_for_next_poll (self, ssm, dev, "turn timeout");
         return;
       }
 
-    if (capture_usable (self, transfer))
+    /* Settle window: finger just landed, let the press stabilise. */
+    if (elapsed < EGIS0577_FINGER_SETTLE_MS * 1000)
       {
-        int sat = (int) count_saturated_pixels (transfer);
-        gboolean quality_ok = FALSE;
-
-        {
-          g_autoptr(FpImage) img = fp_image_new (EGIS0577_PADDED_IMGWIDTH, EGIS0577_IMGHEIGHT);
-          g_autoptr(FpImage) resized_image = NULL;
-          img->width = EGIS0577_PADDED_IMGWIDTH;
-          img->height = EGIS0577_IMGHEIGHT;
-          img->flags = FPI_IMAGE_COLORS_INVERTED;
-
-          for (guint src_y = 0; src_y < EGIS0577_SENSOR_STRIDE_Y; src_y++)
-            for (guint src_x = 0; src_x < EGIS0577_SENSOR_ACTIVE_WIDTH; src_x++)
-              {
-                guint8 val = transfer->buffer[src_y * EGIS0577_SENSOR_STRIDE_X + src_x];
-                guint8 bg = self->background ? self->background[src_y * EGIS0577_SENSOR_STRIDE_X + src_x] : 0;
-
-                if (val > bg + 2)
-                  val -= bg;
-                else
-                  val = 0;
-
-                img->data[src_y * EGIS0577_PADDED_IMGWIDTH + src_x] = val;
-              }
-
-          resized_image = fpi_image_resize (img, EGIS0577_RESIZE, EGIS0577_RESIZE);
-          quality_ok = stage2_snapshot_quality_ok (self, resized_image, NULL, NULL, NULL, NULL, NULL);
-          maybe_write_live_frame_pgm (resized_image);
-        }
-
-        if (quality_ok)
-          {
-            fp_dbg ("Fast exit: early frame passed Stage-2 quality gate");
-            g_clear_pointer (&self->best_frame, g_free);
-            self->best_frame = g_memdup2 (transfer->buffer, transfer->actual_length);
-            self->best_sat = sat;
-            self->best_coverage = coverage;
-            finalize_turn (self, transfer->ssm, dev);
-            return;
-          }
-
-        if (!self->best_frame || sat < self->best_sat)
-          {
-            g_clear_pointer (&self->best_frame, g_free);
-            self->best_frame = g_memdup2 (transfer->buffer, transfer->actual_length);
-            self->best_sat = sat;
-            self->best_coverage = coverage;
-            fp_dbg ("New best turn frame: cov=%d%% sat=%d", coverage, sat);
-          }
+        fp_dbg ("Finger settling (%lld ms / %d ms)", (long long) (elapsed / 1000), EGIS0577_FINGER_SETTLE_MS);
+        restart_for_next_poll (self, ssm, dev, "finger settling");
+        return;
       }
 
-    restart_for_next_poll (self, transfer->ssm, dev, "collecting best turn frame");
-  }
-}
-
-static void
-process_imgs (FpiSsm *ssm, FpDevice *dev)
-{
-  FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
-  gboolean submitted = FALSE;
-
-  report_finger_status (self, TRUE, "processing snapshot frame");
-
-  if (!self->stop && self->capture_frame)
+    /* Past settle, within turn window: evaluate quality. */
     {
-      g_autoptr(FpImage) img = NULL;
-      g_autoptr(FpImage) resized_image = NULL;
+      g_autoptr(FpImage) img = fp_image_new (EGIS0577_PADDED_IMGWIDTH, EGIS0577_IMGHEIGHT);
+      g_autoptr(FpImage) resized = NULL;
       guint grain_pct_x1000 = 0;
       guint ridge_pixels = 0;
       guint minutiae = 0;
@@ -1289,7 +1111,6 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
       guint stretch_p99 = 0;
       gboolean quality_ok;
 
-      img = fp_image_new (EGIS0577_PADDED_IMGWIDTH, EGIS0577_IMGHEIGHT);
       img->width = EGIS0577_PADDED_IMGWIDTH;
       img->height = EGIS0577_IMGHEIGHT;
       img->flags = FPI_IMAGE_COLORS_INVERTED;
@@ -1297,76 +1118,50 @@ process_imgs (FpiSsm *ssm, FpDevice *dev)
       for (guint src_y = 0; src_y < EGIS0577_SENSOR_STRIDE_Y; src_y++)
         for (guint src_x = 0; src_x < EGIS0577_SENSOR_ACTIVE_WIDTH; src_x++)
           {
-            guint8 val = self->capture_frame[src_y * EGIS0577_SENSOR_STRIDE_X + src_x];
+            guint8 val = transfer->buffer[src_y * EGIS0577_SENSOR_STRIDE_X + src_x];
             guint8 bg = self->background ? self->background[src_y * EGIS0577_SENSOR_STRIDE_X + src_x] : 0;
 
-            if (val > bg + 2)
-              val -= bg;
-            else
-              val = 0;
-
-            img->data[src_y * EGIS0577_PADDED_IMGWIDTH + src_x] = val;
+            img->data[src_y * EGIS0577_PADDED_IMGWIDTH + src_x] = (val > bg + 2) ? val - bg : 0;
           }
 
-      resized_image = fpi_image_resize (img, EGIS0577_RESIZE, EGIS0577_RESIZE);
-      quality_ok = stage2_snapshot_quality_ok (self,
-                                               resized_image,
+      resized = fpi_image_resize (img, EGIS0577_RESIZE, EGIS0577_RESIZE);
+
+      /* stage2_snapshot_quality_ok normalises and applies stretch5 in-place. */
+      quality_ok = stage2_snapshot_quality_ok (self, resized,
                                                &grain_pct_x1000,
                                                &ridge_pixels,
                                                &minutiae,
                                                &stretch_p5,
                                                &stretch_p99);
 
-      fp_warn ("Stage-2 snapshot gate: stretch_p5=%u/%u stretch_p99=%u grain=%u.%03u%%/%u.%03u%% ridge_pixels=%u/%u minutiae=%u/%u..%u => %s",
-               stretch_p5,
-               EGIS0577_STAGE2_MIN_STRETCH_P5,
-               stretch_p99,
-               grain_pct_x1000 / 1000,
-               grain_pct_x1000 % 1000,
-               EGIS0577_STAGE2_GRAIN_PCT_X1000 / 1000,
-               EGIS0577_STAGE2_GRAIN_PCT_X1000 % 1000,
-               ridge_pixels,
-               EGIS0577_STAGE2_MIN_RIDGE_PIXELS,
-               minutiae,
-               EGIS0577_STAGE2_MIN_MINUTIAE,
-               EGIS0577_STAGE2_MAX_MINUTIAE,
+      fp_warn ("Stage-2 at %lld ms: grain=%u.%03u%%/<%u.%03u%% ridge=%u/>%u minutiae=%u (%u..%u) => %s",
+               (long long) (elapsed / 1000),
+               grain_pct_x1000 / 1000, grain_pct_x1000 % 1000,
+               EGIS0577_STAGE2_GRAIN_PCT_X1000 / 1000, EGIS0577_STAGE2_GRAIN_PCT_X1000 % 1000,
+               ridge_pixels, EGIS0577_STAGE2_MIN_RIDGE_PIXELS,
+               minutiae, EGIS0577_STAGE2_MIN_MINUTIAE, EGIS0577_STAGE2_MAX_MINUTIAE,
                quality_ok ? "accept" : "retry");
+
+      maybe_write_live_frame_pgm (resized);
 
       if (quality_ok)
         {
-          fp_dbg ("Submitting snapshot image from frame with nonzero=%zu", self->capture_nonzero);
-          on_frame_accepted (dev, g_steal_pointer (&resized_image));
-          submitted = TRUE;
-        }
-      else
-        {
-          self->capture_armed = FALSE;
+          fp_dbg ("Frame accepted at %lld ms", (long long) (elapsed / 1000));
           self->turn_open = FALSE;
-          if (fpi_device_get_current_action (dev) == FPI_DEVICE_ACTION_ENROLL)
-            self->rearm_not_before_time = g_get_monotonic_time () + EGIS0577_ENROLL_REARM_SETTLE_MS * 1000;
-          clear_best_frame (self);
-          fp_warn ("Stage-2 reject: stretch_p5=%u grain=%u.%03u%% ridge=%u minutiae=%u",
-                   stretch_p5,
-                   grain_pct_x1000 / 1000, grain_pct_x1000 % 1000,
-                   ridge_pixels, minutiae);
+          self->capture_armed = FALSE;
+          /* resized is already normalised and stretch-enhanced by stage2. */
+          on_frame_accepted (dev, g_steal_pointer (&resized));
+
+          if (self->stop)
+            fpi_ssm_jump_to_state (ssm, SM_DONE);
+          else
+            restart_capture_cycle (self, ssm, dev, "post-accept poll", EGIS0577_POST_CAPTURE_POLL_DELAY_MS);
+          return;
         }
     }
 
-  clear_capture_frame (self);
-
-  if (self->stop)
-    {
-      fp_dbg ("Action completed after accepted frame");
-      fpi_ssm_jump_to_state (ssm, SM_DONE);
-      return;
-    }
-
-  fp_dbg (submitted ?
-          "Image submitted; waiting for real finger-off and restarting polling" :
-          "Stage-2 rejected image; restarting capture cycle");
-  restart_capture_cycle (self, ssm, dev,
-                         submitted ? "post-capture await finger-off" : "stage2 reject",
-                         EGIS0577_POST_CAPTURE_POLL_DELAY_MS);
+    restart_for_next_poll (self, ssm, dev, "quality gate pending");
+  }
 }
 
 /*
@@ -1418,8 +1213,8 @@ resp_cb (FpiUsbTransfer *transfer, FpDevice *dev, gpointer user_data, GError *er
       if (self->pkt_array == EGIS0577_POST_INIT_PACKETS)
         {
           /* Post-init complete: a full 5356-byte snapshot frame is in
-           * transfer->buffer. save_img decides whether to recycle the claim
-           * for another attempt or move to SM_PROCESS_IMG. */
+           * transfer->buffer. save_img evaluates it and either accepts it or
+           * recycles the claim for another poll. */
           fp_dbg ("Completed post-init sequence, passing frame to save_img");
           self->current_index = 0;
           save_img (transfer, dev);
@@ -1600,11 +1395,10 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
       self->current_index = 0;
 
       clear_capture_frame (self);
-      fp_dbg ("Initial packet array: %s (claim_frames=%u/%u, stage2: p5>=%u grain<%u.%03u%% min=%u max=%u ridge>=%u)",
+      fp_dbg ("Initial packet array: %s (claim_frames=%u/%u, stage2: grain<%u.%03u%% minutiae=%u..%u ridge>%u)",
               packet_array_name (self->pkt_array),
               self->frame_reads_this_claim,
               EGIS0577_MAX_FRAMES_PER_CLAIM,
-              EGIS0577_STAGE2_MIN_STRETCH_P5,
               EGIS0577_STAGE2_GRAIN_PCT_X1000 / 1000,
               EGIS0577_STAGE2_GRAIN_PCT_X1000 % 1000,
               EGIS0577_STAGE2_MIN_MINUTIAE,
@@ -1649,10 +1443,6 @@ ssm_run_state (FpiSsm *ssm, FpDevice *dev)
               self->current_index,
               self->pkt_array_len);
       recv_resp (ssm, dev, self->pkt_array[self->current_index].response_length);
-      break;
-
-    case SM_PROCESS_IMG:
-      process_imgs (ssm, dev);
       break;
 
     case SM_DONE:
@@ -1703,15 +1493,14 @@ reset_action_state (FpDeviceEgis0577 *self)
   self->stop = FALSE;
   self->finger_reported = FALSE;
   self->capture_armed = FALSE;
+  self->waiting_for_lift = FALSE;
   self->frame_counter = 0;
   self->frame_reads_this_claim = 0;
   self->turn_open = FALSE;
   self->has_pre_init_run = FALSE;
   self->startup_timeout_retries = 0;
-  self->rearm_not_before_time = 0;
   clear_capture_frame (self);
   clear_background (self);
-  clear_best_frame (self);
 }
 
 static void
@@ -1767,7 +1556,6 @@ dev_close (FpDevice *dev)
 
   clear_capture_frame (self);
   clear_background (self);
-  clear_best_frame (self);
   g_clear_pointer (&self->enroll_gallery, g_ptr_array_unref);
   fp_dbg ("Releasing interface %d", EGIS0577_INTERFACE);
   g_usb_device_release_interface (fpi_device_get_usb_device (dev),

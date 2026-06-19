@@ -20,10 +20,17 @@ This repository is the bringup workspace for an open-source `libfprint` driver f
   - enters the **post-init** capture loop,
   - captures **non-zero** frames,
   - assembles a single **press snapshot** image,
+  - applies stretch5 contrast enhancement before NBIS minutiae extraction,
   - and reaches **enroll/verify** through libfprint example programs.
-- The main remaining correctness bug is **false matches**: different fingers can still verify as `MATCH`.
+- The capture flow (as of 2026-06-19) is a strict three-phase per-touch turn:
+  1. **Settle (0–400 ms)**: ignore all frames after first finger detection.
+  2. **Evaluate (400–1400 ms)**: run quality gate on each frame; accept first that passes.
+  3. **End of turn**: on accept → submit enhanced image; on timeout → require lift before retry.
+  Re-arming after a failed turn (or after an accepted enroll stage) is lift-based (`waiting_for_lift`), not timer-based.
+- Quality gate: grain < 6%, minutiae strictly 3–9, ridge pixels > 600 (strict).
+- The main remaining correctness concern is **false matches**: different fingers may still verify as `MATCH`.
 - Secondary open questions:
-  - better touch / finger-present guards,
+  - whether the NCC matcher thresholds need tuning with the new stricter quality gate,
   - explicit temperature policy,
   - whether interrupt endpoints matter for a production-quality driver,
   - and how much extra protocol evidence is still needed before upstreaming.

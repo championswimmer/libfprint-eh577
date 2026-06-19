@@ -147,24 +147,25 @@ static const Packet EGIS0577_POST_INIT_PACKETS[] = {
 
 /*
  * Stage-2 processed-image quality gate (runs on the final resized 208x104
- * snapshot geometry, matching the offline capture12 analysis tooling).
+ * snapshot geometry).
  *
- * Stable production operating point (validated 2026-06-12):
- * - stretch5 enhancement (p5..p99 → 20..245) before NBIS minutiae extraction
- * - reject obvious noise using the pre-stretch p5 floor (< MIN_STRETCH_P5)
- * - grain < 6.000% on enhanced output  (GRAIN_PCT_X1000 = 6000)
- * - 2 <= minutiae <= 16
- * - ridge pixels (grain_diff threshold=25, ridge_pixel threshold=180) >= 600
+ * Four acceptance criteria (applied after stretch5 enhancement):
+ * - grain < 6.000%          (GRAIN_PCT_X1000 = 6000)
+ * - minutiae > 2            (strict greater-than; too few = featureless)
+ * - minutiae < 10           (strict less-than; too many = noise/grain artefacts)
+ * - ridge pixels > 600      (strict greater-than)
+ *
+ * stretch5 enhancement (p5..p99 → 20..245) is applied before NBIS extraction
+ * but is NOT itself a rejection gate.
  */
 #define EGIS0577_ENHANCE_STRETCH_LO_PCT 5
 #define EGIS0577_ENHANCE_STRETCH_HI_PCT 99
 #define EGIS0577_ENHANCE_STRETCH_OUT_LO 20
 #define EGIS0577_ENHANCE_STRETCH_OUT_HI 245
-#define EGIS0577_STAGE2_MIN_STRETCH_P5 100
 #define EGIS0577_STAGE2_GRAIN_DIFF_THRESHOLD 25
 #define EGIS0577_STAGE2_GRAIN_PCT_X1000 6000
 #define EGIS0577_STAGE2_MIN_MINUTIAE 2
-#define EGIS0577_STAGE2_MAX_MINUTIAE 16
+#define EGIS0577_STAGE2_MAX_MINUTIAE 10
 #define EGIS0577_STAGE2_RIDGE_PIXEL_THRESHOLD 180
 #define EGIS0577_STAGE2_MIN_RIDGE_PIXELS 600
 
