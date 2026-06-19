@@ -395,6 +395,29 @@ clear_best_frame (FpDeviceEgis0577 *self)
 }
 
 static void
+maybe_write_live_frame_pgm (FpImage *img)
+{
+  const gchar *path = g_getenv ("EGIS0577_LIVE_FRAME_PATH");
+  gchar header[64];
+  int header_len;
+  gsize data_len;
+  g_autofree gchar *buf = NULL;
+  g_autoptr(GError) error = NULL;
+
+  if (!path || !path[0])
+    return;
+
+  header_len = g_snprintf (header, sizeof (header), "P5 %u %u 255\n", img->width, img->height);
+  data_len = (gsize) img->width * img->height;
+  buf = g_malloc (header_len + data_len);
+  memcpy (buf, header, header_len);
+  memcpy (buf + header_len, img->data, data_len);
+
+  if (!g_file_set_contents (path, buf, (gssize) (header_len + data_len), &error))
+    fp_dbg ("live frame write failed: %s", error->message);
+}
+
+static void
 dump_frame_if_requested (FpDeviceEgis0577 *self,
                          FpiUsbTransfer    *transfer,
                          gsize              nonzero)
@@ -1167,11 +1190,9 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
 
   if (!self->capture_armed)
     {
-      fp_dbg ("Got finger-like frame but not yet armed (cov=%d%%); waiting for clean no-finger baseline",
-              coverage);
-      report_finger_status (self, FALSE, "not armed, waiting for no-finger baseline");
-      restart_for_next_poll (self, transfer->ssm, dev, "finger-like while not armed");
-      return;
+      fp_dbg ("Arming on first finger-like frame (cov=%d%%)", coverage);
+      self->capture_armed = TRUE;
+      self->rearm_not_before_time = 0;
     }
 
   if (!self->turn_open)
@@ -1221,6 +1242,7 @@ save_img (FpiUsbTransfer *transfer, FpDevice *dev)
 
           resized_image = fpi_image_resize (img, EGIS0577_RESIZE, EGIS0577_RESIZE);
           quality_ok = stage2_snapshot_quality_ok (self, resized_image, NULL, NULL, NULL, NULL, NULL);
+          maybe_write_live_frame_pgm (resized_image);
         }
 
         if (quality_ok)
@@ -1646,6 +1668,8 @@ static void
 loop_complete (FpiSsm *ssm, FpDevice *dev, GError *error)
 {
   FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
+  GCancellable *cancellable = NULL;
+  g_autoptr(GError) cancelled = NULL;
 
   self->running = FALSE;
 
@@ -1653,11 +1677,20 @@ loop_complete (FpiSsm *ssm, FpDevice *dev, GError *error)
     {
       fp_dbg ("Capture loop completed with error: %s", error->message);
       fpi_device_action_error (dev, error);
+      return;
     }
-  else
+
+  if (fpi_device_get_current_action (dev) != FPI_DEVICE_ACTION_NONE)
+    cancellable = fpi_device_get_cancellable (dev);
+
+  if (cancellable && g_cancellable_set_error_if_cancelled (cancellable, &cancelled))
     {
-      fp_dbg ("Capture loop completed cleanly");
+      fp_dbg ("Capture loop completed after cancellation");
+      fpi_device_action_error (dev, g_steal_pointer (&cancelled));
+      return;
     }
+
+  fp_dbg ("Capture loop completed cleanly");
 }
 
 /*
@@ -1690,6 +1723,15 @@ start_capture_action (FpDevice *dev)
   reset_action_state (self);
   fpi_ssm_start (ssm, loop_complete);
   self->running = TRUE;
+}
+
+static void
+dev_cancel (FpDevice *dev)
+{
+  FpDeviceEgis0577 *self = FPI_DEVICE_EGIS0577 (dev);
+
+  fp_dbg ("Cancel requested (running=%d stop=%d)", self->running, self->stop);
+  self->stop = TRUE;
 }
 
 static void
@@ -1790,6 +1832,7 @@ fpi_device_egis0577_class_init (FpDeviceEgis0577Class *klass)
 
   dev_class->open = dev_open;
   dev_class->close = dev_close;
+  dev_class->cancel = dev_cancel;
   dev_class->enroll = dev_enroll;
   dev_class->verify = dev_verify;
   dev_class->capture = dev_capture;
