@@ -4,6 +4,7 @@ This repository contains the detailed chronological logs of investigations, expe
 
 ## [2026-06-19](research-log/2026-06-19)
 * [01-capture-flow-simplification.md](research-log/2026-06-19/01-capture-flow-simplification.md): Simplified the driver capture loop to a strict settle→evaluate→accept/timeout flow; removed best-frame tracking, `process_imgs`, and time-based re-arm in favour of lift-based `waiting_for_lift`; pared the quality gate to grain < 6%, minutiae 3–9, ridge > 600.
+* [02-identify-enable-and-tools-revamp.md](research-log/2026-06-19/02-identify-enable-and-tools-revamp.md): Enabled 1:N identify in the driver (`on_frame_accepted_identify` + class-init wiring); fixed enroll helper stdout buffering (`setbuf`); added `eh577-reset-helper` binary (open+close cycle); revamped `enroll_identify.sh` with upfront sudo, log-only debug, per-step terminal guidance, and fprint-level device reset.
 
 ## [2026-06-13](research-log/2026-06-13)
 * [01-offline-minutiae-bozorth-vs-ncc-on-capture12-folders.md](research-log/2026-06-13/01-offline-minutiae-bozorth-vs-ncc-on-capture12-folders.md): Compared two `capture12` folders offline; confirmed libfprint/NBIS minutiae counts exactly match the driver logs, stock/relaxed Bozorth remain unusable on these tiny templates, and NCC cleanly separates same-folder pairs from cross-folder pairs strongly enough to justify the planned NCC refactor prototype.
