@@ -150,10 +150,10 @@ static const Packet EGIS0577_POST_INIT_PACKETS[] = {
  * snapshot geometry).
  *
  * Four acceptance criteria (applied after stretch5 enhancement):
- * - grain < 8.000%          (GRAIN_PCT_X1000 = 8000)
- * - minutiae >= 1           (at least one minutia; zero = featureless)
+ * - grain < 6.000%          (GRAIN_PCT_X1000 = 6000)
+ * - minutiae >= 1           (MIN_MINUTIAE = 0; code uses strict >)
  * - minutiae < 10           (strict less-than; too many = noise/grain artefacts)
- * - ridge pixels > 600      (strict greater-than)
+ * - ridge pixels > 4000     (strict greater-than)
  *
  * stretch5 enhancement (p5..p99 → 20..245) is applied before NBIS extraction
  * but is NOT itself a rejection gate.
@@ -163,11 +163,26 @@ static const Packet EGIS0577_POST_INIT_PACKETS[] = {
 #define EGIS0577_ENHANCE_STRETCH_OUT_LO 20
 #define EGIS0577_ENHANCE_STRETCH_OUT_HI 245
 #define EGIS0577_STAGE2_GRAIN_DIFF_THRESHOLD 25
-#define EGIS0577_STAGE2_GRAIN_PCT_X1000 8000
-#define EGIS0577_STAGE2_MIN_MINUTIAE 1
+#define EGIS0577_STAGE2_GRAIN_PCT_X1000 6000
+#define EGIS0577_STAGE2_MIN_MINUTIAE 0
+/* The 70x52 active area is tiny: a genuine partial press can hold at most ~5-6
+ * real minutiae. A count well above that is a red flag that NBIS is finding
+ * spurious points in a still-noisy/smeared image, so the strict cap of 10 is a
+ * deliberate quality gate, not a noise-era artifact. The path to passing it is a
+ * genuinely cleaner ridge image (fewer false minutiae), not a looser cap. */
 #define EGIS0577_STAGE2_MAX_MINUTIAE 10
 #define EGIS0577_STAGE2_RIDGE_PIXEL_THRESHOLD 180
-#define EGIS0577_STAGE2_MIN_RIDGE_PIXELS 600
+#define EGIS0577_STAGE2_MIN_RIDGE_PIXELS 4000
+
+/*
+ * Presence gate: coverage is the primary background-subtracted signal, while
+ * raw finger-like pixels harden it against hot-pixel/background artefacts.
+ * Recent labelled PGM-debug runs showed no-finger frames at <=173 raw
+ * finger-like pixels, and finger-present frames at >=1047.
+ */
+#define EGIS0577_PRESENCE_MIN_COVERAGE_PCT 18
+#define EGIS0577_PRESENCE_MIN_INTENSITY 10
+#define EGIS0577_PRESENCE_MIN_RAW_FINGER_PIXELS 800
 
 /*
  * Minimum number of nonzero pixels required to classify a frame as finger-present.

@@ -35,7 +35,11 @@ STAGE_HINTS=(
   "normal again — flat"
   "tilt slightly left again"
   "tilt slightly right again"
-  "normal — firm press"
+  "roll onto the upper pad of the finger"
+  "roll onto the lower pad of the finger"
+  "shift slightly left of centre"
+  "shift slightly right of centre"
+  "normal — firm, centred press"
 )
 
 # ── pre-flight ─────────────────────────────────────────────────────────────────

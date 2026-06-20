@@ -87,7 +87,7 @@ enum sm_states {
 G_DECLARE_FINAL_TYPE (FpDeviceEgis0577, fpi_device_egis0577, FPI, DEVICE_EGIS0577, FpDevice);
 G_DEFINE_TYPE (FpDeviceEgis0577, fpi_device_egis0577, FP_TYPE_DEVICE);
 
-#define NCC_ENROLL_FRAMES 7
+#define NCC_ENROLL_FRAMES 12
 #define NCC_THRESHOLD 0.50
 #define NCC_MIN_MATCHES 2
 #define NCC_SEARCH_WINDOW 30
@@ -537,10 +537,16 @@ static gboolean
 finger_detected (FpDeviceEgis0577 *self, FpiUsbTransfer *transfer)
 {
   int coverage = 0, intensity = 0;
-  calculate_finger_heuristics (self, transfer, &coverage, &intensity);
+  gsize raw_finger_pixels;
 
-  fp_dbg ("finger_detected: coverage=%d%% intensity=%d", coverage, intensity);
-  return coverage >= 18 && intensity >= 10; /* Require at least a faint solid touch to avoid getting stuck on latent prints */
+  calculate_finger_heuristics (self, transfer, &coverage, &intensity);
+  raw_finger_pixels = count_finger_pixels_raw (transfer);
+
+  fp_dbg ("finger_detected: coverage=%d%% intensity=%d raw_finger_pixels=%zu",
+          coverage, intensity, raw_finger_pixels);
+  return coverage >= EGIS0577_PRESENCE_MIN_COVERAGE_PCT &&
+         intensity >= EGIS0577_PRESENCE_MIN_INTENSITY &&
+         raw_finger_pixels >= EGIS0577_PRESENCE_MIN_RAW_FINGER_PIXELS;
 }
 
 /* Normalize the processed image into the same polarity used by the offline
@@ -677,6 +683,39 @@ median9 (const guint8 *values)
   return sorted[4];
 }
 
+/* In-place 3x3 median denoise. The press snapshot carries high-frequency
+ * speckle that stretch5 then amplifies (a narrow p5..p99 range means a large
+ * stretch gain, turning a few grey levels of sensor wobble into >25-level jumps
+ * that the grain metric counts as noise). A median filter removes that speckle
+ * while preserving ridge edges, so it runs *before* the stretch. Interior
+ * pixels only; the 1px border is left untouched (the grain metric ignores it
+ * too). Operates on a snapshot copy so each output reads only original pixels. */
+static void
+denoise_snapshot_median3x3 (FpImage *img)
+{
+  guint w = img->width;
+  guint h = img->height;
+  g_autofree guint8 *src = NULL;
+  guint8 window[9];
+
+  if (w < 3 || h < 3)
+    return;
+
+  src = g_memdup2 (img->data, (gsize) w * h);
+
+  for (guint y = 1; y + 1 < h; y++)
+    for (guint x = 1; x + 1 < w; x++)
+      {
+        guint idx = 0;
+
+        for (gint dy = -1; dy <= 1; dy++)
+          for (gint dx = -1; dx <= 1; dx++)
+            window[idx++] = src[(y + dy) * w + (x + dx)];
+
+        img->data[y * w + x] = median9 (window);
+      }
+}
+
 static guint
 stage2_grain_pct_x1000 (FpImage *img)
 {
@@ -792,6 +831,7 @@ stage2_snapshot_quality_ok (FpDeviceEgis0577 *self,
   guint stretch_p99 = 0;
 
   normalize_snapshot_image_for_stage2 (img);
+  denoise_snapshot_median3x3 (img);
   enhance_snapshot_image_stretch5 (img, &stretch_p5, &stretch_p99);
 
   grain_pct_x1000 = stage2_grain_pct_x1000 (img);
@@ -931,7 +971,10 @@ pgm_debug_maybe_capture (FpDeviceEgis0577 *self,
   calculate_finger_heuristics (self, transfer, &coverage, &intensity);
   raw_nonzero = (guint) count_nonzero_bytes (transfer);
   raw_finger_pixels = (guint) count_finger_pixels_raw (transfer);
-  present = has_valid_data && coverage >= 18 && intensity >= 10;
+  present = has_valid_data &&
+            coverage >= EGIS0577_PRESENCE_MIN_COVERAGE_PCT &&
+            intensity >= EGIS0577_PRESENCE_MIN_INTENSITY &&
+            raw_finger_pixels >= EGIS0577_PRESENCE_MIN_RAW_FINGER_PIXELS;
 
   img = create_processed_snapshot (self, transfer);
   quality_ok = stage2_snapshot_quality_ok (self, img,
